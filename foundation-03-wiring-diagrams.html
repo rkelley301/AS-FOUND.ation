@@ -1,0 +1,1200 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F3 — Reading Wiring Diagrams · Industrial Instrumentation Foundations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media(max-width:520px){ .checklist { grid-template-columns: 1fr; } }
+  .checklist-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checklist-item .box {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .callout {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .callout.blue { background: var(--accent2); }
+  .callout.green { background: var(--green); }
+  .callout.red { background: var(--red); color: #fff; }
+  .callout.purple { background: var(--purple); color: #fff; }
+  .callout.yellow { background: var(--yellow); }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Foundation Module F3 · I&C Series</div>
+  <h1>Reading <span>Wiring Diagrams</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    Every plant has a set of drawings that show <strong>exactly how every wire is supposed to be connected</strong>. When something doesn't work, the drawing tells you what's wrong. When you need to add a device, the drawing tells you where it goes. <strong>If you can't read the drawing, you're guessing. If you can read it, you know.</strong>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>A wiring diagram is a roadmap for electricity.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">Just like a road atlas has different maps for different purposes — a highway map, a city street map, a topographic map — electrical documentation has different diagram types for different jobs. You use the right one for the question you're asking.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🗺️</div>
+      <div class="analogy-label">Block Diagram</div>
+      <div class="analogy-term">Highway map</div>
+      <div class="analogy-desc">Shows major components and how signals flow between them. No wire-level detail. Great for understanding system architecture.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🛣️</div>
+      <div class="analogy-label">Single-Line Diagram</div>
+      <div class="analogy-term">Road map</div>
+      <div class="analogy-desc">Shows electrical distribution using one line to represent three phases. Used for power distribution systems.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🏘️</div>
+      <div class="analogy-label">Wiring / Loop Diagram</div>
+      <div class="analogy-term">City street map</div>
+      <div class="analogy-desc">Every wire, every terminal, every pin. This is what you take to the field to physically wire or troubleshoot.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. The Diagram Family — Know Which One You're Looking At</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Before reading any drawing, look at the title block in the bottom-right corner. It tells you what type of drawing it is, its number, revision, and who drew it. <strong>Different drawing types serve completely different purposes.</strong></p>
+
+  <table class="info-table">
+    <thead><tr><th>Diagram Type</th><th>What It Shows</th><th>Field Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Block Diagram</strong></td><td>Major components as boxes, signal flow as arrows</td><td>Understanding system architecture</td></tr>
+      <tr><td><strong>Single-Line (One-Line)</strong></td><td>Power distribution, one line represents 3 phases</td><td>Power systems, MCC layouts</td></tr>
+      <tr><td><strong>Elementary / Schematic</strong></td><td>Logical circuit function, not physical layout</td><td>Understanding how a circuit works</td></tr>
+      <tr><td><strong>Ladder Diagram</strong></td><td>Relay logic in ladder form (rungs between two rails)</td><td>PLC programming, motor control logic</td></tr>
+      <tr><td><strong>Wiring / Interconnection</strong></td><td>Physical wire-by-wire connections between devices</td><td>Field wiring, checkout, troubleshooting</td></tr>
+      <tr><td><strong>Loop Diagram</strong></td><td>One complete instrument loop from field to controller</td><td>Instrument checkout, loop troubleshooting</td></tr>
+      <tr><td><strong>P&ID</strong></td><td>Process flow + instruments + control loops on one drawing</td><td>Process understanding, loop identification</td></tr>
+      <tr><td><strong>Panel Layout</strong></td><td>Physical arrangement of devices inside a panel</td><td>Panel building, component location</td></tr>
+      <tr><td><strong>Terminal Diagram</strong></td><td>Terminal block layout with wire numbers</td><td>Termination, wire tracing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2. Reading the Title Block — Always Start Here</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every professional drawing has a title block. It's usually in the bottom-right corner and contains the critical metadata:</p>
+
+  <div class="checklist">
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Drawing number</strong> — unique identifier</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Revision</strong> — letter or number, always use latest</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Title</strong> — what the drawing shows</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Project / Plant</strong> — which site it belongs to</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Scale</strong> — rarely to scale for wiring drawings</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Drawn by / Checked by</strong> — accountability</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Date</strong> — when it was created</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span><strong>Sheet X of Y</strong> — total page count</span></div>
+  </div>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Critical</span>
+    <strong>Always verify you're working from the latest revision.</strong> A field modification that wasn't documented, or a drawing that wasn't updated after a change, will lead you to wire something wrong. If the drawing and the physical panel don't match, <strong>the physical panel is the truth</strong> — and the drawing needs to be redlined.
+  </div>
+
+  <h3>3. Standard Symbols — The Alphabet of Diagrams</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Wiring diagrams use standard symbols so anyone trained can read them. There are two main symbol systems: <strong>NEMA</strong> (common in North America) and <strong>IEC</strong> (common internationally). Most plants use one consistently, but you'll see both.</p>
+
+  <h4 style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:16px;margin-bottom:10px;">Common Instrument Symbols</h4>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 620 340" xmlns="http://www.w3.org/2000/svg">
+      <!-- Row 1: Basics -->
+      <text x="10" y="20" fill="#6B7180" font-family="monospace" font-size="10">BASIC SYMBOLS</text>
+
+      <!-- Resistor -->
+      <rect x="30" y="35" width="60" height="22" fill="none" stroke="#E67E22" stroke-width="2"/>
+      <text x="60" y="78" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">RESISTOR</text>
+
+      <!-- Capacitor -->
+      <line x1="130" y1="35" x2="130" y2="57" stroke="#E67E22" stroke-width="2"/>
+      <line x1="150" y1="35" x2="150" y2="57" stroke="#E67E22" stroke-width="2"/>
+      <line x1="130" y1="46" x2="120" y2="46" stroke="#E67E22" stroke-width="2"/>
+      <line x1="150" y1="46" x2="160" y2="46" stroke="#E67E22" stroke-width="2"/>
+      <text x="140" y="78" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">CAPACITOR</text>
+
+      <!-- Inductor -->
+      <path d="M 210 46 Q 220 35 230 46 Q 240 57 250 46 Q 260 35 270 46" fill="none" stroke="#E67E22" stroke-width="2"/>
+      <text x="240" y="78" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">INDUCTOR</text>
+
+      <!-- Battery -->
+      <line x1="320" y1="35" x2="320" y2="57" stroke="#E67E22" stroke-width="2"/>
+      <line x1="335" y1="40" x2="335" y2="52" stroke="#E67E22" stroke-width="4"/>
+      <line x1="335" y1="46" x2="345" y2="46" stroke="#E67E22" stroke-width="2"/>
+      <line x1="310" y1="46" x2="320" y2="46" stroke="#E67E22" stroke-width="2"/>
+      <text x="325" y="78" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">DC SOURCE</text>
+
+      <!-- Ground -->
+      <line x1="420" y1="35" x2="420" y2="45" stroke="#E67E22" stroke-width="2"/>
+      <line x1="408" y1="45" x2="432" y2="45" stroke="#E67E22" stroke-width="2"/>
+      <line x1="413" y1="50" x2="427" y2="50" stroke="#E67E22" stroke-width="2"/>
+      <line x1="417" y1="55" x2="423" y2="55" stroke="#E67E22" stroke-width="2"/>
+      <text x="420" y="78" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">GROUND</text>
+
+      <!-- Row 2: Switches & Contacts -->
+      <text x="10" y="115" fill="#6B7180" font-family="monospace" font-size="10">SWITCHES &amp; CONTACTS</text>
+
+      <!-- NO contact -->
+      <line x1="30" y1="140" x2="45" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="45" y1="130" x2="65" y2="148" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="65" y1="140" x2="80" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="55" y="178" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">NO CONTACT</text>
+
+      <!-- NC contact -->
+      <line x1="130" y1="140" x2="145" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="145" y1="140" x2="165" y2="130" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="165" y1="140" x2="180" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="165" y1="140" x2="165" y2="155" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="155" y="178" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">NC CONTACT</text>
+
+      <!-- Pushbutton NO -->
+      <line x1="230" y1="140" x2="245" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="245" y1="130" x2="265" y2="148" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="265" y1="140" x2="280" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="245" y1="125" x2="265" y2="125" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="255" y1="125" x2="255" y2="118" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="255" y="178" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">PUSHBUTTON NO</text>
+
+      <!-- Selector switch -->
+      <line x1="330" y1="140" x2="345" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="345" y1="140" x2="375" y2="130" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="375" y1="140" x2="390" y2="140" stroke="#3B9EFF" stroke-width="2"/>
+      <circle cx="345" cy="140" r="3" fill="#3B9EFF"/>
+      <text x="360" y="178" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">SELECTOR SW</text>
+
+      <!-- Fuse -->
+      <rect x="430" y="130" width="40" height="20" fill="none" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="450" y1="130" x2="450" y2="150" stroke="#3B9EFF" stroke-width="1"/>
+      <text x="450" y="178" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">FUSE</text>
+
+      <!-- Row 3: Devices -->
+      <text x="10" y="215" fill="#6B7180" font-family="monospace" font-size="10">DEVICES</text>
+
+      <!-- Coil -->
+      <circle cx="60" cy="250" r="18" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="42" y1="250" x2="30" y2="250" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="78" y1="250" x2="90" y2="250" stroke="#2ECC71" stroke-width="2"/>
+      <text x="60" y="290" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">COIL / RELAY</text>
+
+      <!-- Motor -->
+      <circle cx="180" cy="250" r="20" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <text x="180" y="256" fill="#2ECC71" font-family="monospace" font-size="14" text-anchor="middle" font-weight="bold">M</text>
+      <text x="180" y="290" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">MOTOR</text>
+
+      <!-- Lamp -->
+      <circle cx="300" cy="250" r="18" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="288" y1="238" x2="312" y2="262" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="288" y1="262" x2="312" y2="238" stroke="#2ECC71" stroke-width="2"/>
+      <text x="300" y="290" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">LAMP / INDICATOR</text>
+
+      <!-- Transformer -->
+      <path d="M 420 240 Q 430 250 420 260" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <path d="M 425 240 Q 435 250 425 260" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <path d="M 435 240 Q 445 250 435 260" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="405" y1="250" x2="420" y2="250" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="435" y1="250" x2="450" y2="250" stroke="#2ECC71" stroke-width="2"/>
+      <text x="427" y="290" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">TRANSFORMER</text>
+
+      <!-- Diode -->
+      <polygon points="510,240 510,262 528,251" fill="none" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="528" y1="240" x2="528" y2="262" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="498" y1="251" x2="510" y2="251" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="528" y1="251" x2="540" y2="251" stroke="#2ECC71" stroke-width="2"/>
+      <text x="519" y="290" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">DIODE</text>
+    </svg>
+    <div class="diagram-caption">Common NEMA-style symbols you'll see on industrial drawings</div>
+  </div>
+
+  <h3>4. Wire Numbering — The Tracing System</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every wire in a professional drawing has a <strong>unique wire number</strong>. This is how you trace a circuit from the drawing to the actual panel. Wire numbers follow conventions:</p>
+
+  <ul class="core-bullets">
+    <li><strong>Sequential numbering:</strong> Wires numbered 1, 2, 3... across the sheet. Simple but only works for small systems.</li>
+    <li><strong>Loop-based numbering:</strong> All wires in a single instrument loop share a prefix. Loop 101 wires are 101-1, 101-2, 101-3, etc.</li>
+    <li><strong>Page-and-position numbering:</strong> Wire 305-12 means "page 305, wire 12." Easy to cross-reference.</li>
+    <li><strong>Signal-type numbering:</strong> Analog wires start with A, digital with D, power with P. Helps identify signal type at a glance.</li>
+    <li><strong>Unique per panel:</strong> Wire numbers are unique within a panel or drawing set, not across the whole plant.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Pro Tip</span>
+    When tracing a circuit, <strong>follow the wire number, not the physical wire.</strong> A wire numbered 101-5 might appear on three different drawing sheets and in two different junction boxes. Each appearance tells you where that wire goes next. The number is the thread; the wire is the physical path.
+  </div>
+
+  <h3>5. Terminal Designations — Where Wires Land</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Terminals are labeled with a <strong>device designator + terminal number</strong>. Common format: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:'Space Mono';color:var(--accent);">TB1-5</code> means "terminal block 1, terminal number 5."</p>
+
+  <table class="info-table">
+    <thead><tr><th>Prefix</th><th>Stands For</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TB</strong></td><td>Terminal Block</td><td>TB1-5 = Terminal block 1, terminal 5</td></tr>
+      <tr><td><strong>TS</strong></td><td>Terminal Strip</td><td>TS2-10 = Terminal strip 2, terminal 10</td></tr>
+      <tr><td><strong>J</strong></td><td>Junction Box</td><td>J3 = Junction box 3</td></tr>
+      <tr><td><strong>X</strong></td><td>Terminal (IEC)</td><td>X1:5 = Terminal 5 in enclosure 1</td></tr>
+      <tr><td><strong>P</strong></td><td>Plug / Connector</td><td>P1-3 = Plug 1, pin 3</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6. Device Designators — The Letter Codes</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Instrument and device designators follow ISA S5.1 standard. The <strong>first letter</strong> identifies the measured variable; the <strong>second letter</strong> identifies the function.</p>
+
+  <table class="info-table">
+    <thead><tr><th>First Letter</th><th>Measured Variable</th><th>Second Letter</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td><strong>F</strong></td><td>Flow</td><td><strong>T</strong></td><td>Transmitter</td></tr>
+      <tr><td><strong>T</strong></td><td>Temperature</td><td><strong>I</strong></td><td>Indicator</td></tr>
+      <tr><td><strong>P</strong></td><td>Pressure</td><td><strong>C</strong></td><td>Controller</td></tr>
+      <tr><td><strong>L</strong></td><td>Level</td><td><strong>V</strong></td><td>Valve</td></tr>
+      <tr><td><strong>A</strong></td><td>Analyzer</td><td><strong>R</strong></td><td>Recorder</td></tr>
+      <tr><td><strong>V</strong></td><td>Vibration</td><td><strong>S</strong></td><td>Switch</td></tr>
+      <tr><td><strong>W</strong></td><td>Weight/Force</td><td><strong>E</strong></td><td>Element (sensor)</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:14px;margin-top:14px;"><strong>Examples:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>FT-101</strong> = Flow Transmitter, loop 101</li>
+    <li><strong>FIC-101</strong> = Flow Indicating Controller, loop 101</li>
+    <li><strong>TIC-205</strong> = Temperature Indicating Controller, loop 205</li>
+    <li><strong>LT-310</strong> = Level Transmitter, loop 310</li>
+    <li><strong>PCV-150</strong> = Pressure Control Valve, loop 150</li>
+    <li><strong>PSH-401</strong> = Pressure Switch High, loop 401</li>
+    <li><strong>LSL-401</strong> = Level Switch Low, loop 401</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Loop Number Rule</span>
+    All instruments that work together on the <strong>same control loop share the same loop number</strong>. So FT-101, FIC-101, and FV-101 (flow valve) are all part of loop 101. This is how you find related devices across drawings.
+  </div>
+
+  <h3>7. Anatomy of a Wiring / Loop Diagram</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A standard loop diagram shows a single instrument loop from the field device to the control system. Here's what a typical 4-20 mA loop drawing contains:</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg">
+      <!-- Field area (left) -->
+      <rect x="20" y="20" width="240" height="360" fill="none" stroke="#6B7180" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="140" y="40" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">FIELD</text>
+
+      <!-- Field transmitter -->
+      <rect x="70" y="150" width="140" height="80" fill="#1A1108" stroke="#E67E22" stroke-width="2" rx="4"/>
+      <text x="140" y="180" fill="#E67E22" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">FT-101</text>
+      <text x="140" y="196" fill="#D4D6DC" font-family="monospace" font-size="10" text-anchor="middle">Flow Transmitter</text>
+      <text x="140" y="212" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">4-20 mA, 2-wire</text>
+
+      <!-- Terminal on transmitter -->
+      <text x="80" y="250" fill="#D4D6DC" font-family="monospace" font-size="9">+</text>
+      <text x="200" y="250" fill="#D4D6DC" font-family="monospace" font-size="9">−</text>
+
+      <!-- Wires from transmitter -->
+      <line x1="90" y1="250" x2="90" y2="290" stroke="#E67E22" stroke-width="1.5"/>
+      <line x1="210" y1="250" x2="210" y2="290" stroke="#3B9EFF" stroke-width="1.5"/>
+      <text x="100" y="285" fill="#E67E22" font-family="monospace" font-size="8">101-1</text>
+      <text x="215" y="285" fill="#3B9EFF" font-family="monospace" font-size="8">101-2</text>
+
+      <!-- Junction box -->
+      <rect x="60" y="290" width="180" height="60" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="150" y="312" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">JB-101</text>
+      <text x="150" y="328" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Junction Box</text>
+      <text x="150" y="342" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">2 pair #18 AWG shielded</text>
+
+      <!-- Arrow to panel -->
+      <line x1="260" y1="320" x2="320" y2="320" stroke="#6B7180" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="#6B7180"/>
+        </marker>
+      </defs>
+
+      <!-- Panel area (right) -->
+      <rect x="340" y="20" width="400" height="360" fill="none" stroke="#6B7180" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="540" y="40" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">CONTROL PANEL</text>
+
+      <!-- Terminal block -->
+      <rect x="370" y="130" width="100" height="80" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="420" y="155" fill="#2ECC71" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">TB1</text>
+      <text x="420" y="172" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Terminals</text>
+      <text x="420" y="188" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">1, 2</text>
+      <text x="390" y="205" fill="#E67E22" font-family="monospace" font-size="9">1</text>
+      <text x="450" y="205" fill="#3B9EFF" font-family="monospace" font-size="9">2</text>
+
+      <!-- Wires to controller -->
+      <line x1="380" y1="210" x2="380" y2="260" stroke="#E67E22" stroke-width="1.5"/>
+      <line x1="460" y1="210" x2="460" y2="260" stroke="#3B9EFF" stroke-width="1.5"/>
+
+      <!-- Controller / PLC input card -->
+      <rect x="500" y="130" width="220" height="150" fill="#100A14" stroke="#A855F7" stroke-width="2" rx="4"/>
+      <text x="610" y="155" fill="#A855F7" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">PLC INPUT CARD</text>
+      <text x="610" y="172" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">AI-01, Channel 3</text>
+
+      <!-- Input terminals on card -->
+      <rect x="520" y="190" width="30" height="20" fill="none" stroke="#A855F7" stroke-width="1.5"/>
+      <rect x="560" y="190" width="30" height="20" fill="none" stroke="#A855F7" stroke-width="1.5"/>
+      <text x="535" y="204" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">+</text>
+      <text x="575" y="204" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">−</text>
+
+      <!-- Wires to card -->
+      <line x1="380" y1="260" x2="535" y2="260" stroke="#E67E22" stroke-width="1.5"/>
+      <line x1="535" y1="260" x2="535" y2="210" stroke="#E67E22" stroke-width="1.5"/>
+      <line x1="460" y1="260" x2="575" y2="260" stroke="#3B9EFF" stroke-width="1.5"/>
+      <line x1="575" y1="260" x2="575" y2="210" stroke="#3B9EFF" stroke-width="1.5"/>
+
+      <!-- Power supply -->
+      <rect x="370" y="300" width="350" height="50" fill="#16120A" stroke="#F1C40F" stroke-width="2" rx="4"/>
+      <text x="545" y="322" fill="#F1C40F" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">24 VDC POWER SUPPLY</text>
+      <text x="545" y="338" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Loop-powered transmitter</text>
+
+      <!-- Labels -->
+      <text x="270" y="65" fill="#E67E22" font-family="monospace" font-size="9">Signal: 4-20 mA</text>
+      <text x="270" y="80" fill="#E67E22" font-family="monospace" font-size="9">Range: 0-500 GPM</text>
+      <text x="270" y="95" fill="#6B7180" font-family="monospace" font-size="8">Loop: FIC-101</text>
+    </svg>
+    <div class="diagram-caption">Simplified loop diagram: FT-101 in the field, wired through JB-101 to TB1 in the panel, landing on PLC analog input card AI-01, channel 3</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;"><strong>What this drawing tells you:</strong></p>
+  <ul class="core-bullets">
+    <li>There's a flow transmitter called <strong>FT-101</strong> in the field.</li>
+    <li>It's a <strong>2-wire, 4-20 mA, loop-powered</strong> transmitter.</li>
+    <li>Its signal travels through junction box <strong>JB-101</strong> via <strong>2-pair, 18 AWG shielded cable</strong>.</li>
+    <li>The wires are numbered <strong>101-1 and 101-2</strong> (loop 101, wires 1 and 2).</li>
+    <li>They land on <strong>TB1, terminals 1 and 2</strong> in the control panel.</li>
+    <li>From TB1, they go to the PLC input card <strong>AI-01, channel 3</strong>, terminals <strong>+ and −</strong>.</li>
+    <li>The loop is powered by the <strong>24 VDC power supply</strong> (loop-powered configuration).</li>
+  </ul>
+
+  <h3>8. NEMA vs IEC Symbols — Quick Comparison</h3>
+  <table class="info-table">
+    <thead><tr><th>Component</th><th>NEMA Style</th><th>IEC Style</th></tr></thead>
+    <tbody>
+      <tr><td>NO Contact</td><td>Two parallel lines with a gap</td><td>Two parallel lines with a diagonal bar</td></tr>
+      <tr><td>NC Contact</td><td>Contact with a diagonal bar</td><td>Contact with a small diagonal across it</td></tr>
+      <tr><td>Coil / Relay</td><td>Circle with letter designation</td><td>Rectangle with letter designation</td></tr>
+      <tr><td>Pushbutton</td><td>Contact with actuator line</td><td>Contact with a circle and actuator symbol</td></tr>
+      <tr><td>Motor</td><td>Circle with "M"</td><td>Circle with "M" and terminal markings</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9. Reference Designators & Cross-References</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Large drawing sets use <strong>cross-reference notes</strong> to tell you where to look next. Common formats:</p>
+
+  <ul class="core-bullets">
+    <li><strong>Sheet references:</strong> <span class="callout">SEE SHEET 5</span> or <span class="callout blue">/5</span> tells you the wire or device continues on sheet 5.</li>
+    <li><strong>Zone references:</strong> <span class="callout green">3-D4</span> means "zone 3, grid D4" on that sheet. Sheets are usually divided into lettered rows and numbered columns.</li>
+    <li><strong>Device references:</strong> <span class="callout purple">FT-101</span> appears everywhere FT-101 is used — field wiring, terminal block, PLC input card, and controller configuration.</li>
+    <li><strong>Terminal references:</strong> <span class="callout yellow">TB1-1</span> means "terminal block 1, terminal 1." Trace every wire to a terminal reference.</li>
+  </ul>
+
+  <h3>10. How to Trace a Circuit — Step by Step</h3>
+  <p style="font-size:14px;margin-bottom:10px;">When you're troubleshooting, you trace a circuit from source to destination. Here's the systematic approach:</p>
+
+  <ul class="step-list">
+    <li><strong>Identify the loop number.</strong> If the problem is with a flow loop, find the loop number (e.g., 101) and pull every drawing that references it.</li>
+    <li><strong>Find the source.</strong> Where does power originate? A 24 VDC supply, a 120 VAC feed, an internal PLC supply? Start there.</li>
+    <li><strong>Follow the wire numbers.</strong> From the source, follow the wire number through the drawing. Every time it appears, you're moving along the path. Write down each terminal it passes through.</li>
+    <li><strong>Note each device.</strong> As you trace, write down every device the circuit passes through: fuses, switches, terminal blocks, connectors, transmitters, etc. This is your path map.</li>
+    <li><strong>Cross-reference sheets.</strong> When the drawing says <span class="callout">SEE SHEET 5</span>, go to sheet 5 and find the same wire number or device reference. Continue tracing.</li>
+    <li><strong>Verify against the physical system.</strong> Once you've traced from the drawing, go to the panel and check the actual wires. Is the drawing accurate? If not, you just found your problem — or a documentation issue.</li>
+    <li><strong>Check the destination.</strong> Confirm the signal arrives at the correct terminal on the correct card at the correct channel.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Field Practice</span>
+    When tracing a circuit, use a <strong>highlighter</strong> on a photocopy of the drawing. Highlight each wire as you trace it. This prevents you from getting lost and gives you a visual record of the path. Never mark up the original drawing.
+  </div>
+
+  <h3>11. Reading a Simple Ladder Diagram</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Ladder diagrams are used for control logic (relay circuits and PLC programs). They're called "ladder" because they look like a ladder: two vertical rails (power) with horizontal rungs (logic) between them.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Left rail -->
+      <line x1="50" y1="30" x2="50" y2="220" stroke="#E67E22" stroke-width="3"/>
+      <text x="50" y="20" fill="#E67E22" font-family="monospace" font-size="10" text-anchor="middle">L1 / +24V</text>
+
+      <!-- Right rail -->
+      <line x1="570" y1="30" x2="570" y2="220" stroke="#3B9EFF" stroke-width="3"/>
+      <text x="570" y="20" fill="#3B9EFF" font-family="monospace" font-size="10" text-anchor="middle">L2 / 0V</text>
+
+      <!-- Rung 1: Start/Stop with seal-in -->
+      <text x="30" y="65" fill="#6B7180" font-family="monospace" font-size="9">RUNG 1</text>
+      <line x1="50" y1="75" x2="570" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+
+      <!-- Stop button (NC) -->
+      <line x1="50" y1="75" x2="130" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <line x1="130" y1="75" x2="150" y2="65" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="150" y1="75" x2="150" y2="85" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="150" y1="75" x2="190" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <text x="150" y="60" fill="#2ECC71" font-family="monospace" font-size="9" text-anchor="middle">STOP</text>
+
+      <!-- Start button (NO) -->
+      <line x1="190" y1="75" x2="230" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <line x1="230" y1="75" x2="250" y2="90" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="250" y1="75" x2="290" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <text x="245" y="60" fill="#2ECC71" font-family="monospace" font-size="9" text-anchor="middle">START</text>
+
+      <!-- Seal-in contact (parallel with start) -->
+      <path d="M 230 75 L 230 105 L 250 105" stroke="#2ECC71" stroke-width="2" fill="none"/>
+      <line x1="250" y1="105" x2="270" y2="95" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="270" y1="105" x2="290" y2="105" stroke="#2ECC71" stroke-width="2"/>
+      <path d="M 290 105 L 290 75" stroke="#2ECC71" stroke-width="2" fill="none"/>
+      <text x="260" y="122" fill="#2ECC71" font-family="monospace" font-size="9" text-anchor="middle">M1 AUX</text>
+
+      <!-- Coil M1 -->
+      <circle cx="510" cy="75" r="20" fill="none" stroke="#A855F7" stroke-width="2"/>
+      <line x1="290" y1="75" x2="490" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <line x1="530" y1="75" x2="570" y2="75" stroke="#D4D6DC" stroke-width="1.5"/>
+      <text x="510" y="79" fill="#A855F7" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">M1</text>
+      <text x="510" y="105" fill="#A855F7" font-family="monospace" font-size="9" text-anchor="middle">MOTOR STARTER</text>
+
+      <!-- Rung 2: indicator lamp -->
+      <text x="30" y="155" fill="#6B7180" font-family="monospace" font-size="9">RUNG 2</text>
+      <line x1="50" y1="165" x2="570" y2="165" stroke="#D4D6DC" stroke-width="1.5"/>
+
+      <!-- M1 aux contact -->
+      <line x1="50" y1="165" x2="130" y2="165" stroke="#D4D6DC" stroke-width="1.5"/>
+      <line x1="130" y1="165" x2="150" y2="180" stroke="#2ECC71" stroke-width="2"/>
+      <line x1="150" y1="165" x2="190" y2="165" stroke="#D4D6DC" stroke-width="1.5"/>
+      <text x="150" y="150" fill="#2ECC71" font-family="monospace" font-size="9" text-anchor="middle">M1 AUX</text>
+
+      <!-- Lamp -->
+      <circle cx="510" cy="165" r="20" fill="none" stroke="#F1C40F" stroke-width="2"/>
+      <line x1="498" y1="153" x2="522" y2="177" stroke="#F1C40F" stroke-width="2"/>
+      <line x1="498" y1="177" x2="522" y2="153" stroke="#F1C40F" stroke-width="2"/>
+      <line x1="190" y1="165" x2="490" y2="165" stroke="#D4D6DC" stroke-width="1.5"/>
+      <line x1="530" y1="165" x2="570" y2="165" stroke="#D4D6DC" stroke-width="1.5"/>
+      <text x="510" y="200" fill="#F1C40F" font-family="monospace" font-size="9" text-anchor="middle">RUN LAMP</text>
+    </svg>
+    <div class="diagram-caption">Classic ladder logic: press START to energize motor starter M1, which seals itself in. RUN lamp lights when M1 is on.</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;"><strong>How to read it (rung by rung, left to right):</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Left rail</strong> = source power (L1 or +24V). <strong>Right rail</strong> = return (L2 or 0V).</li>
+    <li><strong>Rung 1:</strong> Power flows from L1 through the STOP button (NC), through either the START button (NO) OR the M1 auxiliary contact (NO, sealed-in), to the M1 coil, and back to L2.</li>
+    <li><strong>Press START:</strong> The START contact closes, current flows to M1 coil, motor starts. M1 auxiliary contact closes (seals in), so releasing START doesn't stop the motor.</li>
+    <li><strong>Press STOP:</strong> The NC contact opens, breaks the current path, M1 coil de-energizes, motor stops. The seal-in contact also opens.</li>
+    <li><strong>Rung 2:</strong> When M1 is energized, its second auxiliary contact closes, lighting the RUN lamp.</li>
+  </ul>
+</div>
+
+<!-- ═══════════ SECTION 4: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Trace Circuits, Draw Diagrams, Read Real Drawings</h2>
+
+  <h3>Exercise A: Trace the Loop Diagram Above</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Using the loop diagram in section 03 (the FT-101 example), answer these questions on paper:</p>
+  <ul class="step-list">
+    <li>Starting at the 24 VDC power supply, what is the <strong>first wire number</strong> the loop current passes through?</li>
+    <li>What terminal does that wire land on inside JB-101?</li>
+    <li>What is the terminal designation in the control panel where the field wires terminate?</li>
+    <li>What terminal on the PLC input card does the positive signal land on?</li>
+    <li>What channel of AI-01 is FT-101 wired to?</li>
+    <li>If FT-101 reads 50% of its range, what current should you measure with a multimeter in series?</li>
+    <li>If you measure 0 mA at the PLC card but 12 mA at TB1, where is the fault?</li>
+  </ul>
+
+  <h3>Exercise B: Draw Your Own Loop Diagram</h3>
+  <p style="font-size:14px;margin-bottom:10px;">On a blank sheet of paper, draw a complete loop diagram for the following field scenario:</p>
+  <ul class="core-bullets">
+    <li>A <strong>temperature transmitter TT-205</strong> in the field, range 0-300°F, 4-20 mA, 2-wire loop-powered</li>
+    <li>Wired through junction box <strong>JB-205</strong> with <strong>1 pair 18 AWG shielded</strong> cable</li>
+    <li>Terminating in control panel at <strong>TB2, terminals 5 (+) and 6 (−)</strong></li>
+    <li>Landing on <strong>PLC analog input AI-02, channel 1</strong></li>
+    <li>Powered by the same <strong>24 VDC supply</strong></li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Include: field area, panel area, transmitter, junction box, terminal block, PLC card, power supply, wire numbers, and all terminal designations. Label the signal type and range.</p>
+
+  <h3>Exercise C: Read a Real Drawing</h3>
+  <p style="font-size:14px;margin-bottom:10px;">If you have access to any real wiring drawing or loop diagram:</p>
+  <ul class="step-list">
+    <li>Find the title block. What type of drawing is it? What's the drawing number and revision?</li>
+    <li>Find the wire numbering system. Is it sequential, loop-based, or page-based?</li>
+    <li>Pick a single instrument loop. Trace every wire from the field device to its final destination.</li>
+    <li>Write down every terminal the loop passes through, in order.</li>
+    <li>Identify all device designators. What do the letters mean?</li>
+    <li>If cross-reference notes exist (like <span class="callout">SEE SHEET 5</span>), follow one. Did you end up at the right place?</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Practice Goal</span>
+    By the end of these exercises, you should be able to look at any loop diagram and <strong>trace a complete circuit in under 5 minutes</strong> — identifying every device, terminal, and wire number along the way.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qf3-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> On a loop diagram, what does the designator "TIC-205" tell you?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf3-1',false)">A) Temperature Indicator, loop 205</li>
+      <li onclick="answer(this,'qf3-1',true)">B) Temperature Indicating Controller, loop 205</li>
+      <li onclick="answer(this,'qf3-1',false)">C) Transmitter Instrument Calibration, unit 205</li>
+      <li onclick="answer(this,'qf3-1',false)">D) Turbine Interlock Circuit, tag 205</li>
+    </ul>
+    <div class="quiz-feedback" id="qf3-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf3-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> What is the purpose of a wiring/loop diagram as opposed to an elementary (schematic) diagram?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf3-2',false)">A) Wiring diagrams show logic; schematics show physical layout</li>
+      <li onclick="answer(this,'qf3-2',true)">B) Wiring diagrams show physical connections; schematics show logical function</li>
+      <li onclick="answer(this,'qf3-2',false)">C) They are the same thing with different names</li>
+      <li onclick="answer(this,'qf3-2',false)">D) Wiring diagrams are for power; schematics are for instruments</li>
+    </ul>
+    <div class="quiz-feedback" id="qf3-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf3-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> A wire on a drawing is labeled "TB2-7". What does this mean?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf3-3',false)">A) Wire number 2, terminal 7</li>
+      <li onclick="answer(this,'qf3-3',false)">B) Test board 2, position 7</li>
+      <li onclick="answer(this,'qf3-3',true)">C) Terminal block 2, terminal 7</li>
+      <li onclick="answer(this,'qf3-3',false)">D) Time base 2, channel 7</li>
+    </ul>
+    <div class="quiz-feedback" id="qf3-3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-f3">—/3</span>
+    <span class="score-label" id="msg-f3" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">Reading Wiring Diagrams — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Diagram Types</h3>
+        <ul>
+          <li><span class="key">Block →</span><span class="val">Architecture</span></li>
+          <li><span class="key">Single-line →</span><span class="val">Power distribution</span></li>
+          <li><span class="key">Schematic →</span><span class="val">Logical function</span></li>
+          <li><span class="key">Ladder →</span><span class="val">Control logic</span></li>
+          <li><span class="key">Wiring/Loop →</span><span class="val">Physical connections</span></li>
+          <li><span class="key">P&amp;ID →</span><span class="val">Process + instruments</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>First Letter (Measured Var)</h3>
+        <ul>
+          <li><span class="key">F →</span><span class="val">Flow</span></li>
+          <li><span class="key">T →</span><span class="val">Temperature</span></li>
+          <li><span class="key">P →</span><span class="val">Pressure</span></li>
+          <li><span class="key">L →</span><span class="val">Level</span></li>
+          <li><span class="key">A →</span><span class="val">Analyzer</span></li>
+          <li><span class="key">V →</span><span class="val">Vibration</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Second Letter (Function)</h3>
+        <ul>
+          <li><span class="key">T →</span><span class="val">Transmitter</span></li>
+          <li><span class="key">I →</span><span class="val">Indicator</span></li>
+          <li><span class="key">C →</span><span class="val">Controller</span></li>
+          <li><span class="key">V →</span><span class="val">Valve</span></li>
+          <li><span class="key">S →</span><span class="val">Switch</span></li>
+          <li><span class="key">E →</span><span class="val">Element (sensor)</span></li>
+          <li><span class="key">R →</span><span class="val">Recorder</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Terminal Prefixes</h3>
+        <ul>
+          <li><span class="key">TB →</span><span class="val">Terminal Block</span></li>
+          <li><span class="key">TS →</span><span class="val">Terminal Strip</span></li>
+          <li><span class="key">J →</span><span class="val">Junction Box</span></li>
+          <li><span class="key">X →</span><span class="val">Terminal (IEC)</span></li>
+          <li><span class="key">P →</span><span class="val">Plug / Connector</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Title Block Checklist</h3>
+        <ul>
+          <li><span class="key">→</span><span class="val">Drawing number</span></li>
+          <li><span class="key">→</span><span class="val">Revision (use latest)</span></li>
+          <li><span class="key">→</span><span class="val">Title &amp; project</span></li>
+          <li><span class="key">→</span><span class="val">Drawn/checked by</span></li>
+          <li><span class="key">→</span><span class="val">Date</span></li>
+          <li><span class="key">→</span><span class="val">Sheet X of Y</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Circuit Tracing Method</h3>
+        <ul>
+          <li><span class="key">1. →</span><span class="val">Find loop number</span></li>
+          <li><span class="key">2. →</span><span class="val">Start at power source</span></li>
+          <li><span class="key">3. →</span><span class="val">Follow wire numbers</span></li>
+          <li><span class="key">4. →</span><span class="val">Note every device</span></li>
+          <li><span class="key">5. →</span><span class="val">Cross-reference sheets</span></li>
+          <li><span class="key">6. →</span><span class="val">Verify in panel</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      FT-101 = Flow Transmitter · TIC-205 = Temp Indicating Controller · TB1-5 = Terminal Block 1, Terminal 5
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qf3-1': { correct: false, answered: false },
+    'qf3-2': { correct: false, answered: false },
+    'qf3-3': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qf3-1': "✓ Correct. T = Temperature (measured variable), I = Indicating, C = Controller. So TIC-205 = Temperature Indicating Controller, loop 205. Loop 205 will also include TT-205 (transmitter) and TV-205 (valve) if it's a full control loop.",
+    'qf3-1_wrong': "✗ Break down each letter. First letter = measured variable (T = Temperature). Second letter = function (I = Indicating). Third letter = another function (C = Controller). So TIC = Temperature Indicating Controller.",
+    'qf3-2': "✓ Correct. Wiring/loop diagrams show the physical path — every terminal, wire number, and connection point. Schematics show the logical function — how a circuit works, not where the wires are physically located.",
+    'qf3-2_wrong': "✗ Wiring diagrams are physical (wire-by-wire, terminal-by-terminal). Schematics are logical (what the circuit does). They serve different purposes — a schematic tells you HOW it works, a wiring diagram tells you WHERE to connect.",
+    'qf3-3': "✓ Correct. TB = Terminal Block, 2 = the block number, 7 = the terminal position within that block. So TB2-7 = terminal block 2, terminal 7.",
+    'qf3-3_wrong': "✗ Break down the prefix. TB is the standard abbreviation for Terminal Block. The first number is the block designator, the second is the terminal position within it."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-f3');
+    const msg = document.getElementById('msg-f3');
+
+    if (answered === 3) {
+      display.textContent = correct + '/3';
+      if (correct === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You\'re ready for F4.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and re-read carefully.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (3 - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>

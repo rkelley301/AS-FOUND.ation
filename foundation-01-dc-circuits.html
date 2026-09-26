@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 — DC Circuits & Ohm's Law · Industrial Instrumentation Foundations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  /* ── CALCULATOR ── */
+  .calc-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    margin-top: 16px;
+  }
+  .calc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  @media(max-width:520px){ .calc-row { grid-template-columns: 1fr; } }
+  .calc-field label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .calc-field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: var(--head);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .calc-field input:focus { border-color: var(--accent); }
+  .calc-field .unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .calc-result {
+    background: #0B1A12;
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--green);
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+  .calc-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── CIRCUIT DIAGRAM ── */
+  .circuit-diagram {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .circuit-diagram svg { max-width: 100%; height: auto; }
+
+  .loop-diagram {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    justify-content: center;
+  }
+  .loop-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: var(--head);
+    white-space: nowrap;
+    text-align: center;
+  }
+  .loop-box.tx { border-color: var(--accent); color: var(--accent); }
+  .loop-box.ps { border-color: var(--yellow); color: var(--yellow); }
+  .loop-box.res { border-color: var(--accent2); color: var(--accent2); }
+  .loop-box.ctrl { border-color: var(--green); color: var(--green); }
+  .loop-arrow { color: var(--muted); font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Foundation Module F1 · I&C Series</div>
+  <h1>DC Circuits & <span>Ohm's Law</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    Every <strong>4-20 mA loop</strong> in your plant is a DC circuit. When a transmitter can't drive the signal to the controller, when a HART communicator won't communicate, when a loop reads low — <strong>the answer is almost always hiding in Ohm's law</strong>. You can't troubleshoot what you don't understand.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>Electricity is water in a pipe.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">This is the single most useful mental model in electronics. Every concept below maps directly to plumbing you already understand.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">💧</div>
+      <div class="analogy-label">Voltage (V)</div>
+      <div class="analogy-term">Water pressure</div>
+      <div class="analogy-desc">The "push" that drives current. Measured in <strong>volts</strong>. A 24 VDC supply is like a pump pushing at 24 PSI.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🌊</div>
+      <div class="analogy-label">Current (I)</div>
+      <div class="analogy-term">Flow rate</div>
+      <div class="analogy-desc">The actual movement of electrons. Measured in <strong>amps</strong>. A 20 mA signal is a tiny, precise trickle.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🚧</div>
+      <div class="analogy-label">Resistance (R)</div>
+      <div class="analogy-term">Pipe restriction</div>
+      <div class="analogy-desc">Anything that opposes flow. Measured in <strong>ohms (Ω)</strong>. A 250 Ω resistor in a loop is a deliberate restriction.</div>
+    </div>
+  </div>
+
+  <div class="formula-box" style="margin-top:20px;">
+    V = I × R &nbsp;&nbsp;·&nbsp;&nbsp; I = V / R &nbsp;&nbsp;·&nbsp;&nbsp; R = V / I
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. The Three Fundamental Quantities</h3>
+  <ul class="core-bullets">
+    <li><strong>Voltage (V)</strong> — electrical potential difference. It's the <em>cause</em>. Without a voltage difference between two points, no current flows. Units: volts (V). Common in instrumentation: 24 VDC, 120 VAC, 5 VDC logic.</li>
+    <li><strong>Current (I)</strong> — the rate of electron flow. It's the <em>effect</em>. Units: amperes (A). In instrumentation we live in the milliamp range: 4-20 mA is 0.004 to 0.020 A.</li>
+    <li><strong>Resistance (R)</strong> — opposition to current flow. Units: ohms (Ω). Every wire, every connection, every component has some resistance. In a healthy loop, total resistance is carefully budgeted.</li>
+  </ul>
+
+  <h3>2. Ohm's Law — The Master Equation</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Ohm's law says: <strong>the current through a conductor is directly proportional to the voltage across it, and inversely proportional to its resistance.</strong></p>
+  <div class="formula-box">V = I × R</div>
+  <p style="font-size:13px;color:var(--muted);margin-top:10px;">Rearrange it three ways depending on what you're solving for:</p>
+  <table class="info-table">
+    <thead><tr><th>Solve For</th><th>Formula</th><th>When You Use It</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Voltage</strong></td><td>V = I × R</td><td>Find voltage drop across a known resistance at a known current</td></tr>
+      <tr><td><strong>Current</strong></td><td>I = V / R</td><td>Find loop current given supply voltage and total loop resistance</td></tr>
+      <tr><td><strong>Resistance</strong></td><td>R = V / I</td><td>Find an unknown resistor value from measured V and I</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. Power — The Fourth Quantity</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Power is the rate of energy consumption. It tells you how much heat a component must dissipate. Exceed it and things burn.</p>
+  <div class="formula-box">P = V × I &nbsp;=&nbsp; I²R &nbsp;=&nbsp; V² / R</div>
+  <p style="font-size:13px;color:var(--muted);margin-top:10px;">A 250 Ω resistor with 20 mA through it dissipates P = (0.020)² × 250 = <strong>0.1 W</strong>. A 1/4 W resistor handles that easily. A 1/8 W resistor would run hot.</p>
+
+  <h3>4. Series Circuits</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Components connected end-to-end. There is only <strong>one path</strong> for current.</p>
+  <ul class="core-bullets">
+    <li><strong>Current is the same</strong> through every component. I<sub>total</sub> = I₁ = I₂ = I₃</li>
+    <li><strong>Voltages add up.</strong> V<sub>total</sub> = V₁ + V₂ + V₃ (Kirchhoff's Voltage Law)</li>
+    <li><strong>Resistances add up.</strong> R<sub>total</sub> = R₁ + R₂ + R₃</li>
+  </ul>
+  <p style="font-size:13px;color:var(--muted);margin-top:8px;"><em>Field example:</em> A 4-20 mA loop is a series circuit. The transmitter, the wires, the receiver resistor, and any other loads are all in series. The same 20 mA flows through every element.</p>
+
+  <h3>5. Parallel Circuits</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Components connected across the same two points. There are <strong>multiple paths</strong> for current.</p>
+  <ul class="core-bullets">
+    <li><strong>Voltage is the same</strong> across every branch. V<sub>total</sub> = V₁ = V₂ = V₃</li>
+    <li><strong>Currents add up.</strong> I<sub>total</sub> = I₁ + I₂ + I₃ (Kirchhoff's Current Law)</li>
+    <li><strong>Resistances combine reciprocally.</strong> 1/R<sub>total</sub> = 1/R₁ + 1/R₂ + 1/R₃</li>
+  </ul>
+  <p style="font-size:13px;color:var(--muted);margin-top:8px;"><em>Field example:</em> Two 250 Ω resistors in parallel give 125 Ω. This matters when you're calculating loop load.</p>
+
+  <h3>6. Kirchhoff's Laws — The Two Rules</h3>
+  <ul class="core-bullets">
+    <li><strong>KVL (Voltage Law):</strong> The sum of all voltage rises and drops around any closed loop equals zero. In plain English: <em>whatever voltage the supply provides, the loads must consume it all.</em></li>
+    <li><strong>KCL (Current Law):</strong> The sum of currents entering a junction equals the sum of currents leaving it. In plain English: <em>current doesn't disappear — it goes somewhere.</em></li>
+  </ul>
+
+  <h3>7. The 4-20 mA Loop as a DC Circuit</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Here's where it all comes together. A standard loop-powered transmitter circuit:</p>
+
+  <div class="loop-diagram">
+    <div class="loop-box ps">24 VDC<br>Power Supply</div>
+    <span class="loop-arrow">→</span>
+    <div class="loop-box tx">Transmitter<br>(4-20 mA)</div>
+    <span class="loop-arrow">→</span>
+    <div class="loop-box">Loop Wires<br>(~50 Ω)</div>
+    <span class="loop-arrow">→</span>
+    <div class="loop-box res">250 Ω<br>Receiver Resistor</div>
+    <span class="loop-arrow">→</span>
+    <div class="loop-box ctrl">Controller<br>Input</div>
+    <span class="loop-arrow">↺</span>
+    <div class="loop-box ps">Back to<br>Supply (−)</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;">Apply Ohm's law to this loop. At 20 mA (full scale):</p>
+  <table class="info-table">
+    <thead><tr><th>Element</th><th>Resistance</th><th>Voltage Drop (at 20 mA)</th></tr></thead>
+    <tbody>
+      <tr><td>Transmitter (minimum)</td><td>~12 V compliance</td><td>12.0 V</td></tr>
+      <tr><td>Loop wires (500 ft, 16 AWG)</td><td>~50 Ω</td><td>1.0 V</td></tr>
+      <tr><td>Receiver resistor</td><td>250 Ω</td><td>5.0 V</td></tr>
+      <tr><td>Controller input</td><td>~100 Ω</td><td>2.0 V</td></tr>
+      <tr><td><strong>Total</strong></td><td>~400 Ω + TX</td><td><strong>20.0 V</strong></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--muted);margin-top:10px;">If total voltage drop exceeds the supply (24 V), the loop <strong>saturates</strong> — the transmitter can't push 20 mA through the circuit. This is why loop resistance budgets matter, and why you sometimes need a 26 V or 30 V supply on long runs.</p>
+</div>
+
+<!-- ═══════════ SECTION 4: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Interactive Ohm's Law Calculator</h2>
+  <p style="font-size:14px;margin-bottom:6px;">Enter any <strong>two</strong> values and leave the third blank. The calculator will solve for the missing value and compute power.</p>
+
+  <div class="calc-box">
+    <div class="calc-row">
+      <div class="calc-field">
+        <label>Voltage (V)</label>
+        <input type="number" id="calc-v" placeholder="?" step="any" oninput="calcOhm()">
+        <div class="unit">volts</div>
+      </div>
+      <div class="calc-field">
+        <label>Current (I)</label>
+        <input type="number" id="calc-i" placeholder="?" step="any" oninput="calcOhm()">
+        <div class="unit">amps (use 0.020 for 20 mA)</div>
+      </div>
+      <div class="calc-field">
+        <label>Resistance (R)</label>
+        <input type="number" id="calc-r" placeholder="?" step="any" oninput="calcOhm()">
+        <div class="unit">ohms</div>
+      </div>
+    </div>
+    <div class="calc-result" id="calc-result">Enter any two values</div>
+    <div class="calc-hint">Tip: For milliamp currents, enter 0.004 for 4 mA or 0.020 for 20 mA. You can also write 4e-3 or 20e-3.</div>
+  </div>
+
+  <h3 style="margin-top:24px;">Practice Problems (no calculator)</h3>
+  <ul class="step-list">
+    <li>A 24 VDC supply drives a loop with 600 Ω total resistance. What current flows? <em>(Answer: I = 24/600 = 0.040 A = 40 mA — but the transmitter limits it to 20 mA max. The loop is over-resisted for full scale.)</em></li>
+    <li>A 250 Ω resistor has 16 mA flowing through it. What voltage appears across it? <em>(Answer: V = 0.016 × 250 = 4.0 V)</em></li>
+    <li>You measure 5.0 V across a 250 Ω resistor. What is the loop current? <em>(Answer: I = 5/250 = 0.020 A = 20 mA — full scale)</em></li>
+    <li>A 250 Ω resistor is rated at 1/4 W. At 20 mA, is it safe? <em>(Answer: P = (0.020)² × 250 = 0.1 W. Yes, comfortably safe.)</em></li>
+    <li>Two 250 Ω resistors in series. Total resistance? Current at 10 V? <em>(Answer: 500 Ω. I = 10/500 = 0.020 A = 20 mA)</em></li>
+    <li>Two 250 Ω resistors in parallel. Total resistance? <em>(Answer: 125 Ω)</em></li>
+  </ul>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qf1-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> A 4-20 mA transmitter is driving 20 mA through a loop with a 250 Ω receiver resistor. What voltage appears across that resistor?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf1-1',false)">A) 1.0 V</li>
+      <li onclick="answer(this,'qf1-1',false)">B) 2.5 V</li>
+      <li onclick="answer(this,'qf1-1',true)">C) 5.0 V</li>
+      <li onclick="answer(this,'qf1-1',false)">D) 20 V</li>
+    </ul>
+    <div class="quiz-feedback" id="qf1-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf1-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> In a series circuit, which quantity is the same through every component?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf1-2',false)">A) Voltage</li>
+      <li onclick="answer(this,'qf1-2',true)">B) Current</li>
+      <li onclick="answer(this,'qf1-2',false)">C) Resistance</li>
+      <li onclick="answer(this,'qf1-2',false)">D) Power</li>
+    </ul>
+    <div class="quiz-feedback" id="qf1-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf1-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> You have a 24 VDC supply and a loop with 800 Ω total resistance. What is the maximum current that can flow (ignoring transmitter limits)?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf1-3',false)">A) 10 mA</li>
+      <li onclick="answer(this,'qf1-3',false)">B) 20 mA</li>
+      <li onclick="answer(this,'qf1-3',true)">C) 30 mA</li>
+      <li onclick="answer(this,'qf1-3',false)">D) 48 mA</li>
+    </ul>
+    <div class="quiz-feedback" id="qf1-3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-f1">—/3</span>
+    <span class="score-label" id="msg-f1" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">DC Circuits & Ohm's Law — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>The Big Three Formulas</h3>
+        <ul>
+          <li><span class="key">Voltage →</span><span class="val">V = I × R</span></li>
+          <li><span class="key">Current →</span><span class="val">I = V / R</span></li>
+          <li><span class="key">Resistance →</span><span class="val">R = V / I</span></li>
+          <li><span class="key">Power →</span><span class="val">P = V × I</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Series vs Parallel</h3>
+        <ul>
+          <li><span class="key">Series: I →</span><span class="val">Same everywhere</span></li>
+          <li><span class="key">Series: V →</span><span class="val">Adds up</span></li>
+          <li><span class="key">Series: R →</span><span class="val">R₁ + R₂ + R₃</span></li>
+          <li><span class="key">Parallel: V →</span><span class="val">Same across all</span></li>
+          <li><span class="key">Parallel: I →</span><span class="val">Adds up</span></li>
+          <li><span class="key">Parallel: R →</span><span class="val">1/R = 1/R₁ + 1/R₂</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>4-20 mA Loop Numbers</h3>
+        <ul>
+          <li><span class="key">4 mA →</span><span class="val">0% (live zero)</span></li>
+          <li><span class="key">20 mA →</span><span class="val">100% (full scale)</span></li>
+          <li><span class="key">250 Ω at 20 mA →</span><span class="val">5.0 V</span></li>
+          <li><span class="key">250 Ω at 4 mA →</span><span class="val">1.0 V</span></li>
+          <li><span class="key">Typical loop supply →</span><span class="val">24 VDC</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Field Rules of Thumb</h3>
+        <ul>
+          <li><span class="key">Long runs →</span><span class="val">Voltage drop adds up</span></li>
+          <li><span class="key">Over-resisted loop →</span><span class="val">Saturates, won't reach 20 mA</span></li>
+          <li><span class="key">Under-resisted loop →</span><span class="val">HART won't communicate</span></li>
+          <li><span class="key">Min loop R for HART →</span><span class="val">~230 Ω</span></li>
+          <li><span class="key">Max loop R (24V) →</span><span class="val">~600 Ω typical</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      V = I × R &nbsp;·&nbsp; P = V × I &nbsp;·&nbsp; Series: R<sub>t</sub> = R₁ + R₂ &nbsp;·&nbsp; Parallel: 1/R<sub>t</sub> = 1/R₁ + 1/R₂
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── OHM'S LAW CALCULATOR ──
+  function calcOhm() {
+    const v = parseFloat(document.getElementById('calc-v').value);
+    const i = parseFloat(document.getElementById('calc-i').value);
+    const r = parseFloat(document.getElementById('calc-r').value);
+    const result = document.getElementById('calc-result');
+
+    const hasV = !isNaN(v);
+    const hasI = !isNaN(i);
+    const hasR = !isNaN(r);
+
+    const count = [hasV, hasI, hasR].filter(Boolean).length;
+
+    if (count < 2) {
+      result.textContent = 'Enter any two values';
+      result.style.color = 'var(--green)';
+      return;
+    }
+    if (count === 3) {
+      // verify
+      const vCheck = i * r;
+      result.textContent = `All three entered. Check: I×R = ${vCheck.toFixed(3)} V (should match V = ${v} V)`;
+      result.style.color = Math.abs(vCheck - v) < 0.01 ? 'var(--green)' : 'var(--red)';
+      return;
+    }
+
+    let outV = v, outI = i, outR = r;
+    if (hasV && hasI) { outR = v / i; }
+    else if (hasV && hasR) { outI = v / r; }
+    else if (hasI && hasR) { outV = i * r; }
+
+    const p = outV * outI;
+    result.innerHTML = `V = <strong>${outV.toFixed(4)} V</strong> &nbsp;·&nbsp; I = <strong>${(outI*1000).toFixed(3)} mA</strong> &nbsp;·&nbsp; R = <strong>${outR.toFixed(2)} Ω</strong> &nbsp;·&nbsp; P = <strong>${(p*1000).toFixed(3)} mW</strong>`;
+    result.style.color = 'var(--green)';
+  }
+
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qf1-1': { correct: false, answered: false },
+    'qf1-2': { correct: false, answered: false },
+    'qf1-3': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qf1-1': "✓ Correct. V = I × R = 0.020 A × 250 Ω = 5.0 V. This is why 250 Ω is the classic receiver resistor — it converts the 4-20 mA signal to a clean 1-5 V signal for the controller's ADC.",
+    'qf1-1_wrong': "✗ Use Ohm's law: V = I × R. Current is 20 mA = 0.020 A. Resistance is 250 Ω. Multiply them.",
+    'qf1-2': "✓ Correct. In a series circuit there's only one path for current, so the same current flows through every component. Voltage divides across the resistances; current does not.",
+    'qf1-2_wrong': "✗ In series, there's only one path — so the same current must flow everywhere. Voltage is what divides across the resistances.",
+    'qf1-3': "✓ Correct. I = V / R = 24 V / 800 Ω = 0.030 A = 30 mA. In a real 4-20 mA loop, the transmitter would limit this to 20 mA max, but the circuit's theoretical maximum is 30 mA.",
+    'qf1-3_wrong': "✗ Use Ohm's law: I = V / R. Voltage is 24 V, resistance is 800 Ω. Divide 24 by 800."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-f1');
+    const msg = document.getElementById('msg-f1');
+
+    if (answered === 3) {
+      display.textContent = correct + '/3';
+      if (correct === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You\'re ready for F2.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and re-read carefully.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (3 - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>

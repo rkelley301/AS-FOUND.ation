@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F5 — PLC ↔ Instrument Block Diagrams & Signal Flow · Industrial Instrumentation Foundations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media(max-width:520px){ .checklist { grid-template-columns: 1fr; } }
+  .checklist-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checklist-item .box {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .callout {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .callout.blue { background: var(--accent2); }
+  .callout.green { background: var(--green); }
+  .callout.red { background: var(--red); color: #fff; }
+  .callout.purple { background: var(--purple); color: #fff; }
+  .callout.yellow { background: var(--yellow); }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media(max-width:520px){ .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+  }
+  .compare-card h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .compare-card.analog h4 { color: var(--accent); }
+  .compare-card.digital h4 { color: var(--accent2); }
+  .compare-card ul { list-style: none; }
+  .compare-card ul li {
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-card ul li:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Foundation Module F5 · I&C Series</div>
+  <h1>PLC ↔ Instrument <span>Block Diagrams</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    Up to now you've learned each piece in isolation: the physics, the wire, the drawing, the panel. But in the field, <strong>the question is almost never about one piece — it's about the whole loop</strong>. "Why isn't the flow reading right?" could be the transmitter, the wiring, the terminal, the I/O card, the PLC scaling, the logic, or the HMI. If you can't see the <em>whole system</em>, you can't troubleshoot it. <strong>A block diagram is how you see the whole system at a glance.</strong>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>A block diagram is a relay race.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">The signal starts in the field, gets handed off at each stage, and eventually ends up as an action on the other side. Each block is a runner. Each arrow is a handoff. If any handoff fails, the whole race fails — and the block diagram tells you which runner to look at.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🏃</div>
+      <div class="analogy-label">Each Block</div>
+      <div class="analogy-term">A runner</div>
+      <div class="analogy-desc">It has a job: convert the signal, process it, transmit it, or act on it.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🤝</div>
+      <div class="analogy-label">Each Arrow</div>
+      <div class="analogy-term">A handoff</div>
+      <div class="analogy-desc">The signal changes form: physical → electrical → digital → logic → action.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🏆</div>
+      <div class="analogy-label">The Whole Loop</div>
+      <div class="analogy-term">The race</div>
+      <div class="analogy-desc">The goal is to move the process variable to the setpoint. Every block must work together.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. What a Block Diagram Actually Is</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A block diagram is a <strong>simplified system view</strong>. Each block represents a device, a function, or a signal-processing step. Arrows show what flows between them. There are no wires, no terminal numbers, no pin details — just <em>what each block does and how signal moves between blocks</em>.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Blocks</strong> are rectangles with labels inside. The label describes the function, not the part number. "Transmitter," "A/D Converter," "PID Controller," "Valve."</li>
+    <li><strong>Arrows</strong> show direction of signal flow. Almost always left to right for the process signal, with feedback drawn as a return path.</li>
+    <li><strong>Signal labels</strong> on the arrows describe what's flowing: 4-20 mA, 0-10 V, digital bits, 0-100% CV, engineering units, etc.</li>
+    <li><strong>No physical detail.</strong> A block diagram of a control loop doesn't care whether the wire goes through a junction box or a terminal strip — that's the wiring diagram's job.</li>
+    <li><strong>Purpose:</strong> To understand the system architecture, identify where a fault could be, and communicate the design without needing to draw every detail.</li>
+  </ul>
+
+  <h3>2. The Universal Control Loop — Block by Block</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every process control loop — flow, pressure, level, temperature — has the same fundamental block diagram. Once you understand this one diagram, you understand every loop.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 780 380" xmlns="http://www.w3.org/2000/svg">
+      <!-- Field side (left) -->
+      <text x="20" y="20" fill="#6B7180" font-family="monospace" font-size="10">FIELD (PROCESS SIDE)</text>
+
+      <!-- Process block -->
+      <rect x="20" y="80" width="120" height="60" fill="#1A1108" stroke="#E67E22" stroke-width="2" rx="4"/>
+      <text x="80" y="108" fill="#E67E22" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">PROCESS</text>
+      <text x="80" y="125" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Tank, pipe, reactor</text>
+
+      <!-- Sensor / transmitter -->
+      <rect x="20" y="180" width="120" height="60" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="80" y="208" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">TRANSMITTER</text>
+      <text x="80" y="225" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">FT-101</text>
+
+      <!-- Wire from process to transmitter -->
+      <line x1="80" y1="140" x2="80" y2="180" stroke="#E67E22" stroke-width="1.5"/>
+      <text x="90" y="165" fill="#E67E22" font-family="monospace" font-size="9">physical PV</text>
+
+      <!-- Actuator / valve -->
+      <rect x="20" y="280" width="120" height="60" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="80" y="308" fill="#2ECC71" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">FINAL ELEMENT</text>
+      <text x="80" y="325" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">FV-101 (valve)</text>
+
+      <!-- Wire from valve to process (feedback control) -->
+      <line x1="20" y1="310" x2="10" y2="310" stroke="#2ECC71" stroke-width="1.5"/>
+      <line x1="10" y1="310" x2="10" y2="110" stroke="#2ECC71" stroke-width="1.5"/>
+      <line x1="10" y1="110" x2="20" y2="110" stroke="#2ECC71" stroke-width="1.5"/>
+      <text x="-20" y="220" fill="#2ECC71" font-family="monospace" font-size="9" transform="rotate(-90 -20 220)">manipulated variable</text>
+
+      <!-- Panel side -->
+      <text x="240" y="20" fill="#6B7180" font-family="monospace" font-size="10">CONTROL PANEL</text>
+
+      <!-- Terminal block -->
+      <rect x="200" y="180" width="80" height="60" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="240" y="208" fill="#2ECC71" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">TB1</text>
+      <text x="240" y="225" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Terminals</text>
+
+      <!-- Wire transmitter to TB -->
+      <line x1="140" y1="210" x2="200" y2="210" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="170" y="200" fill="#3B9EFF" font-family="monospace" font-size="9" text-anchor="middle">4-20 mA</text>
+
+      <!-- I/O card -->
+      <rect x="320" y="170" width="110" height="80" fill="#100A14" stroke="#A855F7" stroke-width="2" rx="4"/>
+      <text x="375" y="200" fill="#A855F7" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">AI CARD</text>
+      <text x="375" y="217" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Analog Input</text>
+      <text x="375" y="232" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">A/D Conversion</text>
+
+      <!-- Wire TB to AI card -->
+      <line x1="280" y1="210" x2="320" y2="210" stroke="#3B9EFF" stroke-width="2"/>
+
+      <!-- CPU -->
+      <rect x="470" y="150" width="120" height="120" fill="#100A14" stroke="#A855F7" stroke-width="3" rx="4"/>
+      <text x="530" y="180" fill="#A855F7" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">PLC CPU</text>
+      <text x="530" y="200" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Executes logic</text>
+      <text x="530" y="215" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">PID algorithm</text>
+      <text x="530" y="230" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Scaling</text>
+      <text x="530" y="245" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Scan cycle</text>
+
+      <!-- Wire AI to CPU (backplane) -->
+      <line x1="430" y1="210" x2="470" y2="210" stroke="#A855F7" stroke-width="2"/>
+      <text x="450" y="200" fill="#A855F7" font-family="monospace" font-size="8" text-anchor="middle">bus</text>
+
+      <!-- AO card -->
+      <rect x="320" y="280" width="110" height="80" fill="#100A14" stroke="#A855F7" stroke-width="2" rx="4"/>
+      <text x="375" y="310" fill="#A855F7" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">AO CARD</text>
+      <text x="375" y="327" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Analog Output</text>
+      <text x="375" y="342" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">D/A Conversion</text>
+
+      <!-- Wire CPU to AO -->
+      <line x1="530" y1="270" x2="530" y2="320" stroke="#A855F7" stroke-width="2"/>
+      <line x1="530" y1="320" x2="430" y2="320" stroke="#A855F7" stroke-width="2"/>
+
+      <!-- Wire AO back to TB (4-20 mA out to valve) -->
+      <line x1="320" y1="320" x2="280" y2="320" stroke="#3B9EFF" stroke-width="2"/>
+      <line x1="280" y1="320" x2="280" y2="245" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="295" y="290" fill="#3B9EFF" font-family="monospace" font-size="9">4-20 mA</text>
+
+      <!-- Wire TB to valve -->
+      <line x1="200" y1="310" x2="140" y2="310" stroke="#3B9EFF" stroke-width="2"/>
+
+      <!-- HMI / Operator -->
+      <rect x="620" y="200" width="120" height="70" fill="#16120A" stroke="#F1C40F" stroke-width="2" rx="4"/>
+      <text x="680" y="228" fill="#F1C40F" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">HMI / SCADA</text>
+      <text x="680" y="245" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Operator display</text>
+      <text x="680" y="260" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Trends, alarms</text>
+
+      <!-- Network link -->
+      <line x1="590" y1="210" x2="620" y2="235" stroke="#F1C40F" stroke-width="2"/>
+      <text x="605" y="215" fill="#F1C40F" font-family="monospace" font-size="8" text-anchor="middle">Ethernet</text>
+
+      <!-- Setpoint arrow into CPU -->
+      <line x1="620" y1="235" x2="590" y2="235" stroke="#F1C40F" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="605" y="250" fill="#F1C40F" font-family="monospace" font-size="8" text-anchor="middle">SP</text>
+    </svg>
+    <div class="diagram-caption">Universal control loop block diagram. Signal flows: Process → Transmitter → Terminal Block → AI Card → CPU (PID) → AO Card → Terminal Block → Valve → Process.</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;"><strong>Read it left to right (forward path):</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Process</strong> — the physical thing being controlled (flow, level, temperature, pressure). It has a process variable (PV) that we want to control.</li>
+    <li><strong>Transmitter</strong> — the sensor that measures the PV and converts it to a 4-20 mA signal. It's the "eyes" of the loop.</li>
+    <li><strong>Terminal Block</strong> — where the field wire meets the panel wire. Just a pass-through, but critical for isolation and test points.</li>
+    <li><strong>AI Card</strong> — analog input card in the PLC. Converts the 4-20 mA analog signal into a digital number the CPU can process. This is the A/D conversion.</li>
+    <li><strong>PLC CPU</strong> — the brain. Reads the digital value, scales it to engineering units, runs the PID algorithm, decides what the output should be, and sends a digital value to the AO card.</li>
+    <li><strong>AO Card</strong> — analog output card. Converts the CPU's digital output value back into a 4-20 mA signal. This is D/A conversion.</li>
+    <li><strong>Terminal Block</strong> — same as before, but on the output side. Pass-through to the field.</li>
+    <li><strong>Final Element</strong> — the valve or actuator. Receives the 4-20 mA signal and moves to the commanded position. This is the "hands" of the loop.</li>
+    <li><strong>Process</strong> — back to the start. The valve position affects the process, which changes the PV, which is measured by the transmitter, closing the loop.</li>
+  </ul>
+
+  <p style="font-size:14px;margin-top:14px;"><strong>The feedback path (dashed or drawn beneath):</strong></p>
+  <ul class="core-bullets">
+    <li>The valve position changes the process.</li>
+    <li>The transmitter measures the new PV and sends a new 4-20 mA signal.</li>
+    <li>The PLC reads the new value and adjusts the output.</li>
+    <li>This continues indefinitely — that's what makes it a <em>closed loop</em>.</li>
+  </ul>
+
+  <h3>3. Signal Flow — How the Signal Changes Form</h3>
+  <p style="font-size:14px;margin-bottom:10px;">One of the most important ideas in system thinking: <strong>the signal changes form at every block</strong>. Understanding this is how you know where to measure and what to expect.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Stage</th><th>Signal Form</th><th>What You'd Measure</th></tr></thead>
+    <tbody>
+      <tr><td>Process PV</td><td>Physical (flow, pressure, temp)</td><td>At the process itself — using a test instrument</td></tr>
+      <tr><td>Transmitter output</td><td>4-20 mA analog current</td><td>Multimeter in series with the loop</td></tr>
+      <tr><td>AI Card input</td><td>4-20 mA → digital number</td><td>PLC software — raw counts (e.g., 0-32767)</td></tr>
+      <tr><td>CPU internal (scaled)</td><td>Engineering units (e.g., 0-500 GPM)</td><td>PLC software — scaled value</td></tr>
+      <tr><td>CPU output (raw)</td><td>Digital number (e.g., 0-32767)</td><td>PLC software — output register</td></tr>
+      <tr><td>AO Card output</td><td>4-20 mA analog current</td><td>Multimeter in series with output loop</td></tr>
+      <tr><td>Valve position</td><td>Physical (valve stem position)</td><td>Visual or position transmitter</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Key Insight</span>
+    When troubleshooting, <strong>check the signal at each stage</strong>. If the transmitter reads 12 mA but the PLC sees 0 counts, the problem is between them (wiring, terminal, AI card). If the PLC sees the correct value but the output doesn't match the expectation, the problem is in the CPU logic or the AO card. The block diagram tells you where to look.
+  </div>
+
+  <h3>4. Analog vs Digital Signals — Two Different Worlds</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Industrial instrumentation uses two broad signal types. Every loop you work on will involve one or both.</p>
+
+  <div class="compare-grid">
+    <div class="compare-card analog">
+      <h4>Analog Signals</h4>
+      <ul>
+        <li><strong>Continuous values</strong> — any value in a range</li>
+        <li><strong>4-20 mA</strong> — the industry standard for instruments</li>
+        <li><strong>0-10 V</strong> — older systems, short distances only</li>
+        <li><strong>RTD/TC</strong> — resistance or millivolt signals from temperature sensors</li>
+        <li><strong>Requires A/D conversion</strong> at the PLC to become digital</li>
+        <li><strong>Susceptible to noise</strong> — needs shielding and twisted pairs</li>
+        <li><strong>Examples:</strong> flow, pressure, level, temperature, valve position</li>
+      </ul>
+    </div>
+    <div class="compare-card digital">
+      <h4>Digital Signals</h4>
+      <ul>
+        <li><strong>Two states only</strong> — ON/OFF, 1/0, TRUE/FALSE</li>
+        <li><strong>24 VDC discrete</strong> — the standard for most PLC digital I/O</li>
+        <li><strong>120 VAC discrete</strong> — older systems, still common in motor controls</li>
+        <li><strong>Dry contact</strong> — just a switch closure, no voltage</li>
+        <li><strong>Already digital</strong> — no conversion needed for the CPU</li>
+        <li><strong>Highly noise-immune</strong> at logic voltages</li>
+        <li><strong>Examples:</strong> limit switches, pushbuttons, relays, solenoids, motor starters</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>5. Inside the PLC — The Blocks You Need to Know</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A PLC is not one device; it's a system of modules on a common backplane. Here's what's inside the box:</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- Rack/chassis outline -->
+      <rect x="30" y="40" width="640" height="220" fill="#0E0F14" stroke="#6B7180" stroke-width="2" rx="6"/>
+
+      <!-- Power supply -->
+      <rect x="50" y="60" width="90" height="180" fill="#16120A" stroke="#F1C40F" stroke-width="2" rx="4"/>
+      <text x="95" y="120" fill="#F1C40F" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">POWER</text>
+      <text x="95" y="135" fill="#F1C40F" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">SUPPLY</text>
+      <text x="95" y="158" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">120 VAC →</text>
+      <text x="95" y="170" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">24 VDC</text>
+
+      <!-- CPU -->
+      <rect x="160" y="60" width="120" height="180" fill="#100A14" stroke="#A855F7" stroke-width="2" rx="4"/>
+      <text x="220" y="110" fill="#A855F7" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">CPU</text>
+      <text x="220" y="130" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Processor</text>
+      <text x="220" y="145" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Memory</text>
+      <text x="220" y="160" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Logic solver</text>
+      <text x="220" y="175" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Scan cycle</text>
+      <text x="220" y="195" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">The brain</text>
+
+      <!-- AI card -->
+      <rect x="300" y="60" width="90" height="180" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="345" y="110" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">AI</text>
+      <text x="345" y="130" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Analog In</text>
+      <text x="345" y="145" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">4-20 mA →</text>
+      <text x="345" y="158" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">digital</text>
+      <text x="345" y="180" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">Sensors in</text>
+
+      <!-- AO card -->
+      <rect x="410" y="60" width="90" height="180" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="455" y="110" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">AO</text>
+      <text x="455" y="130" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Analog Out</text>
+      <text x="455" y="145" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">digital →</text>
+      <text x="455" y="158" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">4-20 mA</text>
+      <text x="455" y="180" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">Valves out</text>
+
+      <!-- DI card -->
+      <rect x="520" y="60" width="65" height="85" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="552" y="95" fill="#2ECC71" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">DI</text>
+      <text x="552" y="112" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Digital In</text>
+      <text x="552" y="128" fill="#6B7180" font-family="monospace" font-size="7" text-anchor="middle">Switches</text>
+
+      <!-- DO card -->
+      <rect x="595" y="60" width="65" height="85" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="627" y="95" fill="#2ECC71" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">DO</text>
+      <text x="627" y="112" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Digital Out</text>
+      <text x="627" y="128" fill="#6B7180" font-family="monospace" font-size="7" text-anchor="middle">Relays</text>
+
+      <!-- Comm card -->
+      <rect x="520" y="155" width="140" height="85" fill="#16120A" stroke="#F1C40F" stroke-width="2" rx="4"/>
+      <text x="590" y="188" fill="#F1C40F" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">COMMS</text>
+      <text x="590" y="205" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Ethernet/IP</text>
+      <text x="590" y="220" fill="#D4D6DC" font-family="monospace" font-size="8" text-anchor="middle">Modbus TCP, etc.</text>
+
+      <!-- Backplane -->
+      <rect x="30" y="245" width="640" height="15" fill="#3A3D45" rx="2"/>
+      <text x="350" y="256" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">BACKPLANE BUS — modules communicate through here</text>
+
+      <!-- Top labels -->
+      <text x="350" y="25" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">PLC RACK (CHASSIS)</text>
+    </svg>
+    <div class="diagram-caption">Inside the PLC: power supply, CPU, I/O cards (analog and digital), and communication modules all share a backplane bus.</div>
+  </div>
+
+  <table class="info-table">
+    <thead><tr><th>Block</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Power Supply</strong></td><td>Converts incoming AC (usually 120 VAC) to the DC voltages the CPU and cards need (5 VDC for logic, 24 VDC for I/O).</td></tr>
+      <tr><td><strong>CPU</strong></td><td>The processor. Runs the user program (ladder logic, function blocks), executes the scan cycle, manages memory, and coordinates all other modules.</td></tr>
+      <tr><td><strong>AI Card (Analog Input)</strong></td><td>Receives 4-20 mA or other analog signals from field transmitters. Converts them to digital values (raw counts) for the CPU.</td></tr>
+      <tr><td><strong>AO Card (Analog Output)</strong></td><td>Takes digital values from the CPU and converts them back to 4-20 mA signals for valves, positioners, or other final elements.</td></tr>
+      <tr><td><strong>DI Card (Digital Input)</strong></td><td>Reads on/off states from field switches, pushbuttons, and contacts. 24 VDC present = logic 1; absent = logic 0.</td></tr>
+      <tr><td><strong>DO Card (Digital Output)</strong></td><td>Drives on/off devices — relays, solenoids, indicator lamps, motor starters. Logic 1 = energize; logic 0 = de-energize.</td></tr>
+      <tr><td><strong>Comm Module</strong></td><td>Connects the PLC to networks: Ethernet/IP, Modbus TCP, Profibus, etc. Enables communication with HMIs, SCADA, other PLCs, and smart field devices.</td></tr>
+      <tr><td><strong>Backplane</strong></td><td>The internal bus that lets all modules talk to the CPU. Every module plugs into it.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6. The PLC Scan Cycle — Why It Matters</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A PLC doesn't respond instantly. It executes a repeating cycle — the <strong>scan cycle</strong> — that determines how fast it can react to inputs and update outputs. Understanding the scan cycle is essential for understanding why PLC-controlled loops behave the way they do.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cycle arrows -->
+      <defs>
+        <marker id="arrowCycle" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="#E67E22"/>
+        </marker>
+      </defs>
+
+      <!-- Step 1: Input Scan -->
+      <rect x="150" y="30" width="200" height="70" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="250" y="60" fill="#3B9EFF" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">1. INPUT SCAN</text>
+      <text x="250" y="80" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Read all input cards</text>
+      <text x="250" y="93" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">Copy to input memory</text>
+
+      <!-- Arrow 1→2 -->
+      <path d="M 350 65 Q 400 65 400 130" fill="none" stroke="#E67E22" stroke-width="2" marker-end="url(#arrowCycle)"/>
+
+      <!-- Step 2: Program Execute -->
+      <rect x="150" y="140" width="200" height="70" fill="#100A14" stroke="#A855F7" stroke-width="2" rx="4"/>
+      <text x="250" y="170" fill="#A855F7" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">2. PROGRAM EXECUTE</text>
+      <text x="250" y="190" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Run ladder logic, PID, etc.</text>
+      <text x="250" y="203" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">Write to output memory</text>
+
+      <!-- Arrow 2→3 -->
+      <path d="M 350 175 Q 400 175 400 240" fill="none" stroke="#E67E22" stroke-width="2" marker-end="url(#arrowCycle)"/>
+
+      <!-- Step 3: Output Update -->
+      <rect x="150" y="250" width="200" height="70" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="4"/>
+      <text x="250" y="280" fill="#2ECC71" font-family="monospace" font-size="12" text-anchor="middle" font-weight="bold">3. OUTPUT UPDATE</text>
+      <text x="250" y="300" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">Write output memory to cards</text>
+      <text x="250" y="313" fill="#6B7180" font-family="monospace" font-size="8" text-anchor="middle">Drives field devices</text>
+
+      <!-- Arrow 3→1 -->
+      <path d="M 150 285 Q 100 285 100 220 Q 100 155 100 100 Q 100 65 150 65" fill="none" stroke="#E67E22" stroke-width="2" marker-end="url(#arrowCycle)"/>
+      <text x="75" y="180" fill="#E67E22" font-family="monospace" font-size="9" text-anchor="middle">repeat</text>
+
+      <!-- Time annotation -->
+      <text x="250" y="360" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">Typical scan time: 5-50 ms</text>
+      <text x="250" y="378" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Faster PLCs (compact): 1-5 ms</text>
+    </svg>
+    <div class="diagram-caption">The PLC scan cycle repeats continuously — typically every 5-50 milliseconds. Everything the PLC does happens in this cycle.</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;"><strong>What each step does:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Input Scan:</strong> The CPU reads the current state of every input card and stores those values in input memory. This is a snapshot — it doesn't change during the rest of the scan.</li>
+    <li><strong>Program Execute:</strong> The CPU runs the user program (ladder logic, function blocks). It reads from input memory, does math and logic, and writes results to output memory.</li>
+    <li><strong>Output Update:</strong> The CPU copies the output memory values to the output cards, which drive the physical outputs.</li>
+    <li><strong>Repeat.</strong> The cycle starts over immediately. The speed at which this repeats is the <em>scan time</em>.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Why This Matters</span>
+    <strong>The PLC can only "see" inputs once per scan.</strong> If a signal pulses for less than the scan time, the PLC might miss it entirely. This is why very fast events (like a short pulse from a flow meter) require either a high-speed counter module or dedicated hardware — the standard scan cycle can't catch them.
+  </div>
+
+  <h3>7. HART Communication — Digital on Top of Analog</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Most modern 4-20 mA transmitters also support <strong>HART</strong>, which superimposes a digital signal on the same two wires. This doesn't interfere with the 4-20 mA signal — the analog current still drives the loop, and the digital signal carries extra information (diagnostics, calibration data, secondary variables).</p>
+
+  <ul class="core-bullets">
+    <li><strong>HART signal is FSK</strong> (Frequency Shift Keying) — small AC frequencies added to the DC loop current.</li>
+    <li><strong>Doesn't interfere with the 4-20 mA signal</strong> — the digital modulation is filtered out by the receiver.</li>
+    <li><strong>Requires a HART communicator or HART modem</strong> — a handheld device or a PC with a HART modem.</li>
+    <li><strong>Supports device configuration, diagnostics, and multi-variable readout</strong> — over the same two wires that carry the 4-20 mA signal.</li>
+    <li><strong>Loop resistance matters:</strong> HART needs at least ~230 Ω of loop resistance to communicate properly. Very low-resistance loops may prevent HART communication.</li>
+  </ul>
+
+  <h3>8. Digital Fieldbus — When the Whole Signal Is Digital</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Some systems go further: instead of an analog signal with digital on top, they use a <strong>pure digital fieldbus</strong> where the entire measurement is transmitted digitally. FOUNDATION Fieldbus, Profibus PA, and HART-IP are examples.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Advantages:</strong> Multiple variables from one device, faster diagnostics, multi-drop topologies (many devices on one cable), and remote configuration.</li>
+    <li><strong>Disadvantages:</strong> More complex, requires special tools and training, harder to troubleshoot without specialized software.</li>
+    <li><strong>Signal in the block diagram:</strong> The field signal to the PLC is digital from the start. The AI card might be replaced by a fieldbus interface module, but the block diagram concept is the same.</li>
+  </ul>
+
+  <h3>9. How to Draw a Block Diagram — Step by Step</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Block diagrams are drawn from left to right, top to bottom, following the signal flow. Here's the systematic approach:</p>
+
+  <ul class="step-list">
+    <li><strong>Identify the process variable and the final control element.</strong> What is being controlled (flow, level, temperature)? What device controls it (valve, motor, heater)?</li>
+    <li><strong>List every device in the loop.</strong> Transmitter, junction box, terminal block, I/O card, PLC CPU, HMI, power supply, final element, etc.</li>
+    <li><strong>Arrange them in signal flow order.</strong> Field on the left, PLC in the middle, HMI on the right. Feedback path drawn below or as a dashed line.</li>
+    <li><strong>Draw boxes for each device.</strong> Label each box with its function (not its part number). Keep box size consistent.</li>
+    <li><strong>Draw arrows between blocks.</strong> Label each arrow with the signal type — 4-20 mA, digital bits, 0-100%, physical PV, etc.</li>
+    <li><strong>Add the feedback path.</strong> Close the loop: valve affects process, process affects transmitter, transmitter feeds back to PLC.</li>
+    <li><strong>Annotate critical values.</strong> Range, setpoint, alarm limits, loop number, tag numbers. Keep it clean — don't overcrowd.</li>
+    <li><strong>Review for clarity.</strong> Can someone unfamiliar with the loop understand it in 30 seconds? If not, simplify.</li>
+  </ul>
+
+  <h3>10. Describing the System — The Verbal Skill</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Drawing is one skill. Describing the system in words is another — and it's what you'll be asked to do in meetings, on job sites, and in troubleshooting calls. A clear verbal description follows the same path as the block diagram:</p>
+
+  <ul class="core-bullets">
+    <li><strong>Start with the process variable:</strong> "We're controlling the flow of cooling water on loop FIC-101, range 0-500 GPM."</li>
+    <li><strong>Name the transmitter:</strong> "Flow transmitter FT-101 senses the differential pressure across an orifice plate and converts it to a 4-20 mA signal."</li>
+    <li><strong>Trace the signal path:</strong> "The 4-20 mA signal goes through junction box JB-101, lands on terminal block TB1, and goes into analog input card AI-01, channel 3."</li>
+    <li><strong>Explain the PLC action:</strong> "The PLC scales the raw count to engineering units, compares it to the setpoint of 250 GPM, and runs a PID algorithm that outputs a 4-20 mA signal from AO card AO-01."</li>
+    <li><strong>Name the final element:</strong> "That signal drives flow control valve FV-101, which adjusts the cooling water flow to bring the process variable to setpoint."</li>
+    <li><strong>Close the loop:</strong> "The loop is closed — every change in valve position changes the flow, which is picked up by the transmitter, and the cycle continues."</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Interview Question</span>
+    "Describe how a PLC controls a flow loop." If you can answer this in 60 seconds — clearly, in order, with the right terms — you'll do well in any I&C interview. Practice it out loud.
+  </div>
+
+  <h3>11. Common Block Diagram Patterns You'll See</h3>
+  <table class="info-table">
+    <thead><tr><th>Pattern</th><th>Description</th><th>Where You See It</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Simple single loop</strong></td><td>One transmitter → PLC → one valve</td><td>Most basic process control</td></tr>
+      <tr><td><strong>Cascade loop</strong></td><td>Master controller output becomes slave controller setpoint</td><td>Temperature control of a jacketed vessel (master = temperature, slave = jacket flow)</td></tr>
+      <tr><td><strong>Ratio control</strong></td><td>One flow is controlled as a ratio of another</td><td>Combustion control (air/fuel ratio)</td></tr>
+      <tr><td><strong>Split-range</strong></td><td>One controller output drives two valves in sequence</td><td>Heating/cooling control with one PID</td></tr>
+      <tr><td><strong>Feedforward</strong></td><td>Disturbance is measured and compensated before it affects PV</td><td>Boiler control, heat exchangers</td></tr>
+      <tr><td><strong>Selective control</strong></td><td>Multiple controllers, high/low select picks one output</td><td>Compressor surge control, safety systems</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12. Redundant and Fault-Tolerant Configurations</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Critical loops use redundancy to keep operating even if a component fails. Block diagrams show these configurations clearly.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Redundant transmitters:</strong> Two (or three) transmitters measure the same PV. The PLC uses voting logic (median, average, or 2-out-of-3) to determine the best value.</li>
+    <li><strong>Redundant CPUs:</strong> Primary and backup CPUs run the same program. If the primary fails, the backup takes over without interrupting the process.</li>
+    <li><strong>Redundant I/O cards:</strong> Primary and backup cards wired to the same field device. If the primary fails, the backup takes over.</li>
+    <li><strong>Redundant power supplies:</strong> Two power supplies share the load. If one fails, the other picks up without a glitch.</li>
+    <li><strong>Redundant networks:</strong> Two separate network paths. If one fails, the other carries the traffic.</li>
+  </ul>
+</div>
+
+<!-- ═══════════ SECTION 4: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Draw Block Diagrams, Describe Loops, Trace Signal Flow</h2>
+
+  <h3>Exercise A: Draw the Standard Loop From Memory</h3>
+  <p style="font-size:14px;margin-bottom:10px;">On a blank sheet of paper, draw the standard control loop block diagram from section 03 — <strong>without looking at the module</strong>. Include all blocks:</p>
+  <div class="checklist">
+    <div class="checklist-item"><span class="box">☐</span><span>Process</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Transmitter</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Terminal block</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>AI card</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>PLC CPU</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>AO card</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Terminal block (output side)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Final element (valve)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>HMI/SCADA (optional)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Signal labels on every arrow</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Feedback path</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Loop number and tag numbers</span></div>
+  </div>
+  <p style="font-size:14px;margin-top:12px;">When you're done, compare against the module. Did you miss any blocks? Any signal labels?</p>
+
+  <h3>Exercise B: Draw a Temperature Loop</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Draw a block diagram for the following temperature control loop:</p>
+  <ul class="core-bullets">
+    <li>Loop number: <strong>TIC-205</strong></li>
+    <li>Process: Hot water tank, range 0-300°F, setpoint 180°F</li>
+    <li>Transmitter: <strong>TT-205</strong>, RTD, 4-20 mA output</li>
+    <li>Final element: <strong>TV-205</strong>, steam control valve, 4-20 mA input</li>
+    <li>PLC: AI card channel 5, AO card channel 2</li>
+    <li>HMI: displays temperature and setpoint, allows setpoint changes</li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Include all the same blocks as Exercise A. Label the temperature range and signal type on each arrow.</p>
+
+  <h3>Exercise C: Describe the System Out Loud</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Using the block diagram you just drew in Exercise B, <strong>describe the system out loud</strong> as if you're explaining it to a new technician. Follow the verbal pattern from section 03:</p>
+  <ul class="step-list">
+    <li>Start with the process variable and loop number.</li>
+    <li>Name the transmitter and its signal type.</li>
+    <li>Trace the signal path through terminals and I/O cards.</li>
+    <li>Explain the PLC action (scaling, PID).</li>
+    <li>Name the final element and how it affects the process.</li>
+    <li>Close the loop.</li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Time yourself. Aim to describe the loop clearly in <strong>under 60 seconds</strong>. This is the skill interviewers and senior techs look for.</p>
+
+  <h3>Exercise D: Identify the Fault</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Consider this scenario with the temperature loop from Exercise B:</p>
+  <ul class="core-bullets">
+    <li>TT-205 reads 180°F at the transmitter (verified with a multimeter measuring loop current).</li>
+    <li>The AI card channel 5 shows 45°F in the PLC software.</li>
+    <li>The PID output is stuck at 100% (valve fully open).</li>
+    <li>The valve is fully open, but the tank never reaches setpoint.</li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Where is the fault likely located? Use the block diagram to reason through it:</p>
+  <ul class="step-list">
+    <li>The transmitter reads 180°F correctly, so the transmitter is fine.</li>
+    <li>The AI card reads a different value, so the problem is between the transmitter and the AI card.</li>
+    <li>Possible causes: wiring fault between transmitter and TB, bad terminal connection, wrong AI channel configured, or scaling error in the PLC.</li>
+    <li>The valve is fully open and the temperature isn't rising — that suggests the process has reached equilibrium or the steam supply is insufficient.</li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Write down the specific steps you'd take to isolate the actual fault.</p>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Practice Goal</span>
+    By the end of these exercises, you should be able to <strong>draw the standard loop block diagram from memory in under 2 minutes</strong> and <strong>describe any loop clearly in under 1 minute</strong>. This is the baseline skill that every I&C technician needs.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qf5-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> In a standard control loop, which block converts the 4-20 mA analog signal from the field into a digital value for the CPU?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf5-1',false)">A) The AO card</li>
+      <li onclick="answer(this,'qf5-1',true)">B) The AI card</li>
+      <li onclick="answer(this,'qf5-1',false)">C) The CPU itself</li>
+      <li onclick="answer(this,'qf5-1',false)">D) The terminal block</li>
+    </ul>
+    <div class="quiz-feedback" id="qf5-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf5-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> What are the three steps of the PLC scan cycle in order?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf5-2',false)">A) Output update → Program execute → Input scan</li>
+      <li onclick="answer(this,'qf5-2',true)">B) Input scan → Program execute → Output update</li>
+      <li onclick="answer(this,'qf5-2',false)">C) Program execute → Input scan → Output update</li>
+      <li onclick="answer(this,'qf5-2',false)">D) Input scan → Output update → Program execute</li>
+    </ul>
+    <div class="quiz-feedback" id="qf5-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf5-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> A flow loop's transmitter reads 16 mA correctly, but the PLC displays a value corresponding to 8 mA. Which block is most likely at fault?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf5-3',false)">A) The transmitter</li>
+      <li onclick="answer(this,'qf5-3',false)">B) The AO card</li>
+      <li onclick="answer(this,'qf5-3',true)">C) The AI card or the wiring between the transmitter and the AI card</li>
+      <li onclick="answer(this,'qf5-3',false)">D) The final control element</li>
+    </ul>
+    <div class="quiz-feedback" id="qf5-3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-f5">—/3</span>
+    <span class="score-label" id="msg-f5" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">PLC ↔ Instrument Block Diagrams — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Signal Flow (Input)</h3>
+        <ul>
+          <li><span class="key">1.</span><span class="val">Process PV (physical)</span></li>
+          <li><span class="key">2.</span><span class="val">Transmitter → 4-20 mA</span></li>
+          <li><span class="key">3.</span><span class="val">Terminal block (pass-through)</span></li>
+          <li><span class="key">4.</span><span class="val">AI card → digital counts</span></li>
+          <li><span class="key">5.</span><span class="val">CPU → scaled engineering units</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Signal Flow (Output)</h3>
+        <ul>
+          <li><span class="key">1.</span><span class="val">CPU → digital output value</span></li>
+          <li><span class="key">2.</span><span class="val">AO card → 4-20 mA</span></li>
+          <li><span class="key">3.</span><span class="val">Terminal block (pass-through)</span></li>
+          <li><span class="key">4.</span><span class="val">Final element (valve position)</span></li>
+          <li><span class="key">5.</span><span class="val">Process changes</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>PLC Scan Cycle</h3>
+        <ul>
+          <li><span class="key">Step 1 →</span><span class="val">Input scan (read all inputs)</span></li>
+          <li><span class="key">Step 2 →</span><span class="val">Program execute (run logic)</span></li>
+          <li><span class="key">Step 3 →</span><span class="val">Output update (write outputs)</span></li>
+          <li><span class="key">Repeat →</span><span class="val">Continuously, every 5-50 ms</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>I/O Card Types</h3>
+        <ul>
+          <li><span class="key">AI →</span><span class="val">Analog In (4-20 mA → digital)</span></li>
+          <li><span class="key">AO →</span><span class="val">Analog Out (digital → 4-20 mA)</span></li>
+          <li><span class="key">DI →</span><span class="val">Digital In (24 VDC → logic 1)</span></li>
+          <li><span class="key">DO →</span><span class="val">Digital Out (logic 1 → 24 VDC)</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Block Diagram Drawing Steps</h3>
+        <ul>
+          <li><span class="key">1. →</span><span class="val">Identify PV and final element</span></li>
+          <li><span class="key">2. →</span><span class="val">List every device in the loop</span></li>
+          <li><span class="key">3. →</span><span class="val">Arrange in signal flow order</span></li>
+          <li><span class="key">4. →</span><span class="val">Draw boxes for each device</span></li>
+          <li><span class="key">5. →</span><span class="val">Arrows with signal labels</span></li>
+          <li><span class="key">6. →</span><span class="val">Close the feedback loop</span></li>
+          <li><span class="key">7. →</span><span class="val">Annotate ranges and tags</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Verbal Description Pattern</h3>
+        <ul>
+          <li><span class="key">Start →</span><span class="val">PV, loop number, range</span></li>
+          <li><span class="key">Then →</span><span class="val">Transmitter and signal type</span></li>
+          <li><span class="key">Then →</span><span class="val">Signal path (TB, I/O card)</span></li>
+          <li><span class="key">Then →</span><span class="val">PLC action (PID, scaling)</span></li>
+          <li><span class="key">Then →</span><span class="val">Final element</span></li>
+          <li><span class="key">End →</span><span class="val">Close the loop</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      Process → Transmitter → TB → AI → CPU (PID) → AO → TB → Valve → Process ↺
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qf5-1': { correct: false, answered: false },
+    'qf5-2': { correct: false, answered: false },
+    'qf5-3': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qf5-1': "✓ Correct. The AI (Analog Input) card receives the 4-20 mA signal from the field and converts it to a digital value — the raw counts the CPU can process. The AO card does the opposite (digital → 4-20 mA).",
+    'qf5-1_wrong': "✗ The AO card converts digital to analog (output side). The terminal block is just a pass-through. The CPU processes digital values, it doesn't do the conversion. The AI card is the analog-to-digital converter.",
+    'qf5-2': "✓ Correct. The PLC reads all inputs first (input scan), then runs the program logic (program execute), then writes to the outputs (output update). This cycle repeats continuously — typically every 5-50 milliseconds.",
+    'qf5-2_wrong': "✗ The order matters. The PLC must read inputs before running the program (so it knows the current state), and it must run the program before updating outputs (so it knows what to set them to). The correct order is input scan → program execute → output update.",
+    'qf5-3': "✓ Correct. The transmitter is reading correctly (16 mA). The PLC sees a value that corresponds to 8 mA. The problem is in the path between them: wiring, terminal, AI card, or PLC scaling. The AO card and final element are on the output side, and the transmitter itself is functioning.",
+    'qf5-3_wrong': "✗ If the transmitter reads correctly but the PLC sees a different value, the problem must be between them. The AI card, the wiring, the terminal block, or the PLC scaling configuration are the suspects."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-f5');
+    const msg = document.getElementById('msg-f5');
+
+    if (answered === 3) {
+      display.textContent = correct + '/3';
+      if (correct === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Foundation complete. Ready for the main modules.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and re-read carefully.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (3 - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>

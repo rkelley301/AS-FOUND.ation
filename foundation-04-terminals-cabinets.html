@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F4 — Terminal Boards & Control Cabinet Layout · Industrial Instrumentation Foundations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media(max-width:520px){ .checklist { grid-template-columns: 1fr; } }
+  .checklist-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checklist-item .box {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .callout {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .callout.blue { background: var(--accent2); }
+  .callout.green { background: var(--green); }
+  .callout.red { background: var(--red); color: #fff; }
+  .callout.purple { background: var(--purple); color: #fff; }
+  .callout.yellow { background: var(--yellow); }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Foundation Module F4 · I&C Series</div>
+  <h1>Terminal Boards & <span>Control Cabinets</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    A loop diagram tells you that wire 101-1 goes from FT-101 to TB1-1. But <strong>where is TB1-1 physically? Which cabinet? Which side? Which row?</strong> If you can't find the terminal in the panel, the drawing is useless. And when you're building or modifying a panel, you have to know where everything goes — not just electrically, but physically. Terminal blocks and cabinet layout are the bridge between the drawing and the real world.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>A control cabinet is a city. Terminal blocks are its intersections.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">In a city, every road, every block, every building has a purpose and a location. You don't put a hospital in the middle of a residential block. You don't put a highway interchange where a quiet street should be. Control cabinets work the same way — everything has a designated zone, and the terminal blocks are the intersections where different networks meet.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🏙️</div>
+      <div class="analogy-label">Cabinet Zones</div>
+      <div class="analogy-term">City districts</div>
+      <div class="analogy-desc">Power section, logic section, field wiring section. Each zone has its own purpose and layout rules.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🚦</div>
+      <div class="analogy-label">Terminal Blocks</div>
+      <div class="analogy-term">Intersections</div>
+      <div class="analogy-desc">Where field wires (suburbs) meet panel wires (downtown). Every intersection is labeled and mapped.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🛣️</div>
+      <div class="analogy-label">Wire Duct</div>
+      <div class="analogy-term">Roads</div>
+      <div class="analogy-desc">Organized pathways that keep wires where they belong. Without duct, the city is chaos.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. What Terminal Blocks Actually Do</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A terminal block is more than a place to screw wires down. It serves several critical functions:</p>
+
+  <ul class="core-bullets">
+    <li><strong>Mechanical junction:</strong> It provides a reliable, reusable connection point between a field wire and a panel wire. Field wire comes in from the field; panel wire goes to the PLC. The terminal is where they meet.</li>
+    <li><strong>Isolation point:</strong> You can disconnect a loop at the terminal for testing, without disturbing the field wiring or the panel wiring. This is why terminals matter for troubleshooting.</li>
+    <li><strong>Standardization:</strong> Field wires land on the <em>bottom</em> of a terminal; panel wires land on the <em>top</em>. This standard means anyone opening the cabinet knows where to look.</li>
+    <li><strong>Organization:</strong> Terminals group wires by loop, by signal type, or by destination. A well-organized terminal strip tells you the whole story of the panel just by looking at it.</li>
+    <li><strong>Test point:</strong> Many terminals have built-in test points (a small hole in the top) where you can touch a meter probe without loosening the wire.</li>
+  </ul>
+
+  <h3>2. Terminal Block Types</h3>
+  <table class="info-table">
+    <thead><tr><th>Type</th><th>How It Works</th><th>Best Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Screw Clamp</strong></td><td>Screw pushes a metal clamp onto the wire</td><td>Most common. Works with ferruled or bare wire.</td></tr>
+      <tr><td><strong>Spring / Push-In</strong></td><td>Spring-loaded contact grips the wire when inserted</td><td>Fast, vibration-resistant, no ferrules needed (but recommend ferrules)</td></tr>
+      <tr><td><strong>IDC (Insulation Displacement)</strong></td><td>Blade cuts through insulation to contact conductor</td><td>Telecom, some sensor wiring. Not reusable.</td></tr>
+      <tr><td><strong>Barrier Strip</strong></td><td>Individual screw terminals on a barrier-separated strip</td><td>Older panels, high-current applications</td></tr>
+      <tr><td><strong>Stud / Lug</strong></td><td>Ring terminal bolted to a stud</td><td>High current, large wires, power distribution</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. DIN Rail — The Mounting Standard</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Almost all modern terminal blocks and panel devices mount on <strong>DIN rail</strong> — a standardized metal strip. This is what makes control panels modular and reconfigurable.</p>
+
+  <table class="info-table">
+    <thead><tr><th>DIN Rail Type</th><th>Dimensions</th><th>Common Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TS35 (top hat)</strong></td><td>35mm wide, 7.5mm or 15mm deep</td><td>Industry standard — most terminals, PLCs, relays</td></tr>
+      <tr><td><strong>TS15</strong></td><td>15mm wide</td><td>Small terminals, tight spaces</td></tr>
+      <tr><td><strong>TS32 (G-rail)</strong></td><td>32mm wide, asymmetric</td><td>Older European equipment</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:14px;margin-top:10px;"><strong>Key advantage:</strong> You can snap a terminal onto the rail, slide it to position, and lock it with an end stop. No tools required for mounting. This is why panel modification is fast and clean.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- DIN Rail side view -->
+      <text x="20" y="20" fill="#6B7180" font-family="monospace" font-size="10">DIN RAIL — SIDE PROFILE (TS35)</text>
+
+      <!-- Rail cross section -->
+      <path d="M 100 60 L 100 100 L 140 100 L 140 80 L 440 80 L 440 100 L 480 100 L 480 60 L 460 60 L 460 75 L 140 75 L 140 60 Z"
+            fill="#3A3D45" stroke="#6B7180" stroke-width="1.5"/>
+
+      <!-- Dimensions -->
+      <line x1="100" y1="130" x2="480" y2="130" stroke="#3B9EFF" stroke-width="1"/>
+      <line x1="100" y1="125" x2="100" y2="135" stroke="#3B9EFF" stroke-width="1"/>
+      <line x1="480" y1="125" x2="480" y2="135" stroke="#3B9EFF" stroke-width="1"/>
+      <text x="290" y="150" fill="#3B9EFF" font-family="monospace" font-size="10" text-anchor="middle">35 mm</text>
+
+      <!-- Terminal block sitting on rail -->
+      <rect x="220" y="30" width="60" height="45" fill="#E67E22" opacity="0.9" rx="2"/>
+      <text x="250" y="58" fill="#000" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">TERM</text>
+
+      <!-- Snap-on detail -->
+      <text x="290" y="40" fill="#D4D6DC" font-family="monospace" font-size="9">Snap-on</text>
+      <text x="290" y="55" fill="#6B7180" font-family="monospace" font-size="8">No tools needed</text>
+
+      <!-- End stop -->
+      <rect x="180" y="30" width="15" height="45" fill="#A855F7" rx="2"/>
+      <text x="187" y="25" fill="#A855F7" font-family="monospace" font-size="8" text-anchor="middle">STOP</text>
+
+      <!-- Label -->
+      <text x="20" y="200" fill="#D4D6DC" font-family="monospace" font-size="10">Devices snap onto the rail.</text>
+      <text x="20" y="215" fill="#6B7180" font-family="monospace" font-size="10">End stops lock the strip from sliding.</text>
+    </svg>
+    <div class="diagram-caption">DIN rail is the universal mounting standard. Terminals, relays, PLCs, breakers, and power supplies all snap onto it.</div>
+  </div>
+
+  <h3>4. Terminal Block Configurations</h3>
+  <ul class="core-bullets">
+    <li><strong>Single-level:</strong> One connection point per side. The basic 2-wire terminal. Most common for simple wiring.</li>
+    <li><strong>Double-level (2-tier):</strong> Two connections stacked vertically. Doubles your wire density without needing a wider rail. Common in dense cabinets.</li>
+    <li><strong>Triple-level (3-tier):</strong> Three levels. Used for 3-wire or 4-wire devices (like 3-wire RTDs or 4-20 mA with separate power).</li>
+    <li><strong>Ground terminal (PE):</strong> Green/yellow colored. Connects directly to the DIN rail, which is grounded to the cabinet's earth bar. Every cabinet has these.</li>
+    <li><strong>Fused terminal:</strong> Has a built-in fuse. Protects the panel wiring without needing a separate fuse holder.</li>
+    <li><strong>Disconnect terminal:</strong> Has a lever or plug that opens the circuit without removing wires. Great for testing.</li>
+    <li><strong>Test terminal:</strong> Has a test point (usually a small hole in the top) for meter probes. Doesn't require loosening the wire.</li>
+  </ul>
+
+  <h3>5. Accessories That Make Terminals Work</h3>
+  <table class="info-table">
+    <thead><tr><th>Accessory</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>End stop</strong></td><td>Locks the terminal strip in place on the rail — prevents sliding</td></tr>
+      <tr><td><strong>End cover</strong></td><td>Insulates the exposed metal at the ends of a terminal strip</td></tr>
+      <tr><td><strong>Jumper bar / bridge</strong></td><td>Connects adjacent terminals together (for commoning 24V or 0V)</td></tr>
+      <tr><td><strong>Marker tag</strong></td><td>Slides into the terminal to label it (e.g., "TB1-5" or "101-1")</td></tr>
+      <tr><td><strong>Partition plate</strong></td><td>Insulating divider between groups of different voltage circuits</td></tr>
+      <tr><td><strong>Test plug</strong></td><td>Plugs into a test terminal to provide a probe point</td></tr>
+      <tr><td><strong>DIN rail ground clamp</strong></td><td>Bonds the rail to earth — required by code in most installations</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6. Numbering &amp; Labeling — The Rules</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Terminal numbering follows industry conventions that let anyone trace a wire from the drawing to the physical panel.</p>
+
+  <ul class="core-bullets">
+    <li><strong>TB designation:</strong> Each terminal strip gets a name — TB1, TB2, TB3, etc. Larger strips get divided into sections (TB1A, TB1B).</li>
+    <li><strong>Sequential numbering:</strong> Terminals are numbered 1, 2, 3, 4... left to right, top to bottom. This is the physical position on the strip.</li>
+    <li><strong>Wire number ≠ terminal number:</strong> A wire labeled 101-1 lands on terminal 5. The wire has its own number, the terminal has its own number, and the drawing links them.</li>
+    <li><strong>Labels are mandatory:</strong> Every terminal has a marker. Every wire has a label within 2 inches of the terminal. No exceptions.</li>
+    <li><strong>Numbering convention groups:</strong> Terminals for analog inputs might be TB1-1 through TB1-20; digital inputs TB1-21 through TB1-60; outputs TB1-61 through TB1-100. This is called <em>structured numbering</em> and makes troubleshooting much faster.</li>
+  </ul>
+
+  <h3>7. Control Cabinet Layout — The Big Picture</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A well-designed cabinet is organized into <strong>zones</strong>. Each zone has a purpose, and devices within a zone share similar characteristics. Here's the standard layout (from top to bottom):</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 620 460" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cabinet outline -->
+      <rect x="50" y="30" width="520" height="410" fill="#0E0F14" stroke="#6B7180" stroke-width="3" rx="4"/>
+
+      <!-- Zone 1: Top - Power entry -->
+      <rect x="60" y="40" width="500" height="60" fill="#1A0C0C" opacity="0.4" rx="3"/>
+      <text x="80" y="65" fill="#E74C3C" font-family="monospace" font-size="10" font-weight="bold">ZONE 1 — INCOMING POWER</text>
+      <text x="80" y="82" fill="#6B7180" font-family="monospace" font-size="9">Main breaker, disconnect, surge protection, distribution breakers</text>
+      <!-- Breakers -->
+      <rect x="400" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+      <rect x="422" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+      <rect x="444" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+      <rect x="466" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+      <rect x="488" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+      <rect x="510" y="48" width="18" height="40" fill="#E74C3C" rx="2"/>
+
+      <!-- Zone 2: Power supplies and distribution -->
+      <rect x="60" y="110" width="500" height="65" fill="#16120A" opacity="0.5" rx="3"/>
+      <text x="80" y="135" fill="#F1C40F" font-family="monospace" font-size="10" font-weight="bold">ZONE 2 — POWER SUPPLIES &amp; DC DISTRIBUTION</text>
+      <text x="80" y="152" fill="#6B7180" font-family="monospace" font-size="9">24 VDC power supplies, DC distribution breakers, fusing</text>
+      <!-- Power supplies -->
+      <rect x="400" y="118" width="70" height="48" fill="#F1C40F" opacity="0.8" rx="3"/>
+      <text x="435" y="147" fill="#000" font-family="monospace" font-size="9" text-anchor="middle" font-weight="bold">24V PSU</text>
+      <rect x="480" y="118" width="70" height="48" fill="#F1C40F" opacity="0.8" rx="3"/>
+      <text x="515" y="147" fill="#000" font-family="monospace" font-size="9" text-anchor="middle" font-weight="bold">24V PSU</text>
+
+      <!-- Zone 3: Logic / Control -->
+      <rect x="60" y="185" width="500" height="90" fill="#100A14" opacity="0.5" rx="3"/>
+      <text x="80" y="210" fill="#A855F7" font-family="monospace" font-size="10" font-weight="bold">ZONE 3 — LOGIC / CONTROL</text>
+      <text x="80" y="227" fill="#6B7180" font-family="monospace" font-size="9">PLC CPU, I/O cards, communication modules, relays</text>
+      <!-- PLC -->
+      <rect x="400" y="195" width="35" height="70" fill="#A855F7" opacity="0.9" rx="2"/>
+      <text x="417" y="235" fill="#fff" font-family="monospace" font-size="9" text-anchor="middle" font-weight="bold">CPU</text>
+      <rect x="440" y="195" width="30" height="70" fill="#A855F7" opacity="0.7" rx="2"/>
+      <rect x="475" y="195" width="30" height="70" fill="#A855F7" opacity="0.7" rx="2"/>
+      <rect x="510" y="195" width="30" height="70" fill="#A855F7" opacity="0.7" rx="2"/>
+      <text x="530" y="235" fill="#fff" font-family="monospace" font-size="8" text-anchor="middle">I/O</text>
+
+      <!-- Zone 4: Terminal blocks -->
+      <rect x="60" y="285" width="500" height="80" fill="#0B1A12" opacity="0.5" rx="3"/>
+      <text x="80" y="310" fill="#2ECC71" font-family="monospace" font-size="10" font-weight="bold">ZONE 4 — TERMINAL BLOCKS</text>
+      <text x="80" y="327" fill="#6B7180" font-family="monospace" font-size="9">Field wiring interface. All field wires land here.</text>
+      <!-- Terminal row -->
+      <rect x="400" y="292" width="150" height="30" fill="#2ECC71" opacity="0.6" rx="2"/>
+      <text x="475" y="312" fill="#000" font-family="monospace" font-size="9" text-anchor="middle" font-weight="bold">TB1 · TB2 · TB3 ...</text>
+
+      <!-- Zone 5: Cable entry -->
+      <rect x="60" y="375" width="500" height="55" fill="#0C1420" opacity="0.5" rx="3"/>
+      <text x="80" y="398" fill="#3B9EFF" font-family="monospace" font-size="10" font-weight="bold">ZONE 5 — CABLE ENTRY / GLANDS</text>
+      <text x="80" y="415" fill="#6B7180" font-family="monospace" font-size="9">Cable glands, strain relief, shield bars. Wires enter from bottom.</text>
+      <!-- Glands -->
+      <circle cx="430" cy="405" r="8" fill="#3B9EFF" opacity="0.8"/>
+      <circle cx="460" cy="405" r="8" fill="#3B9EFF" opacity="0.8"/>
+      <circle cx="490" cy="405" r="8" fill="#3B9EFF" opacity="0.8"/>
+      <circle cx="520" cy="405" r="8" fill="#3B9EFF" opacity="0.8"/>
+
+      <!-- Ground bar -->
+      <rect x="60" y="30" width="8" height="410" fill="#2ECC71"/>
+      <text x="30" y="235" fill="#2ECC71" font-family="monospace" font-size="9" text-anchor="middle" transform="rotate(-90 30 235)">EARTH BAR</text>
+    </svg>
+    <div class="diagram-caption">Standard cabinet zone layout: power at top, logic in the middle, terminals below the logic, cable entry at the bottom, earth bar running the full height on the side.</div>
+  </div>
+
+  <h3>8. Zone-by-Zone Layout Rules</h3>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Zone 1 — Incoming Power (top):</strong></p>
+  <ul class="core-bullets">
+    <li>Main disconnect switch (lockable) at the top so it can be reached quickly in emergency.</li>
+    <li>Surge protection devices (SPDs) on the incoming feed.</li>
+    <li>Distribution breakers for downstream circuits.</li>
+    <li>Kept at the top because heat rises and power components generate the most heat.</li>
+  </ul>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Zone 2 — DC Power Supplies:</strong></p>
+  <ul class="core-bullets">
+    <li>24 VDC power supplies (usually redundant or in parallel for critical systems).</li>
+    <li>DC distribution breakers or fused terminal blocks.</li>
+    <li>Voltage monitoring relays or alarms.</li>
+    <li>Buffering capacitors if the loads have high inrush.</li>
+  </ul>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Zone 3 — Logic / Control:</strong></p>
+  <ul class="core-bullets">
+    <li>PLC CPU, power supply module, I/O cards, communication cards.</li>
+    <li>Interposing relays for high-power outputs.</li>
+    <li>Signal conditioners (isolators, splitters, converters).</li>
+    <li>Located in the middle — easiest access for troubleshooting and firmware updates.</li>
+  </ul>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Zone 4 — Terminal Blocks:</strong></p>
+  <ul class="core-bullets">
+    <li>All field wiring lands here. Bottom of the terminal = field wire; top = panel wire.</li>
+    <li>Analog signals on one strip, digital on another, power on another.</li>
+    <li>Ground terminals at the end of each strip, tied to the earth bar.</li>
+    <li>Below the logic so field wires have the shortest run up to the PLC cards.</li>
+  </ul>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Zone 5 — Cable Entry (bottom):</strong></p>
+  <ul class="core-bullets">
+    <li>Cable glands that provide strain relief and environmental sealing.</li>
+    <li>Shield bars where analog cable shields are terminated (one end only).</li>
+    <li>Entry from below keeps water and dust from entering through the top.</li>
+    <li>Separate entries for power and signal cables to minimize EMI coupling.</li>
+  </ul>
+
+  <h3>9. Wire Duct and Routing</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Wires are routed through <strong>wire duct</strong> (also called cable trunking or Panduit) — slotted plastic channels that keep wires organized and protected. Proper routing rules:</p>
+
+  <ul class="core-bullets">
+    <li><strong>Power and signal separated:</strong> Never run 120 VAC power wires in the same duct as 24 VDC signal wires. EMI from the power wire couples into the signal.</li>
+    <li><strong>Analog separated from digital:</strong> Digital switching noise can couple into analog signals. Use separate ducts or a partition.</li>
+    <li><strong>Fill ratio:</strong> Don't fill duct more than 50-60%. The wires need room to lay flat, and tight bundling traps heat.</li>
+    <li><strong>Vertical and horizontal trunks:</strong> Design the duct layout like a road system — major vertical trunks on the sides, horizontal branches to each device.</li>
+    <li><strong>Cover after wiring:</strong> Duct covers go on after wiring is complete. They keep wires in place and protect them from accidental contact.</li>
+  </ul>
+
+  <h3>10. Environmental Ratings — NEMA and IP</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every cabinet has a rating that defines what it protects against. Know the ratings before you install or open one.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Rating</th><th>Protects Against</th><th>Typical Location</th></tr></thead>
+    <tbody>
+      <tr><td><strong>NEMA 1</strong></td><td>Indoor, dust, light contact</td><td>Climate-controlled electrical rooms</td></tr>
+      <tr><td><strong>NEMA 12 / IP54</strong></td><td>Dust, dripping water, oil mist</td><td>Indoor industrial — most control cabinets</td></tr>
+      <tr><td><strong>NEMA 4 / IP66</strong></td><td>Washdown, rain, hose-directed water</td><td>Outdoor or food processing areas</td></tr>
+      <tr><td><strong>NEMA 4X</strong></td><td>Corrosion (stainless or composite)</td><td>Chemical plants, marine, outdoor coastal</td></tr>
+      <tr><td><strong>NEMA 7 / 9</strong></td><td>Explosive atmospheres</td><td>Hazardous areas (Class I Div 1)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11. Heat Management</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Electronics generate heat. Cabinets trap it. Overheating is the #1 cause of premature electronics failure.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Passive cooling:</strong> Louvered vents, natural convection. Works for low-power panels.</li>
+    <li><strong>Filtered fan:</strong> Small fan + filter pulls cool air in and pushes hot air out. Most common for medium panels.</li>
+    <li><strong>Air conditioner:</strong> Closed-loop cooling for high-power or outdoor cabinets. Required when ambient temperature exceeds component rating.</li>
+    <li><strong>Heat exchanger:</strong> For hazardous-area cabinets — cools without opening the enclosure to outside air.</li>
+    <li><strong>Rule of thumb:</strong> Interior temperature should be 10°C below the lowest-rated component in the panel. If any device is rated to 50°C, keep the panel under 40°C.</li>
+  </ul>
+
+  <h3>12. Grounding — The Silent Requirement</h3>
+  <ul class="core-bullets">
+    <li><strong>Earth bar:</strong> A copper bar running the height of the cabinet, connected to the plant's grounding grid. Every ground wire terminates here.</li>
+    <li><strong>DIN rail grounding:</strong> The DIN rail is bonded to the earth bar via a ground clamp.</li>
+    <li><strong>PE terminals:</strong> Green/yellow terminals on every terminal strip. Connected directly to the earth bar.</li>
+    <li><strong>Shield bars:</strong> Separate from earth bar (or connected to it via a dedicated clamp). Analog cable shields terminate here.</li>
+    <li><strong>Bonding jumpers:</strong> Bolted connections between the cabinet door, cabinet body, and backplate — ensures all metal parts are at the same potential.</li>
+  </ul>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Safety</span>
+    <strong>Never open a control cabinet without knowing its voltage.</strong> Even with the main disconnect off, capacitors hold charge, PLC batteries maintain memory, and incoming feeds from other cabinets may still be live. Use a meter to verify absence of voltage before touching anything.
+  </div>
+
+  <h3>13. Cabinet Documentation</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A well-run cabinet has documentation inside the door:</p>
+  <ul class="core-bullets">
+    <li><strong>Panel layout drawing:</strong> Shows physical location of every device in the cabinet.</li>
+    <li><strong>Wiring/loop diagrams:</strong> The drawings you learned to read in F3.</li>
+    <li><strong>Bill of materials:</strong> Every component with part number and manufacturer.</li>
+    <li><strong>Laminated card with key information:</strong> Voltage, circuit IDs, contact information for panel builder.</li>
+    <li><strong>Revision history:</strong> A log of every modification, dated and signed.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Field Rule</span>
+    If you modify a panel, <strong>update the drawing before you leave</strong>. Redline the drawing, take a photo, and turn it in to whoever owns the drawing set. Half of all field headaches come from undocumented modifications.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 4: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Terminal Identification, Cabinet Walkthrough, Zone Mapping</h2>
+
+  <h3>Exercise A: Terminal Identification From a Photo</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Find any photo of a control panel terminal strip online (search "control panel terminal blocks"). Identify:</p>
+  <ul class="step-list">
+    <li>What <strong>type</strong> of terminal blocks are used? (screw, spring, etc.)</li>
+    <li>What <strong>DIN rail</strong> is it mounted on?</li>
+    <li>Are there <strong>end stops</strong> at the ends of the strip?</li>
+    <li>Are there <strong>ground terminals</strong> (green/yellow)?</li>
+    <li>What <strong>jumper bars</strong> can you spot?</li>
+    <li>What's the <strong>labeling system</strong> — how are terminals marked?</li>
+    <li>Are any terminals <strong>fused</strong> or <strong>disconnect type</strong>?</li>
+  </ul>
+
+  <h3>Exercise B: Cabinet Layout Walkthrough</h3>
+  <p style="font-size:14px;margin-bottom:10px;">If you have access to any real control cabinet (or if you can walk through one at work), examine it against the zone layout from section 03:</p>
+  <ul class="step-list">
+    <li>Where are the <strong>power components</strong> (breakers, disconnects) located? Top, middle, bottom?</li>
+    <li>Where are the <strong>power supplies</strong>? Are they labeled?</li>
+    <li>Where is the <strong>PLC / control logic</strong>? Is it accessible without removing other components?</li>
+    <li>Where do the <strong>field wires enter</strong>? Top or bottom?</li>
+    <li>Where is the <strong>terminal block zone</strong>? Is it adjacent to the PLC for short wire runs, or far away?</li>
+    <li>Where is the <strong>earth bar</strong>? Can you see the connections?</li>
+    <li>What's the <strong>NEMA/IP rating</strong>? Check the label inside the door.</li>
+    <li>What <strong>cooling</strong> method is used? Fans, louvers, AC?</li>
+    <li>Does the interior temperature feel warm, hot, or cool compared to ambient?</li>
+    <li>Is the <strong>panel drawing</strong> inside the door? Is it current?</li>
+  </ul>
+
+  <h3>Exercise C: Design a Terminal Strip</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Design a terminal strip on paper for the following field wiring:</p>
+  <ul class="core-bullets">
+    <li>Two 4-20 mA analog inputs (FT-101, PT-201) — 2 wires each = 4 terminals</li>
+    <li>Two digital inputs (LSH-301, LSL-302) — 2 wires each = 4 terminals</li>
+    <li>One 4-20 mA analog output (FV-101) — 2 wires = 2 terminals</li>
+    <li>One 24 VDC power distribution — 2 wires (24V and 0V) = 2 terminals</li>
+    <li>One ground terminal per cable</li>
+  </ul>
+  <p style="font-size:14px;margin-top:10px;">Include: terminal numbers, wire numbers (use the loop number as prefix), <strong>signal type grouping</strong> (analog together, digital together, power together, ground at the end), and a note about where the field wire lands vs. where the panel wire lands.</p>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Practice Goal</span>
+    By the end of these exercises, you should be able to <strong>walk into any control cabinet and immediately identify</strong> its zone layout, cooling method, terminal organization, and safety ratings — without needing to be shown.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qf4-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> In a typical control cabinet layout, where do field wires usually enter the cabinet?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf4-1',false)">A) Top — so rain drains away</li>
+      <li onclick="answer(this,'qf4-1',true)">B) Bottom — to keep water and dust from entering through the top</li>
+      <li onclick="answer(this,'qf4-1',false)">C) Side — for easier access</li>
+      <li onclick="answer(this,'qf4-1',false)">D) It doesn't matter</li>
+    </ul>
+    <div class="quiz-feedback" id="qf4-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf4-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> What does the designation "TB2-7" identify?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf4-2',false)">A) Wire number 2, terminal 7</li>
+      <li onclick="answer(this,'qf4-2',false)">B) Test board 2, position 7</li>
+      <li onclick="answer(this,'qf4-2',true)">C) Terminal block 2, terminal 7</li>
+      <li onclick="answer(this,'qf4-2',false)">D) Time base 2, channel 7</li>
+    </ul>
+    <div class="quiz-feedback" id="qf4-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf4-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> Why should power wiring and signal wiring use separate wire ducts in a control cabinet?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf4-3',false)">A) To save space</li>
+      <li onclick="answer(this,'qf4-3',true)">B) To prevent electromagnetic interference from coupling into signal wires</li>
+      <li onclick="answer(this,'qf4-3',false)">C) It's required by the NEC for all wiring</li>
+      <li onclick="answer(this,'qf4-3',false)">D) Power wires are thicker and need more room</li>
+    </ul>
+    <div class="quiz-feedback" id="qf4-3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-f4">—/3</span>
+    <span class="score-label" id="msg-f4" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">Terminals &amp; Cabinets — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Cabinet Zone Layout</h3>
+        <ul>
+          <li><span class="key">Zone 1 (top) →</span><span class="val">Incoming power</span></li>
+          <li><span class="key">Zone 2 →</span><span class="val">DC power supplies</span></li>
+          <li><span class="key">Zone 3 →</span><span class="val">PLC / logic</span></li>
+          <li><span class="key">Zone 4 →</span><span class="val">Terminal blocks</span></li>
+          <li><span class="key">Zone 5 (bottom) →</span><span class="val">Cable entry</span></li>
+          <li><span class="key">Side →</span><span class="val">Earth bar</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Terminal Block Types</h3>
+        <ul>
+          <li><span class="key">Screw clamp →</span><span class="val">Most common</span></li>
+          <li><span class="key">Spring/push-in →</span><span class="val">Fast, vibration-proof</span></li>
+          <li><span class="key">Ground (PE) →</span><span class="val">Green/yellow</span></li>
+          <li><span class="key">Fused →</span><span class="val">Built-in fuse</span></li>
+          <li><span class="key">Disconnect →</span><span class="val">Test without removing wire</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>DIN Rail Types</h3>
+        <ul>
+          <li><span class="key">TS35 →</span><span class="val">Industry standard</span></li>
+          <li><span class="key">TS15 →</span><span class="val">Small terminals</span></li>
+          <li><span class="key">TS32 →</span><span class="val">Older European</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Accessories</h3>
+        <ul>
+          <li><span class="key">End stop →</span><span class="val">Locks strip on rail</span></li>
+          <li><span class="key">End cover →</span><span class="val">Insulates exposed metal</span></li>
+          <li><span class="key">Jumper bar →</span><span class="val">Connects adjacent terminals</span></li>
+          <li><span class="key">Marker tag →</span><span class="val">Labels terminal</span></li>
+          <li><span class="key">Partition →</span><span class="val">Separates voltage groups</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Environmental Ratings</h3>
+        <ul>
+          <li><span class="key">NEMA 1 →</span><span class="val">Indoor, dry</span></li>
+          <li><span class="key">NEMA 12 →</span><span class="val">Dust, drip, oil mist</span></li>
+          <li><span class="key">NEMA 4 →</span><span class="val">Washdown, rain</span></li>
+          <li><span class="key">NEMA 4X →</span><span class="val">Corrosion-resistant</span></li>
+          <li><span class="key">NEMA 7/9 →</span><span class="val">Hazardous areas</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Field Rules</h3>
+        <ul>
+          <li><span class="key">Field wire →</span><span class="val">Bottom of terminal</span></li>
+          <li><span class="key">Panel wire →</span><span class="val">Top of terminal</span></li>
+          <li><span class="key">Power vs signal →</span><span class="val">Separate ducts</span></li>
+          <li><span class="key">Analog shields →</span><span class="val">Ground one end only</span></li>
+          <li><span class="key">Modify a panel →</span><span class="val">Update the drawing</span></li>
+          <li><span class="key">Every terminal →</span><span class="val">Has a label</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      Zone 1: Power · Zone 2: PSU · Zone 3: PLC · Zone 4: Terminals · Zone 5: Cable Entry
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qf4-1': { correct: false, answered: false },
+    'qf4-2': { correct: false, answered: false },
+    'qf4-3': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qf4-1': "✓ Correct. Field cables enter from the bottom of the cabinet. This is both a practical and an environmental rule — water, dust, and debris fall downward, so bottom entry keeps them from entering through the top. It also keeps cable weight off the terminals.",
+    'qf4-1_wrong': "✗ Top entry would let water and dust drain into the cabinet. Side entry is unusual and awkward. The standard is bottom entry with cable glands for strain relief and environmental sealing.",
+    'qf4-2': "✓ Correct. TB = Terminal Block. The 2 is the block number, 7 is the terminal position within that block. So TB2-7 = terminal block 2, terminal 7. This is the same prefix you learned in F3 — it's used on both drawings and physical labels.",
+    'qf4-2_wrong': "✗ TB is the standard abbreviation for Terminal Block. The first number identifies the block; the second identifies the terminal position within it.",
+    'qf4-3': "✓ Correct. AC power wires radiate electromagnetic fields that induce noise into adjacent signal wires. Separating them into different ducts (and crossing at 90° when they must intersect) minimizes that coupling. This is why analog signal wiring in industrial cabinets is so carefully routed.",
+    'qf4-3_wrong': "✗ The reason is electrical, not spatial or code-mandated. Power wires generate EMI that couples into signal wires and corrupts the signal — especially low-level 4-20 mA signals."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-f4');
+    const msg = document.getElementById('msg-f4');
+
+    if (answered === 3) {
+      display.textContent = correct + '/3';
+      if (correct === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You\'re ready for F5.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and re-read carefully.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (3 - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F2 — Wire Stripping & Terminations · Industrial Instrumentation Foundations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media(max-width:520px){ .checklist { grid-template-columns: 1fr; } }
+  .checklist-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checklist-item .box {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Foundation Module F2 · I&C Series</div>
+  <h1>Wire Stripping & <span>Terminations</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    More loop problems are caused by <strong>bad terminations than by bad transmitters</strong>. A loose screw terminal, a nicked strand, a ferrule installed backwards — these create intermittent signals that look like ghost faults. The instrument gets blamed, gets replaced, and the problem follows the wire. <strong>The technician who can make a proper termination is the one who actually fixes things.</strong>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>A termination is a handshake.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">Every electrical connection is a contract between two conductors. If the handshake is weak, the signal doesn't get through. If it's too aggressive, you damage the wire. It has to be <strong>firm, full-contact, and clean</strong>.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🤝</div>
+      <div class="analogy-label">Good Termination</div>
+      <div class="analogy-term">Firm handshake</div>
+      <div class="analogy-desc">Full contact, proper torque, no damage. Low resistance, stays tight under vibration.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🫱</div>
+      <div class="analogy-label">Loose Terminal</div>
+      <div class="analogy-term">Limp handshake</div>
+      <div class="analogy-desc">Not enough contact. High resistance, heat, intermittent signal. The #1 cause of ghost faults.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">✊</div>
+      <div class="analogy-label">Over-Torqued</div>
+      <div class="analogy-term">Crushing grip</div>
+      <div class="analogy-desc">Damages the wire, crushes strands, cracks the terminal. May work at first, fails under load.</div>
+    </div>
+  </div>
+
+  <p style="font-size:14px;margin-top:16px;">And stripping? Stripping is like <strong>peeling a banana without nicking the fruit</strong>. The insulation comes off cleanly, the conductor underneath is untouched. Nick the conductor and you've weakened the whole wire.</p>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. Wire Gauge & Strand Count</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Wire is sized by <strong>AWG (American Wire Gauge)</strong>. Here's the counterintuitive part: <em>higher AWG number = smaller wire</em>. 16 AWG is smaller than 10 AWG.</p>
+
+  <table class="info-table">
+    <thead><tr><th>AWG</th><th>Diameter</th><th>Typical Ampacity</th><th>Common Instrumentation Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>18</strong></td><td>0.040"</td><td>~7 A</td><td>4-20 mA loops, TC extension, signal wiring</td></tr>
+      <tr><td><strong>16</strong></td><td>0.051"</td><td>~10 A</td><td>Control wiring, some loop runs, solenoid circuits</td></tr>
+      <tr><td><strong>14</strong></td><td>0.064"</td><td>~15 A</td><td>Control power, motor control circuits, lighting</td></tr>
+      <tr><td><strong>12</strong></td><td>0.081"</td><td>~20 A</td><td>Power circuits, small motors, receptacle circuits</td></tr>
+      <tr><td><strong>10</strong></td><td>0.102"</td><td>~30 A</td><td>Larger motors, feeders, power distribution</td></tr>
+      <tr><td><strong>8</strong></td><td>0.128"</td><td>~40 A</td><td>Sub-panels, large motor feeders</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-top:12px;">Almost all industrial control wire is <strong>stranded</strong>, not solid. Stranded wire is flexible, resists vibration fatigue, and terminates reliably in crimp terminals. Solid wire is stiff, breaks under repeated flexing, and is mostly used in residential and some grounding applications.</p>
+
+  <p style="font-size:14px;margin-top:14px;"><strong>Strand count matters.</strong> A 16 AWG wire might be 19 strands of 29 AWG, or 26 strands of 30 AWG, or other combinations. More, finer strands = more flexible. This is why you'll see "16 AWG 19/29" on a wire label — 19 strands, each 29 AWG.</p>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Critical Rule</span>
+    <strong>Never nick, cut, or break strands while stripping.</strong> A nicked strand reduces current-carrying capacity, creates a stress riser that will break under vibration, and can cause the wire to fail inside the insulation where you can't see it.
+  </div>
+
+  <h3>2. Insulation Types</h3>
+  <p style="font-size:14px;margin-bottom:10px;">The insulation determines how you strip the wire and where it can be used.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Type</th><th>Material</th><th>Temp Rating</th><th>Strip Method</th></tr></thead>
+    <tbody>
+      <tr><td><strong>THHN / THWN</strong></td><td>PVC / nylon</td><td>90°C</td><td>Mechanical stripper</td></tr>
+      <tr><td><strong>MTW</strong></td><td>PVC / nylon</td><td>90°C</td><td>Mechanical stripper — oil & moisture resistant</td></tr>
+      <tr><td><strong>XLPE</strong></td><td>Cross-linked polyethylene</td><td>125°C</td><td>Mechanical stripper — tougher insulation</td></tr>
+      <tr><td><strong>Teflon / PTFE</strong></td><td>PTFE</td><td>200°C+</td><td>Thermal stripper preferred — mechanical often slips</td></tr>
+      <tr><td><strong>Shielded Twisted Pair</strong></td><td>Various + foil/braid shield</td><td>Varies</td><td>Careful: strip outer jacket, then shield, then inner wires</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. Strip Length — Match the Terminal</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Strip length is not arbitrary. It must match the terminal it's going into.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+      <!-- Wire body -->
+      <rect x="40" y="60" width="360" height="30" fill="#3A3D45" rx="4"/>
+      <!-- Insulation label -->
+      <text x="220" y="80" fill="#D4D6DC" font-family="monospace" font-size="12" text-anchor="middle">INSULATION</text>
+      <!-- Conductor exposed -->
+      <rect x="400" y="66" width="140" height="18" fill="#E67E22" rx="2"/>
+      <!-- Strand lines -->
+      <line x1="400" y1="70" x2="540" y2="70" stroke="#B35F0E" stroke-width="1"/>
+      <line x1="400" y1="75" x2="540" y2="75" stroke="#B35F0E" stroke-width="1"/>
+      <line x1="400" y1="80" x2="540" y2="80" stroke="#B35F0E" stroke-width="1"/>
+      <!-- Strip length dimension -->
+      <line x1="400" y1="110" x2="540" y2="110" stroke="#3B9EFF" stroke-width="1.5"/>
+      <line x1="400" y1="105" x2="400" y2="115" stroke="#3B9EFF" stroke-width="1.5"/>
+      <line x1="540" y1="105" x2="540" y2="115" stroke="#3B9EFF" stroke-width="1.5"/>
+      <text x="470" y="130" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle">STRIP LENGTH</text>
+      <!-- Conductor label -->
+      <text x="470" y="50" fill="#E67E22" font-family="monospace" font-size="11" text-anchor="middle">CONDUCTOR</text>
+      <!-- Dimension callouts -->
+      <text x="470" y="150" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">1/4" – 5/16" typical</text>
+    </svg>
+  </div>
+
+  <table class="info-table">
+    <thead><tr><th>Terminal Type</th><th>Typical Strip Length</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Screw terminal block</td><td>1/4" – 5/16"</td><td>Full insertion under the clamp, no bare copper exposed beyond terminal</td></tr>
+      <tr><td>Ferrule</td><td>Match ferrule barrel length + 1/16"</td><td>Conductor must fill the barrel completely</td></tr>
+      <tr><td>Ring / fork / spade terminal</td><td>Match terminal barrel length</td><td>Insulation should butt against the terminal's insulation grip</td></tr>
+      <tr><td>Push-in (spring) terminal</td><td>5/16" – 3/8"</td><td>Often marked on the terminal block</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Too Short vs Too Long</span>
+    <strong>Too short:</strong> Not enough conductor under the clamp → high resistance, heat, intermittent signal.<br>
+    <strong>Too long:</strong> Bare copper exposed beyond the terminal → shock hazard, short circuit risk, and reduced creepage distance.
+  </div>
+
+  <h3>4. Stripping Tools</h3>
+  <ul class="core-bullets">
+    <li><strong>Automatic self-adjusting strippers</strong> <span class="tool-tag">BEST FOR 16-24 AWG</span> — The tool senses the wire gauge and strips without nicking. Ideal for 16, 18, and 20 AWG control wire. These are what you want for instrumentation work.</li>
+    <li><strong>Manual strippers with gauge selection</strong> <span class="tool-tag">12-16 AWG</span> — You select the gauge hole that matches the wire. Requires more care but works on larger sizes where automatic strippers stop.</li>
+    <li><strong>Thermal strippers</strong> <span class="tool-tag">TEFLON / PTFE</span> — Use a heated element to melt through the insulation without touching the conductor. Essential for Teflon-insulated wire where mechanical strippers slip.</li>
+    <li><strong>Knife and pliers</strong> <span class="tool-tag">LAST RESORT</span> — Only for 8 AWG and larger where no stripper fits, or in emergencies. Very high risk of nicking strands. Use a <strong>pull-strip</strong> technique: score the insulation lightly, then pull it off with pliers. Never cut toward the conductor.</li>
+    <li><strong>Rotary strippers</strong> <span class="tool-tag">LARGER WIRE</span> — For 8 AWG and up. Adjustable blade depth. Still requires care to avoid nicking.</li>
+  </ul>
+
+  <h3>5. The Cardinal Rule — No Nicked Strands</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A nicked strand is a failure waiting to happen. Here's why:</p>
+  <ul class="core-bullets">
+    <li><strong>Reduced current capacity:</strong> Fewer strands = less copper = more resistance = more heat. On a 20 mA signal this is minor, but on a 15 A motor circuit it matters.</li>
+    <li><strong>Stress riser:</strong> A nick creates a sharp point where stress concentrates. Under vibration (and every industrial environment has vibration), the wire breaks at the nick — often inside the insulation where you can't see it.</li>
+    <li><strong>Intermittent faults:</strong> A partially broken strand can make and break contact as the wire moves. This creates the ghost faults that drive technicians crazy.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Field Test</span>
+    After stripping, <strong>flex the stripped section gently between your fingers</strong>. If any strands break or fall away, the strip was bad. Cut it off and start over. This takes 3 seconds and catches the most common mistake.
+  </div>
+
+  <h3>6. Terminal Types</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Crimp terminals come in several styles. Each has a specific use.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Ring terminal -->
+      <g transform="translate(30,40)">
+        <rect x="0" y="10" width="60" height="20" fill="#E67E22" rx="3"/>
+        <circle cx="80" cy="20" r="18" fill="none" stroke="#E67E22" stroke-width="6"/>
+        <text x="45" y="60" fill="#D4D6DC" font-family="monospace" font-size="11" text-anchor="middle">RING</text>
+        <text x="45" y="75" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Cannot pull off</text>
+      </g>
+      <!-- Fork terminal -->
+      <g transform="translate(180,40)">
+        <rect x="0" y="10" width="50" height="20" fill="#3B9EFF" rx="3"/>
+        <path d="M 50 8 L 90 8 L 90 32 L 50 32 L 70 20 Z" fill="#3B9EFF"/>
+        <text x="45" y="60" fill="#D4D6DC" font-family="monospace" font-size="11" text-anchor="middle">FORK</text>
+        <text x="45" y="75" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Can loosen, won't fall off</text>
+      </g>
+      <!-- Spade terminal -->
+      <g transform="translate(340,40)">
+        <rect x="0" y="10" width="50" height="20" fill="#2ECC71" rx="3"/>
+        <rect x="50" y="12" width="40" height="16" fill="#2ECC71" rx="2"/>
+        <text x="45" y="60" fill="#D4D6DC" font-family="monospace" font-size="11" text-anchor="middle">SPADE</text>
+        <text x="45" y="75" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">Quick connect/disconnect</text>
+      </g>
+      <!-- Pin terminal -->
+      <g transform="translate(490,40)">
+        <rect x="0" y="10" width="50" height="20" fill="#A855F7" rx="3"/>
+        <rect x="50" y="15" width="45" height="10" fill="#A855F7" rx="2"/>
+        <text x="45" y="60" fill="#D4D6DC" font-family="monospace" font-size="11" text-anchor="middle">PIN</text>
+        <text x="45" y="75" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">For push-in terminals</text>
+      </g>
+    </svg>
+  </div>
+
+  <table class="info-table">
+    <thead><tr><th>Terminal</th><th>Use When</th><th>Do Not Use When</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Ring</strong></td><td>Vibration, permanent connection, safety-critical</td><td>You need to remove it without removing the screw</td></tr>
+      <tr><td><strong>Fork</strong></td><td>You need to remove the wire without fully removing the screw</td><td>High vibration — can loosen over time</td></tr>
+      <tr><td><strong>Spade</strong></td><td>Quick connect/disconnect (like a terminal strip)</td><td>Permanent or high-vibration applications</td></tr>
+      <tr><td><strong>Pin</strong></td><td>Push-in terminal blocks</td><td>Screw terminals (use ring or fork)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7. Ferrules — The DCS/PLC Standard</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A <strong>ferrule</strong> (also called a wire end sleeve or cord end terminal) is a metal sleeve crimped onto the end of a stranded wire. It's the standard termination for DCS, PLC, and modern terminal blocks.</p>
+
+  <p style="font-size:14px;margin-bottom:8px;"><strong>Why ferrules matter:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Prevents strand spread:</strong> Without a ferrule, tightening a screw terminal spreads the strands outward. Some strands may not be captured at all, and the ones that are create an uneven contact surface.</li>
+    <li><strong>Ensures full contact:</strong> The ferrule compresses the strands into a solid mass that makes uniform contact with the terminal clamp.</li>
+    <li><strong>Protects against strand breakage:</strong> The ferrule distributes clamping force over the strands, preventing individual strands from being cut by the screw.</li>
+    <li><strong>Enables smaller terminals:</strong> Ferrules allow fine-stranded wire to be used in compact terminal blocks that would otherwise require solid wire.</li>
+  </ul>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+      <!-- Wire with ferrule -->
+      <rect x="40" y="50" width="250" height="30" fill="#3A3D45" rx="4"/>
+      <text x="165" y="70" fill="#D4D6DC" font-family="monospace" font-size="11" text-anchor="middle">INSULATION</text>
+      <!-- Ferrule -->
+      <rect x="290" y="52" width="30" height="26" fill="#E74C3C" rx="2"/>
+      <rect x="320" y="56" width="60" height="18" fill="#C0C0C0" rx="2"/>
+      <text x="350" y="70" fill="#000" font-family="monospace" font-size="9" text-anchor="middle">FERRULE</text>
+      <!-- Labels -->
+      <line x1="290" y1="95" x2="290" y2="105" stroke="#6B7180" stroke-width="1"/>
+      <line x1="320" y1="95" x2="320" y2="105" stroke="#6B7180" stroke-width="1"/>
+      <line x1="380" y1="95" x2="380" y2="105" stroke="#6B7180" stroke-width="1"/>
+      <line x1="290" y1="100" x2="380" y2="100" stroke="#6B7180" stroke-width="1"/>
+      <text x="335" y="120" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">CRIMP ZONE</text>
+      <text x="305" y="145" fill="#E74C3C" font-family="monospace" font-size="10" text-anchor="middle">COLOR = GAUGE</text>
+    </svg>
+  </div>
+
+  <p style="font-size:14px;margin-top:12px;"><strong>Ferrule color codes (DIN standard):</strong></p>
+  <table class="info-table">
+    <thead><tr><th>AWG</th><th>Ferrule Color</th><th>Typical Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>18 AWG</strong></td><td>Gray / white</td><td>Loop wiring, signal wiring</td></tr>
+      <tr><td><strong>16 AWG</strong></td><td>Black / red</td><td>Control wiring, most common</td></tr>
+      <tr><td><strong>14 AWG</strong></td><td>Blue</td><td>Control power, small motor circuits</td></tr>
+      <tr><td><strong>12 AWG</strong></td><td>Gray</td><td>Power circuits</td></tr>
+      <tr><td><strong>10 AWG</strong></td><td>Yellow</td><td>Larger power circuits</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8. Crimping — The Right Way</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Crimping is not just squeezing. A proper crimp creates a <strong>cold weld</strong> between the wire strands and the terminal — a metallurgical bond created by pressure, not solder.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Use the right tool for the terminal.</strong> Insulated terminals need an insulated-terminal crimper (the kind with a color-coded nest). Bare terminals need a bare-terminal crimper. Ferrules need a ferrule crimper. Do not interchange.</li>
+    <li><strong>Use ratcheting tools.</strong> A ratcheting crimper won't release until it reaches full compression. This guarantees a complete crimp every time. Non-ratcheting tools depend on how hard you squeeze — inconsistent.</li>
+    <li><strong>Match the crimp nest to the terminal size.</strong> The color-coded nest on the tool matches the color-coded terminal. Red tool nest = red terminals = 22-16 AWG. Blue = 16-14 AWG. Yellow = 12-10 AWG.</li>
+    <li><strong>Crimp on the barrel, not the insulation.</strong> The crimp zone is the metal barrel of the terminal (or the metal sleeve of the ferrule). Crimping on the insulation does nothing.</li>
+    <li><strong>One crimp, full compression.</strong> Don't crimp twice or crimp lightly "just to be safe." A proper ratcheting tool handles it in one cycle.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Pull Test</span>
+    After crimping, perform a <strong>pull test</strong>. Grip the terminal in one hand and the wire in the other. Pull firmly — roughly 20-40 lbs depending on wire gauge — but don't yank. The wire should break before the crimp pulls off. If the terminal pulls off, the crimp was bad.
+  </div>
+
+  <h3>9. Torque — The Invisible Specification</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every terminal has a torque specification. It's printed on the terminal block, in the manufacturer's datasheet, or on the inside of the enclosure door. <strong>Ignoring it causes fires.</strong></p>
+
+  <ul class="core-bullets">
+    <li><strong>Too loose:</strong> High contact resistance → heat → oxidation → more resistance → more heat. This is a thermal runaway that ends in arcing, melted terminals, and fires. This is the #1 cause of electrical fires in control panels.</li>
+    <li><strong>Too tight:</strong> Crushed strands, stripped screw threads, cracked terminal bodies, deformed contact surfaces. The connection may work at first but degrades over time.</li>
+    <li><strong>Use a torque screwdriver.</strong> Not a regular screwdriver, not an impact driver, not "good and tight." A calibrated torque screwdriver clicks or slips at the set value. This is the only way to know you hit the spec.</li>
+  </ul>
+
+  <table class="info-table">
+    <thead><tr><th>Terminal Size</th><th>Typical Torque Range</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Small control terminals (18-14 AWG)</td><td>4-7 in-lbs (0.45-0.8 Nm)</td><td>Most instrument terminals</td></tr>
+      <tr><td>Medium terminals (12-10 AWG)</td><td>10-15 in-lbs (1.1-1.7 Nm)</td><td>Control power, some motor circuits</td></tr>
+      <tr><td>Large terminals (8 AWG and up)</td><td>20-40 in-lbs (2.3-4.5 Nm)</td><td>Power distribution, feeders</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-top:10px;"><em>Always verify against the manufacturer's specification. These ranges are typical, not universal.</em></p>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Witness Marks</span>
+    After torquing to spec, <strong>mark the screw and terminal with a paint pen or torque marker</strong>. This creates a "witness mark" — a visual indicator that the terminal was torqued. During maintenance inspections, a broken witness mark means the terminal has loosened and needs re-torquing.
+  </div>
+
+  <h3>10. Shielded Cable — Ground One End Only</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Analog signal cables (4-20 mA, RTD, thermocouple) use <strong>shielded twisted pair</strong>. The shield is a foil or braided metal layer that surrounds the signal conductors and drains electromagnetic interference (EMI) to ground.</p>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Critical Rule</span>
+    <strong>Ground the shield at ONE end only.</strong> Usually at the controller/PLC end. Grounding both ends creates a <strong>ground loop</strong> — a circulating current through the shield that induces noise into the signal conductors. The shield is an antenna for noise, not a conductor for signal.
+  </div>
+
+  <ul class="core-bullets">
+    <li><strong>Strip the outer jacket</strong> carefully — don't nick the shield or the inner conductors.</li>
+    <li><strong>Separate the shield</strong> from the signal conductors. It may be a foil with a drain wire, or a braided sleeve.</li>
+    <li><strong>Terminate the shield</strong> to a ground terminal at the controller end only. Use a shield clamp or a dedicated ground terminal.</li>
+    <li><strong>Insulate the shield at the field end</strong> — cut it back and tape or heat-shrink it so it can't contact anything.</li>
+    <li><strong>The drain wire</strong> (the bare wire in contact with foil shield) goes to ground with the shield.</li>
+  </ul>
+
+  <h3>11. Labeling — The Thing You'll Thank Yourself For</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Every wire you terminate should be labeled at both ends. The label should match the drawing. This is not optional — it's how the next technician (or you, six months from now) knows what's what.</p>
+
+  <ul class="core-bullets">
+    <li><strong>Heat-shrink labels:</strong> Most durable. Slide onto the wire before terminating, then shrink with a heat gun.</li>
+    <li><strong>Adhesive wrap labels:</strong> Quick, but can peel off in heat or moisture. Use only in clean, dry environments.</li>
+    <li><strong>Pre-printed ferrules:</strong> Some ferrules come with printed numbers. This is the cleanest option for DCS/PLC terminations.</li>
+    <li><strong>Label both ends:</strong> The field end and the panel end. Also label at every junction, terminal block, and splice.</li>
+  </ul>
+
+  <h3>12. Common Failure Modes</h3>
+  <table class="info-table">
+    <thead><tr><th>Failure</th><th>Cause</th><th>Symptom</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Loose terminal</strong></td><td>Under-torqued, vibration</td><td>Intermittent signal, heat, discoloration</td></tr>
+      <tr><td><strong>Nicked strands</strong></td><td>Poor stripping technique</td><td>Wire breaks under vibration, open circuit</td></tr>
+      <tr><td><strong>Strand spillover</strong></td><td>No ferrule on fine-stranded wire</td><td>Short to adjacent terminal, high resistance</td></tr>
+      <tr><td><strong>Bad crimp</strong></td><td>Wrong tool, wrong nest, no pull test</td><td>Terminal pulls off, high resistance, heat</td></tr>
+      <tr><td><strong>Ground loop</strong></td><td>Shield grounded at both ends</td><td>Noise on analog signal, erratic readings</td></tr>
+      <tr><td><strong>Over-torque</strong></td><td>No torque driver</td><td>Cracked terminal, stripped screw, crushed strands</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════ SECTION 4: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Bench Practice: Strip, Ferrule, Crimp, Torque</h2>
+
+  <p style="font-size:14px;margin-bottom:12px;"><strong>Tools you need:</strong></p>
+  <div class="checklist">
+    <div class="checklist-item"><span class="box">☐</span><span>16 AWG stranded wire (a few feet)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Automatic wire strippers (16-24 AWG)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Ferrule crimper + 16 AWG ferrules</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Ratchet crimper + insulated ring terminals</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Torque screwdriver (4-7 in-lb range)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Terminal block (or a spare piece of DIN rail terminal)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Wire cutters (flush cut)</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Multimeter</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Wire labels or heat-shrink</span></div>
+    <div class="checklist-item"><span class="box">☐</span><span>Paint pen or torque marker</span></div>
+  </div>
+
+  <h3 style="margin-top:20px;">Procedure A: Strip 16 AWG Without Nicking</h3>
+  <ul class="step-list">
+    <li>Cut a 6" length of 16 AWG stranded wire. Look at the end — count the strands if you can. A typical 16 AWG has 19 or 26 strands.</li>
+    <li>Set your automatic strippers to the 16 AWG position (or let them self-adjust). Insert the wire about 1/4" into the stripping jaws.</li>
+    <li>Squeeze the handles firmly. The tool should strip the insulation cleanly in one motion. <strong>Do not twist or pull while stripping.</strong></li>
+    <li>Inspect the stripped end: <strong>All strands should be intact.</strong> No nicks, no cut strands, no copper showing where the insulation was cut.</li>
+    <li><strong>Flex test:</strong> Gently bend the stripped section back and forth between your fingers. No strands should break off.</li>
+    <li>If any strands are nicked or broken: cut the wire, strip again. Do not proceed with a bad strip.</li>
+    <li>Repeat 10 times. The goal is consistent, clean strips every time.</li>
+  </ul>
+
+  <h3 style="margin-top:20px;">Procedure B: Install a Ferrule</h3>
+  <ul class="step-list">
+    <li>Strip the 16 AWG wire to a length that matches the ferrule barrel. The conductor should fill the barrel completely — not extend past it, not leave a gap.</li>
+    <li>Slide the ferrule onto the stripped conductor. The insulation should butt up against the ferrule's plastic collar (if it has one).</li>
+    <li>Insert the ferrule into the ferrule crimper's 16 AWG nest (usually marked or color-coded).</li>
+    <li>Squeeze the crimper until it ratchets fully closed and releases. One full cycle.</li>
+    <li>Inspect the crimp: the ferrule should be uniformly compressed, with no gaps or loose strands at the entry point.</li>
+    <li><strong>Pull test:</strong> Grip the wire in one hand and the ferrule in the other. Pull firmly. The wire should not pull out of the ferrule.</li>
+    <li>Insert the ferruled wire into a terminal block. Tighten the terminal screw to 4-7 in-lbs with a torque screwdriver.</li>
+    <li>Check: the ferrule should be fully seated under the clamp. No copper or ferrule should extend beyond the terminal block's insulation barrier.</li>
+  </ul>
+
+  <h3 style="margin-top:20px;">Procedure C: Install a Ring Terminal</h3>
+  <ul class="step-list">
+    <li>Strip the 16 AWG wire to match the ring terminal's barrel length. The insulation should butt against the terminal's insulation grip (the colored plastic part).</li>
+    <li>Insert the stripped wire into the terminal barrel. Ensure all strands enter the barrel — none should spill out to the side.</li>
+    <li>Insert the terminal into the ratchet crimper's nest. Use the nest that matches the terminal's color (red for 22-16 AWG, blue for 16-14 AWG).</li>
+    <li>Squeeze the crimper until it ratchets fully closed. One full cycle.</li>
+    <li>Inspect: the crimp should be on the metal barrel, not on the insulation. The insulation grip should hold the wire's insulation, and the metal crimp should hold the conductor.</li>
+    <li><strong>Pull test:</strong> Pull firmly. The wire should not pull out of the terminal.</li>
+    <li>Install the ring terminal on a screw terminal. Tighten to the manufacturer's torque spec.</li>
+    <li>Mark the screw with a paint pen (witness mark).</li>
+  </ul>
+
+  <h3 style="margin-top:20px;">Procedure D: Verify with a Multimeter</h3>
+  <ul class="step-list">
+    <li>Set your multimeter to continuity mode (or the lowest ohms range).</li>
+    <li>Touch one probe to the wire conductor (back from the termination) and the other probe to the terminal's contact surface (the ring, the ferrule tip, or the terminal block screw).</li>
+    <li>The meter should read <strong>less than 1 ohm</strong> — ideally less than 0.1 ohm. This confirms the termination is electrically sound.</li>
+    <li>If the meter reads OL (open loop) or high resistance, the crimp is bad or the wire isn't making contact. Re-terminate.</li>
+    <li>For a more thorough test, measure the resistance of a 10-foot piece of wire with terminations at both ends. Subtract the theoretical wire resistance (16 AWG is about 4 ohms per 1000 ft). The difference is your termination resistance.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Practice Goal</span>
+    Do each procedure at least 5 times. By the end, you should be able to strip, ferrule, and crimp a 16 AWG wire <strong>without looking at the tool</strong> — just by feel. That's the level of muscle memory you need in the field.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qf2-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> You're stripping 16 AWG wire and accidentally nick a few strands. What should you do?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf2-1',false)">A) Continue — a few nicked strands won't matter</li>
+      <li onclick="answer(this,'qf2-1',false)">B) Twist the nicked strands back into place</li>
+      <li onclick="answer(this,'qf2-1',true)">C) Cut the wire and strip again</li>
+      <li onclick="answer(this,'qf2-1',false)">D) Cover the nick with electrical tape</li>
+    </ul>
+    <div class="quiz-feedback" id="qf2-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf2-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> What is the primary purpose of a ferrule on fine-stranded wire?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf2-2',false)">A) To increase the wire's current capacity</li>
+      <li onclick="answer(this,'qf2-2',true)">B) To prevent strands from spreading and ensure full contact in the terminal</li>
+      <li onclick="answer(this,'qf2-2',false)">C) To provide a color code for the wire gauge</li>
+      <li onclick="answer(this,'qf2-2',false)">D) To make the wire easier to strip</li>
+    </ul>
+    <div class="quiz-feedback" id="qf2-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qf2-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> A shielded analog signal cable's shield should be grounded:</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qf2-3',false)">A) At both ends</li>
+      <li onclick="answer(this,'qf2-3',false)">B) At neither end</li>
+      <li onclick="answer(this,'qf2-3',true)">C) At one end only</li>
+      <li onclick="answer(this,'qf2-3',false)">D) At every junction</li>
+    </ul>
+    <div class="quiz-feedback" id="qf2-3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-f2">—/3</span>
+    <span class="score-label" id="msg-f2" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">Wire Stripping & Terminations — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Wire Gauge Quick Ref</h3>
+        <ul>
+          <li><span class="key">18 AWG →</span><span class="val">~7 A · signal wiring</span></li>
+          <li><span class="key">16 AWG →</span><span class="val">~10 A · control wiring</span></li>
+          <li><span class="key">14 AWG →</span><span class="val">~15 A · control power</span></li>
+          <li><span class="key">12 AWG →</span><span class="val">~20 A · power circuits</span></li>
+          <li><span class="key">10 AWG →</span><span class="val">~30 A · larger motors</span></li>
+          <li><span class="key">8 AWG →</span><span class="val">~40 A · feeders</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Ferrule Color Codes</h3>
+        <ul>
+          <li><span class="key">18 AWG →</span><span class="val">Gray / white</span></li>
+          <li><span class="key">16 AWG →</span><span class="val">Black / red</span></li>
+          <li><span class="key">14 AWG →</span><span class="val">Blue</span></li>
+          <li><span class="key">12 AWG →</span><span class="val">Gray</span></li>
+          <li><span class="key">10 AWG →</span><span class="val">Yellow</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Torque Specs (Typical)</h3>
+        <ul>
+          <li><span class="key">18-14 AWG →</span><span class="val">4-7 in-lbs</span></li>
+          <li><span class="key">12-10 AWG →</span><span class="val">10-15 in-lbs</span></li>
+          <li><span class="key">8 AWG+ →</span><span class="val">20-40 in-lbs</span></li>
+          <li><span class="key">Always →</span><span class="val">Check mfr spec</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Terminal Selection</h3>
+        <ul>
+          <li><span class="key">Vibration →</span><span class="val">Ring terminal</span></li>
+          <li><span class="key">Removable →</span><span class="val">Fork terminal</span></li>
+          <li><span class="key">Quick disconnect →</span><span class="val">Spade</span></li>
+          <li><span class="key">DCS/PLC →</span><span class="val">Ferrule</span></li>
+          <li><span class="key">Push-in →</span><span class="val">Pin terminal</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Strip Length Guide</h3>
+        <ul>
+          <li><span class="key">Screw terminal →</span><span class="val">1/4" – 5/16"</span></li>
+          <li><span class="key">Ferrule →</span><span class="val">Barrel length + 1/16"</span></li>
+          <li><span class="key">Ring/fork →</span><span class="val">Match barrel length</span></li>
+          <li><span class="key">Push-in →</span><span class="val">5/16" – 3/8"</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Field Rules</h3>
+        <ul>
+          <li><span class="key">Never →</span><span class="val">Nick strands</span></li>
+          <li><span class="key">Always →</span><span class="val">Pull-test crimps</span></li>
+          <li><span class="key">Always →</span><span class="val">Torque to spec</span></li>
+          <li><span class="key">Always →</span><span class="val">Mark witness marks</span></li>
+          <li><span class="key">Shield →</span><span class="val">Ground one end only</span></li>
+          <li><span class="key">Label →</span><span class="val">Both ends, every junction</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      Strip clean · No nicks · Full insertion · Correct torque · Pull test · Witness mark
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qf2-1': { correct: false, answered: false },
+    'qf2-2': { correct: false, answered: false },
+    'qf2-3': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qf2-1': "✓ Correct. A nicked strand is a failure waiting to happen. It reduces current capacity, creates a stress riser, and will break under vibration — often inside the insulation where you can't see it. Cut it off and strip again. It takes 10 seconds.",
+    'qf2-1_wrong': "✗ A nicked strand can't be fixed by twisting or taping. It's permanently weakened and will break under vibration. The only correct answer is to cut and re-strip.",
+    'qf2-2': "✓ Correct. A ferrule compresses the strands into a solid mass so they make full, uniform contact with the terminal clamp. Without it, strands spread outward and some may not be captured at all.",
+    'qf2-2_wrong': "✗ A ferrule doesn't change current capacity or make stripping easier. Its purpose is mechanical: to keep strands together and ensure full contact in the terminal.",
+    'qf2-3': "✓ Correct. Grounding the shield at both ends creates a ground loop — a circulating current through the shield that induces noise into the signal conductors. Ground one end only, usually at the controller.",
+    'qf2-3_wrong': "✗ Grounding both ends creates a ground loop that adds noise. Grounding neither end leaves the shield floating, so it doesn't drain EMI. The correct answer is one end only."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-f2');
+    const msg = document.getElementById('msg-f2');
+
+    if (answered === 3) {
+      display.textContent = correct + '/3';
+      if (correct === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You\'re ready for F3.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and re-read carefully.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (3 - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>
