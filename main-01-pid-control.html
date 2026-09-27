@@ -536,6 +536,81 @@
     border-bottom: 1px solid var(--border);
   }
   .zn-card ul li:last-child { border-bottom: none; }
+
+  /* ── SIMULATOR ── */
+  .simulator {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    margin-top: 14px;
+  }
+  .sim-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media(max-width:560px){ .sim-controls { grid-template-columns: 1fr; } }
+  .sim-slider label {
+    display: flex; justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .sim-val { color: var(--accent); font-weight: 700; }
+  .sim-slider input[type=range] {
+    width: 100%; accent-color: var(--accent); cursor: pointer;
+  }
+  .sim-buttons { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .sim-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sim-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .sim-btn-primary { border-color: var(--accent); color: var(--accent); }
+  .sim-btn-primary:hover { background: #1A1108; }
+  .sim-plot { width: 100%; height: auto; background: var(--bg); border-radius: 4px; display: block; }
+  .sim-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    margin-top: 8px; text-align: center;
+  }
+
+  /* ── RESPONSE CARDS (07B) ── */
+  .response-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+  @media(max-width:560px){ .response-options { grid-template-columns: 1fr; } }
+  .response-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    text-align: center;
+  }
+  .response-card:hover { border-color: var(--accent); }
+  .response-card.correct { background: #0B1A12; border-color: var(--green); }
+  .response-card.wrong { background: #1A0C0C; border-color: var(--red); }
+  .response-card.reveal-correct { background: #0B1A12; border-color: var(--green); }
+  .response-card svg { display: block; margin: 0 auto 6px; }
+  .response-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .response-desc { font-size: 11px; color: var(--text); line-height: 1.4; }
+
+  /* ── 07C STAGING ── */
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); margin: 10px 0 8px;
+  }
+  .stage2-locked { opacity: 0.35; pointer-events: none; transition: opacity 0.3s; }
+  .stage2-locked.unlocked { opacity: 1; pointer-events: auto; }
+  .exercise-reset { margin-top: 20px; text-align: center; }
 </style>
 </head>
 <body>
@@ -925,41 +1000,255 @@
     <span class="section-num" style="background:#0F0F14;color:var(--yellow);">07</span>
     Hands-On Exercise
   </div>
-  <h2>Simulate, Tune, Troubleshoot</h2>
+  <h2>Simulate, Predict, Diagnose</h2>
 
-  <h3>Exercise A: PID Simulator — Full Tuning Session</h3>
-  <p style="font-size:14px;margin-bottom:10px;">Go to <strong>pidtuner.com</strong> or search "PID simulator online." Run through this complete tuning session:</p>
+  <!-- ── INLINE SIMULATOR ── -->
+  <h3>PID Simulator</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Drag the sliders to change tuning. Click <strong>Setpoint Step</strong> to apply a disturbance. Watch the PV response.</p>
 
+  <div class="simulator">
+    <div class="sim-controls">
+      <div class="sim-slider">
+        <label for="sim-kp">Kp <span class="sim-val" id="sim-kp-val">1.00</span></label>
+        <input type="range" id="sim-kp" min="0" max="10" step="0.1" value="1.0" oninput="simUpdate()">
+      </div>
+      <div class="sim-slider">
+        <label for="sim-ki">Ki <span class="sim-val" id="sim-ki-val">0.00</span></label>
+        <input type="range" id="sim-ki" min="0" max="5" step="0.01" value="0" oninput="simUpdate()">
+      </div>
+      <div class="sim-slider">
+        <label for="sim-kd">Kd <span class="sim-val" id="sim-kd-val">0.00</span></label>
+        <input type="range" id="sim-kd" min="0" max="5" step="0.05" value="0" oninput="simUpdate()">
+      </div>
+    </div>
+
+    <div class="sim-buttons">
+      <button class="sim-btn sim-btn-primary" onclick="simStep()">Setpoint Step</button>
+      <button class="sim-btn" onclick="simReset()">Reset</button>
+    </div>
+
+    <svg id="sim-plot" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" class="sim-plot">
+      <line x1="40" y1="180" x2="580" y2="180" stroke="#6B7180" stroke-width="1"/>
+      <line x1="40" y1="20" x2="40" y2="180" stroke="#6B7180" stroke-width="1"/>
+      <text x="30" y="110" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle" transform="rotate(-90 30 110)">PV</text>
+      <text x="310" y="205" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">TIME</text>
+      <line id="sim-sp-line" x1="40" y1="60" x2="580" y2="60" stroke="#E67E22" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text id="sim-sp-label" x="585" y="63" fill="#E67E22" font-family="monospace" font-size="9">SP</text>
+      <path id="sim-pv-path" d="" fill="none" stroke="#3B9EFF" stroke-width="2"/>
+      <text id="sim-empty" x="310" y="110" fill="#6B7180" font-family="monospace" font-size="11" text-anchor="middle">Click "Setpoint Step" to run</text>
+    </svg>
+    <div class="sim-caption">Simplified second-order process response. Not to scale.</div>
+  </div>
+
+  <!-- ── 07A PROCEDURAL TUNING ── -->
+  <h3>07A · Tuning Session</h3>
   <ul class="step-list">
-    <li><strong>Baseline:</strong> Set Kp=1, Ki=0, Kd=0. Apply a setpoint step. Observe the steady-state offset.</li>
-    <li><strong>Tune P:</strong> Increase Kp until the loop responds quickly but doesn't oscillate. Note the value. This is your "P only" tuning.</li>
-    <li><strong>Add I:</strong> Start with a small Ki (0.01). Increase slowly until the offset is eliminated. Watch for overshoot. Find the Ki that eliminates offset with minimal overshoot.</li>
-    <li><strong>Cause windup:</strong> Set Ki=5 (way too high). Apply a large setpoint step. Watch the windup and overshoot. Reset Ki to a reasonable value.</li>
-    <li><strong>Add D:</strong> If there's still overshoot, add a small amount of Kd (0.1). Increase carefully, watching for noise. Find the Kd that smooths the approach.</li>
-    <li><strong>Test disturbance rejection:</strong> With your tuned values, introduce a load disturbance (if the simulator supports it). Watch the recovery.</li>
-    <li><strong>Document your tuning:</strong> Write down the final Kp, Ki, Kd, and describe the response.</li>
+    <li><strong>Set Kp=1, Ki=0, Kd=0.</strong> Click Setpoint Step. Observe the steady-state offset — the PV never quite reaches SP. This is P-only droop.</li>
+    <li><strong>Tune P.</strong> Increase Kp until the response is fast but not oscillating. Back off 20%. Write down the value.</li>
+    <li><strong>Tune I.</strong> Start with Ki=0.01. Increase slowly until the offset is eliminated with minimal overshoot. Watch for windup at high Ki. Write down the value.</li>
+    <li><strong>Tune D.</strong> Only if overshoot remains. Start with Kd=0.1. Increase carefully — watch for noise amplification. Write down the value.</li>
+    <li><strong>Document.</strong> Write your final Kp/Ki/Kd. For each value, write one sentence explaining why you stopped where you did.</li>
   </ul>
 
-  <h3>Exercise B: Ziegler-Nichols Tuning</h3>
-  <p style="font-size:14px;margin-bottom:10px;">Using the same simulator, perform the Ziegler-Nichols closed-loop method:</p>
-  <ul class="step-list">
-    <li>Set Ki=0, Kd=0.</li>
-    <li>Increase Kp until the loop oscillates with constant amplitude. Record Ku and Pu.</li>
-    <li>Calculate Kp, Ti, Td from the Z-N table.</li>
-    <li>Enter those values. Observe the response. Is it faster than your manual tuning? Is it more oscillatory?</li>
-    <li>Apply the "practical correction" — reduce Kp by 25%, increase Ti by 25%. Compare again.</li>
-  </ul>
+  <!-- ── 07B PREDICTION ── -->
+  <h3>07B · Predict the Response</h3>
+  <p style="font-size:14px;margin-bottom:10px;">For each scenario, commit to a prediction <em>before</em> clicking. No second attempts.</p>
 
-  <h3>Exercise C: Troubleshooting Scenarios</h3>
-  <p style="font-size:14px;margin-bottom:10px;">For each scenario, identify the most likely cause and the fix:</p>
-  <ul class="core-bullets">
-    <li><strong>Scenario 1:</strong> A flow loop oscillates with a period of about 3 seconds. Amplitude is steady. The valve is moving constantly. The PV signal looks clean. <em>(Answer: Kp too high — reduce Kp.)</em></li>
-    <li><strong>Scenario 2:</strong> A temperature loop oscillates slowly, period about 5 minutes. Overshoots by 15°F, then undershoots by 10°F, slowly decaying. <em>(Answer: Ki too high or Ti too short — reduce integral action.)</em></li>
-    <li><strong>Scenario 3:</strong> A pressure loop sits at 2 PSI below setpoint indefinitely. No oscillation, just steady offset. Output is at 45%. <em>(Answer: Integral action off or Ki too low — enable or increase integral.)</em></li>
-    <li><strong>Scenario 4:</strong> A level loop's valve signal is at 100% but the level won't reach setpoint. The valve is fully open. <em>(Answer: Valve undersized or process demand exceeds capacity — check valve Cv and upstream supply.)</em></li>
-    <li><strong>Scenario 5:</strong> After a large setpoint change, the loop overshoots by 30% and takes a long time to recover. <em>(Answer: Integral windup — check anti-windup settings or reduce Ki.)</em></li>
-    <li><strong>Scenario 6:</strong> A flow loop oscillates with a very small amplitude at high frequency (2-3 Hz). The valve is jittering. D action is set to 0.5. <em>(Answer: Kd too high, amplifying noise — reduce Kd or filter the PV.)</em></li>
-  </ul>
+  <!-- B1 -->
+  <div class="quiz-item" id="B1">
+    <div class="quiz-q"><span class="qnum">B1.</span> Loop is stable: <strong>Kp=1.0, Ki=0.1, Kd=0</strong>. Small steady-state offset (~2%). Clean PV signal. You increase <strong>Ki to 2.0</strong>. Which PV response results?</div>
+    <div class="response-options">
+      <div class="response-card" onclick="predictB(this,'B1',false)">
+        <div class="response-label">Option A</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 60 50 120 42 Q 160 38 185 36" stroke="#F1C40F" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Slower approach, larger offset</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B1',false)">
+        <div class="response-label">Option B</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 50 30 80 32 Q 120 36 160 35 L 185 35" stroke="#2ECC71" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Faster approach, small overshoot, clean settle</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B1',true)">
+        <div class="response-label">Option C</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 35 15 55 30 Q 75 50 95 20 Q 115 5 135 30 Q 155 55 175 25 Q 185 15 190 28" stroke="#E74C3C" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Strong overshoot, sustained oscillation</div>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="B1-fb"></div>
+  </div>
+
+  <!-- B2 -->
+  <div class="quiz-item" id="B2">
+    <div class="quiz-q"><span class="qnum">B2.</span> Loop is slow: <strong>Kp=0.5, Ki=0.1, Kd=0</strong>. Takes ~4 minutes to reach setpoint after a step. You increase <strong>Kp to 3.0</strong>. Which PV response results?</div>
+    <div class="response-options">
+      <div class="response-card" onclick="predictB(this,'B2',false)">
+        <div class="response-label">Option A</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 50 30 80 33 Q 120 36 160 35 L 185 35" stroke="#2ECC71" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Faster response, no overshoot, clean settle</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B2',true)">
+        <div class="response-label">Option B</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 30 20 50 30 Q 70 50 90 25 Q 110 10 130 32 Q 150 50 175 28 Q 185 22 190 30" stroke="#E74C3C" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Faster response with growing oscillation</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B2',false)">
+        <div class="response-label">Option C</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 80 52 130 50 Q 170 49 185 48" stroke="#6B7180" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">No visible change</div>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="B2-fb"></div>
+  </div>
+
+  <!-- B3 -->
+  <div class="quiz-item" id="B3">
+    <div class="quiz-q"><span class="qnum">B3.</span> Loop is stable: <strong>Kp=1.0, Ki=0.1, Kd=0</strong>. Overshoots ~10% after each setpoint change. Clean PV signal. You add <strong>Kd=0.3</strong>. Which PV response results?</div>
+    <div class="response-options">
+      <div class="response-card" onclick="predictB(this,'B3',true)">
+        <div class="response-label">Option A</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 55 28 90 33 Q 130 36 165 35 L 185 35" stroke="#2ECC71" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Reduced overshoot, smoother approach</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B3',false)">
+        <div class="response-label">Option B</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 40 15 65 40 Q 90 60 120 25 Q 150 5 185 40" stroke="#E74C3C" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Amplified overshoot</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B3',false)">
+        <div class="response-label">Option C</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 30 38 45 42 Q 55 30 70 40 Q 85 25 100 40 Q 115 30 130 42 Q 145 28 160 40 Q 175 32 185 38" stroke="#F1C40F" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Valve jitter, PV noisy</div>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="B3-fb"></div>
+  </div>
+
+  <!-- B4 -->
+  <div class="quiz-item" id="B4">
+    <div class="quiz-q"><span class="qnum">B4.</span> Loop sits 3% below SP indefinitely: <strong>Kp=1.0, Ki=0, Kd=0</strong>. Output steady at ~55%. No oscillation. You enable <strong>Ki=0.1</strong>. Which PV response results?</div>
+    <div class="response-options">
+      <div class="response-card" onclick="predictB(this,'B4',true)">
+        <div class="response-label">Option A</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 48 Q 70 46 120 38 Q 160 36 185 35" stroke="#2ECC71" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Offset eliminated, PV reaches SP</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B4',false)">
+        <div class="response-label">Option B</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 48 Q 80 48 130 48 Q 170 48 185 48" stroke="#6B7180" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Offset remains, no change</div>
+      </div>
+      <div class="response-card" onclick="predictB(this,'B4',false)">
+        <div class="response-label">Option C</div>
+        <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 48 Q 30 20 45 40 Q 60 60 80 18 Q 100 5 120 42 Q 140 60 165 15 Q 180 8 190 35" stroke="#E74C3C" stroke-width="2" fill="none"/></svg>
+        <div class="response-desc">Loop goes unstable</div>
+      </div>
+    </div>
+    <div class="quiz-feedback" id="B4-fb"></div>
+  </div>
+
+  <!-- ── 07C DIAGNOSE ── -->
+  <h3>07C · Diagnose the Loop</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Two stages per scenario. Stage 2 unlocks after Stage 1 is revealed.</p>
+
+  <!-- C1 -->
+  <div class="quiz-item" id="C1">
+    <div class="quiz-q"><span class="qnum">C1.</span> PV oscillates with a period of ~3 seconds. Amplitude steady. Valve constantly moving. PV signal clean.</div>
+    <div class="stage-label">Stage 1 — Most likely cause</div>
+    <ul class="quiz-options">
+      <li onclick="diagnoseCause(this,'C1',true)">A) Kp too high</li>
+      <li onclick="diagnoseCause(this,'C1',false)">B) Ki too high</li>
+      <li onclick="diagnoseCause(this,'C1',false)">C) Kd too high</li>
+      <li onclick="diagnoseCause(this,'C1',false)">D) Valve stiction</li>
+    </ul>
+    <div class="quiz-feedback" id="C1-cause-fb"></div>
+
+    <div class="stage2-locked" id="C1-stage2">
+      <div class="stage-label" style="margin-top:14px;">Stage 2 — First safe check</div>
+      <ul class="quiz-options">
+        <li onclick="chooseNextCheck(this,'C1',true)">A) Reduce Kp by 25%, observe</li>
+        <li onclick="chooseNextCheck(this,'C1',false)">B) Increase Ki to compensate</li>
+        <li onclick="chooseNextCheck(this,'C1',false)">C) Replace the valve</li>
+        <li onclick="chooseNextCheck(this,'C1',false)">D) Add a filter to the PV signal</li>
+      </ul>
+      <div class="quiz-feedback" id="C1-next-fb"></div>
+    </div>
+  </div>
+
+  <!-- C2 -->
+  <div class="quiz-item" id="C2">
+    <div class="quiz-q"><span class="qnum">C2.</span> After a large setpoint change, PV overshoots by 30°F. During overshoot, controller output was at 100% for ~90 seconds. Recovery takes ~20 minutes.</div>
+    <div class="stage-label">Stage 1 — Most likely cause</div>
+    <ul class="quiz-options">
+      <li onclick="diagnoseCause(this,'C2',true)">A) Integral windup</li>
+      <li onclick="diagnoseCause(this,'C2',false)">B) Kp too low</li>
+      <li onclick="diagnoseCause(this,'C2',false)">C) Kd too low</li>
+      <li onclick="diagnoseCause(this,'C2',false)">D) Transmitter miscalibrated</li>
+    </ul>
+    <div class="quiz-feedback" id="C2-cause-fb"></div>
+
+    <div class="stage2-locked" id="C2-stage2">
+      <div class="stage-label" style="margin-top:14px;">Stage 2 — First safe check</div>
+      <ul class="quiz-options">
+        <li onclick="chooseNextCheck(this,'C2',true)">A) Verify anti-windup is enabled; if not, enable it</li>
+        <li onclick="chooseNextCheck(this,'C2',false)">B) Reduce Kp by 50%</li>
+        <li onclick="chooseNextCheck(this,'C2',false)">C) Replace the controller</li>
+        <li onclick="chooseNextCheck(this,'C2',false)">D) Reduce the setpoint change size</li>
+      </ul>
+      <div class="quiz-feedback" id="C2-next-fb"></div>
+    </div>
+  </div>
+
+  <!-- C3 -->
+  <div class="quiz-item" id="C3">
+    <div class="quiz-q"><span class="qnum">C3.</span> Controller output at 100%. Valve fully open (verified visually and by position feedback). PV 5% below SP and steady. No oscillation.</div>
+    <div class="stage-label">Stage 1 — Most likely cause</div>
+    <ul class="quiz-options">
+      <li onclick="diagnoseCause(this,'C3',true)">A) Valve undersized or process demand exceeds capacity</li>
+      <li onclick="diagnoseCause(this,'C3',false)">B) Ki too high</li>
+      <li onclick="diagnoseCause(this,'C3',false)">C) Kd too high</li>
+      <li onclick="diagnoseCause(this,'C3',false)">D) PV filter over-damped</li>
+    </ul>
+    <div class="quiz-feedback" id="C3-cause-fb"></div>
+
+    <div class="stage2-locked" id="C3-stage2">
+      <div class="stage-label" style="margin-top:14px;">Stage 2 — First safe check</div>
+      <ul class="quiz-options">
+        <li onclick="chooseNextCheck(this,'C3',true)">A) Check valve Cv against required flow; verify upstream supply pressure</li>
+        <li onclick="chooseNextCheck(this,'C3',false)">B) Increase Ki</li>
+        <li onclick="chooseNextCheck(this,'C3',false)">C) Increase Kp</li>
+        <li onclick="chooseNextCheck(this,'C3',false)">D) Enable derivative</li>
+      </ul>
+      <div class="quiz-feedback" id="C3-next-fb"></div>
+    </div>
+  </div>
+
+  <!-- C4 -->
+  <div class="quiz-item" id="C4">
+    <div class="quiz-q"><span class="qnum">C4.</span> PV sits 2°F below SP indefinitely. Output steady at 45%. Loop stable. No oscillation. Transmitter recently calibrated and verified against a reference instrument.</div>
+    <div class="stage-label">Stage 1 — Most likely cause</div>
+    <ul class="quiz-options">
+      <li onclick="diagnoseCause(this,'C4',true)">A) Integral action is off, or Ki is too low</li>
+      <li onclick="diagnoseCause(this,'C4',false)">B) Kp too high</li>
+      <li onclick="diagnoseCause(this,'C4',false)">C) Valve stiction</li>
+      <li onclick="diagnoseCause(this,'C4',false)">D) Setpoint is wrong</li>
+    </ul>
+    <div class="quiz-feedback" id="C4-cause-fb"></div>
+
+    <div class="stage2-locked" id="C4-stage2">
+      <div class="stage-label" style="margin-top:14px;">Stage 2 — First safe check</div>
+      <ul class="quiz-options">
+        <li onclick="chooseNextCheck(this,'C4',true)">A) Enable integral action; start with a small Ki and increase slowly</li>
+        <li onclick="chooseNextCheck(this,'C4',false)">B) Increase Kp by 50%</li>
+        <li onclick="chooseNextCheck(this,'C4',false)">C) Recalibrate the transmitter</li>
+        <li onclick="chooseNextCheck(this,'C4',false)">D) Reduce the setpoint to match PV</li>
+      </ul>
+      <div class="quiz-feedback" id="C4-next-fb"></div>
+    </div>
+  </div>
+
+  <div class="exercise-reset">
+    <button class="sim-btn" onclick="resetExercise()">Reset Exercise</button>
+  </div>
 </div>
 
 <!-- ═══════════ SECTION 8: QUIZ ═══════════ -->
@@ -1119,6 +1408,73 @@
 </div>
 
 <script>
+  // ── EXERCISE STATE (07B / 07C) ──
+  const exerciseState = {
+    B: {
+      B1: { selected: null, revealed: false },
+      B2: { selected: null, revealed: false },
+      B3: { selected: null, revealed: false },
+      B4: { selected: null, revealed: false }
+    },
+    C: {
+      C1: { causeSelected: null, causeRevealed: false, nextSelected: null, nextRevealed: false },
+      C2: { causeSelected: null, causeRevealed: false, nextSelected: null, nextRevealed: false },
+      C3: { causeSelected: null, causeRevealed: false, nextSelected: null, nextRevealed: false },
+      C4: { causeSelected: null, causeRevealed: false, nextSelected: null, nextRevealed: false }
+    }
+  };
+
+  const exerciseText = {
+    B1: {
+      correct: "✓ Correct. Ki was already adequate. A 20× increase over-accumulates integral during the approach; the controller overshoots, then unwinds — producing sustained oscillation.",
+      wrong: "✗ Check the direction of the change. A slower approach with a larger offset is what happens if you reduce Ki. A 20× increase is far beyond a moderate change that would produce a clean settle."
+    },
+    B2: {
+      correct: "✓ Correct. 6× Kp increase. Response is faster, phase margin drops, oscillation grows. Classical 'Kp too high' signature.",
+      wrong: "✗ A 6× Kp change always affects the response. A clean settle without overshoot is what a moderate increase produces — 6× is aggressive."
+    },
+    B3: {
+      correct: "✓ Correct. D acts as a brake. On a clean signal with real overshoot, moderate D reduces the approach rate near setpoint. Textbook case for D.",
+      wrong: "✗ D does not amplify overshoot on a clean signal. Jitter appears when D is applied to a noisy PV — this scenario specifies a clean signal."
+    },
+    B4: {
+      correct: "✓ Correct. Steady offset with stable output is P-only droop. Integral action drives residual error to zero. 0.1 is gentle — slow but stable.",
+      wrong: "✗ 'No change' would only happen if the I term were disabled in the controller. Ki=0.1 is too small to cause instability — instability comes from 10–50× higher Ki, or windup."
+    },
+    C1_cause: {
+      correct: "✓ Correct. Fast, steady oscillation on a clean signal is proportional gain. 3-second period is consistent with a fast flow or pressure loop.",
+      wrong: "✗ Ki oscillation is slower (tens of seconds to minutes). Kd on a clean signal produces high-frequency jitter, not a 3-second sine. Valve stiction produces a limit cycle correlated with travel direction, not a smooth wave."
+    },
+    C1_next: {
+      correct: "✓ Correct. Reduce Kp in a measured step. If amplitude decreases, Kp was the cause.",
+      wrong: "✗ Increasing Ki makes oscillation worse. Replacing a valve is the last check, not the first. Filtering a clean signal accomplishes nothing."
+    },
+    C2_cause: {
+      correct: "✓ Correct. Output saturation followed by post-upset overshoot is the definitive windup signature.",
+      wrong: "✗ Low Kp produces sluggishness, not post-saturation overshoot. Low Kd causes overshoot in a well-tuned loop but not saturation. A miscalibrated transmitter produces consistent bias, not timing-dependent overshoot."
+    },
+    C2_next: {
+      correct: "✓ Correct. Anti-windup is the direct fix. If already enabled, the Ki value may need reducing.",
+      wrong: "✗ Reducing Kp hides the symptom without fixing the mechanism. The controller is functioning as designed — it's producing windup that any controller would produce without anti-windup. Reducing step size leaves the mechanism intact."
+    },
+    C3_cause: {
+      correct: "✓ Correct. Output saturated, valve at mechanical limit, PV stable = capacity problem.",
+      wrong: "✗ High Ki causes oscillation, not a steady shortfall. High Kd amplifies noise, not offsets. An over-damped filter slows response but doesn't cause a permanent shortfall."
+    },
+    C3_next: {
+      correct: "✓ Correct. When the loop is saturated, tuning cannot help. Verify hardware capability.",
+      wrong: "✗ Increasing Ki with a saturated output has no effect — output is already at its limit. Kp cannot push output beyond 100%. Derivative reduces overshoot; there is no overshoot here."
+    },
+    C4_cause: {
+      correct: "✓ Correct. Steady offset with stable mid-range output is P-only droop. Transmitter verified, so measurement is trustworthy.",
+      wrong: "✗ High Kp causes oscillation, not steady offset. Valve stiction produces a limit cycle, not static offset. Setpoint 'being wrong' is a control-room decision, not a controller fault."
+    },
+    C4_next: {
+      correct: "✓ Correct. Enable I with a gentle Ki (0.05–0.1 for typical flow or pressure) and observe.",
+      wrong: "✗ Increasing Kp reduces the offset slightly but never eliminates it. The transmitter was just verified — recalibration is wasted effort. Moving SP to match a drifting PV defeats the purpose of control."
+    }
+  };
+
   // ── QUIZ ENGINE ──
   const quizState = {
     'qm1-1': { correct: false, answered: false },
@@ -1196,6 +1552,273 @@
       display.textContent = correct + '/' + answered;
       msg.textContent = (5 - answered) + ' question(s) remaining';
     }
+  }
+
+  // ── 07B PREDICTION ──
+  function predictB(el, sid, isCorrect) {
+    const st = exerciseState.B[sid];
+    if (st.revealed) return;
+    st.selected = isCorrect ? 'correct' : 'wrong';
+    st.revealed = true;
+
+    const card = el.closest('.quiz-item');
+    const cards = card.querySelectorAll('.response-card');
+    cards.forEach(c => c.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(sid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = exerciseText[sid].correct;
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      cards.forEach(c => {
+        if (c.getAttribute('onclick') && c.getAttribute('onclick').includes('true')) {
+          c.classList.add('reveal-correct');
+        }
+      });
+      fb.textContent = exerciseText[sid].wrong;
+      fb.className = 'quiz-feedback show fail';
+    }
+  }
+
+  // ── 07C STAGE 1 ──
+  function diagnoseCause(el, sid, isCorrect) {
+    const st = exerciseState.C[sid];
+    if (st.causeRevealed) return;
+    st.causeSelected = isCorrect ? 'correct' : 'wrong';
+    st.causeRevealed = true;
+
+    const card = document.getElementById(sid);
+    const causeGroup = card.querySelector('.quiz-options');
+    causeGroup.querySelectorAll('li').forEach(li => li.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(sid + '-cause-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = exerciseText[sid + '_cause'].correct;
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      causeGroup.querySelectorAll('li').forEach(li => {
+        if (li.getAttribute('onclick') && li.getAttribute('onclick').includes('true')) {
+          li.classList.add('reveal-correct');
+        }
+      });
+      fb.textContent = exerciseText[sid + '_cause'].wrong;
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    // Unlock stage 2
+    const stage2 = document.getElementById(sid + '-stage2');
+    if (stage2) stage2.classList.add('unlocked');
+  }
+
+  // ── 07C STAGE 2 ──
+  function chooseNextCheck(el, sid, isCorrect) {
+    const st = exerciseState.C[sid];
+    if (!st.causeRevealed) return;
+    if (st.nextRevealed) return;
+    st.nextSelected = isCorrect ? 'correct' : 'wrong';
+    st.nextRevealed = true;
+
+    const card = document.getElementById(sid);
+    const stage2 = document.getElementById(sid + '-stage2');
+    const nextGroup = stage2.querySelector('.quiz-options');
+    nextGroup.querySelectorAll('li').forEach(li => li.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(sid + '-next-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = exerciseText[sid + '_next'].correct;
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      nextGroup.querySelectorAll('li').forEach(li => {
+        if (li.getAttribute('onclick') && li.getAttribute('onclick').includes('true')) {
+          li.classList.add('reveal-correct');
+        }
+      });
+      fb.textContent = exerciseText[sid + '_next'].wrong;
+      fb.className = 'quiz-feedback show fail';
+    }
+  }
+
+  // ── RESET ──
+  function resetExercise() {
+    // Reset 07B
+    ['B1','B2','B3','B4'].forEach(sid => {
+      exerciseState.B[sid] = { selected: null, revealed: false };
+      const card = document.getElementById(sid);
+      if (!card) return;
+      card.querySelectorAll('.response-card').forEach(c => {
+        c.classList.remove('correct','wrong','reveal-correct');
+        c.style.pointerEvents = '';
+      });
+      const fb = document.getElementById(sid + '-fb');
+      if (fb) { fb.className = 'quiz-feedback'; fb.textContent = ''; }
+    });
+
+    // Reset 07C
+    ['C1','C2','C3','C4'].forEach(sid => {
+      exerciseState.C[sid] = { causeSelected: null, causeRevealed: false, nextSelected: null, nextRevealed: false };
+      const card = document.getElementById(sid);
+      if (!card) return;
+      card.querySelectorAll('.quiz-options li').forEach(li => {
+        li.classList.remove('correct','wrong','reveal-correct');
+        li.style.pointerEvents = '';
+      });
+      const causeFb = document.getElementById(sid + '-cause-fb');
+      const nextFb = document.getElementById(sid + '-next-fb');
+      if (causeFb) { causeFb.className = 'quiz-feedback'; causeFb.textContent = ''; }
+      if (nextFb) { nextFb.className = 'quiz-feedback'; nextFb.textContent = ''; }
+      const stage2 = document.getElementById(sid + '-stage2');
+      if (stage2) stage2.classList.remove('unlocked');
+    });
+
+    // Reset simulator
+    simReset();
+  }
+
+  // ── INLINE SIMULATOR ──
+  let simData = [];
+  let simTime = 0;
+  let simSP = 50;
+  let simPV = 50;
+  let simIntegral = 0;
+  let simPrevError = 0;
+  let simRunning = false;
+  let simRafId = null;
+
+  function simUpdate() {
+    const kp = parseFloat(document.getElementById('sim-kp').value);
+    const ki = parseFloat(document.getElementById('sim-ki').value);
+    const kd = parseFloat(document.getElementById('sim-kd').value);
+    document.getElementById('sim-kp-val').textContent = kp.toFixed(2);
+    document.getElementById('sim-ki-val').textContent = ki.toFixed(2);
+    document.getElementById('sim-kd-val').textContent = kd.toFixed(2);
+  }
+
+  function simStep() {
+    if (simRafId) cancelAnimationFrame(simRafId);
+    simData = [];
+    simTime = 0;
+    simSP = 50;
+    simPV = 50;
+    simIntegral = 0;
+    simPrevError = 0;
+    simRunning = true;
+    document.getElementById('sim-empty').style.display = 'none';
+    simTick();
+  }
+
+  function simTick() {
+    if (!simRunning) return;
+    const kp = parseFloat(document.getElementById('sim-kp').value);
+    const ki = parseFloat(document.getElementById('sim-ki').value);
+    const kd = parseFloat(document.getElementById('sim-kd').value);
+
+    const dt = 0.05; // seconds per tick
+    const steps = 4; // simulate 4 steps of dt per frame = 0.2s sim time per frame
+
+    for (let s = 0; s < steps; s++) {
+      // After 1 second, step the setpoint
+      if (simTime > 1 && simTime < 1.05) simSP = 75;
+
+      const error = simSP - simPV;
+
+      // Integral with clamp (anti-windup)
+      simIntegral += error * dt;
+      if (simIntegral > 100) simIntegral = 100;
+      if (simIntegral < -100) simIntegral = -100;
+
+      const derivative = (error - simPrevError) / dt;
+      simPrevError = error;
+
+      // PID output
+      let output = kp * error + ki * simIntegral + kd * derivative;
+      if (output > 100) output = 100;
+      if (output < 0) output = 0;
+
+      // Second-order process: PV lags output
+      // Simple first-order: PV moves toward output
+      simPV += (output - simPV) * 0.08;
+
+      // Add small noise, amplified visually when Kd is high
+      const noise = (Math.random() - 0.5) * 0.3;
+      const displayPV = simPV + noise * (1 + kd * 2);
+
+      simData.push({ t: simTime, pv: displayPV, sp: simSP });
+      simTime += dt;
+    }
+
+    simDraw();
+
+    if (simTime < 30) {
+      simRafId = requestAnimationFrame(simTick);
+    } else {
+      simRunning = false;
+    }
+  }
+
+  function simDraw() {
+    const path = document.getElementById('sim-pv-path');
+    const spLine = document.getElementById('sim-sp-line');
+    const spLabel = document.getElementById('sim-sp-label');
+
+    // Map data to SVG coords: x = 40..580, y = 20..180 (inverted, 100 at top)
+    const xMin = 0, xMax = 30;
+    const yMin = 0, yMax = 100;
+    const xScale = 540 / (xMax - xMin);
+    const yScale = 160 / (yMax - yMin);
+
+    let d = '';
+    simData.forEach((pt, i) => {
+      const x = 40 + (pt.t - xMin) * xScale;
+      const y = 180 - (pt.pv - yMin) * yScale;
+      if (i === 0) d += `M ${x.toFixed(1)} ${y.toFixed(1)}`;
+      else d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+    });
+    path.setAttribute('d', d);
+
+    // Setpoint line
+    const currentSP = simData.length > 0 ? simData[simData.length - 1].sp : 50;
+    const spY = 180 - (currentSP - yMin) * yScale;
+    spLine.setAttribute('y1', spY.toFixed(1));
+    spLine.setAttribute('y2', spY.toFixed(1));
+    spLabel.setAttribute('y', (spY + 3).toFixed(1));
+  }
+
+  function simReset() {
+    if (simRafId) cancelAnimationFrame(simRafId);
+    simRafId = null;
+    simData = [];
+    simTime = 0;
+    simSP = 50;
+    simPV = 50;
+    simIntegral = 0;
+    simPrevError = 0;
+    simRunning = false;
+
+    const path = document.getElementById('sim-pv-path');
+    if (path) path.setAttribute('d', '');
+    const spLine = document.getElementById('sim-sp-line');
+    if (spLine) { spLine.setAttribute('y1', 60); spLine.setAttribute('y2', 60); }
+    const spLabel = document.getElementById('sim-sp-label');
+    if (spLabel) spLabel.setAttribute('y', 63);
+    const empty = document.getElementById('sim-empty');
+    if (empty) empty.style.display = '';
+
+    const kp = document.getElementById('sim-kp');
+    const ki = document.getElementById('sim-ki');
+    const kd = document.getElementById('sim-kd');
+    if (kp) kp.value = 1.0;
+    if (ki) ki.value = 0;
+    if (kd) kd.value = 0;
+    simUpdate();
   }
 </script>
 </body>
