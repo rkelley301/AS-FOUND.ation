@@ -1,0 +1,2599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M2 — Control Valves &amp; Final Control Elements · AS-FOUND.ation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --purple: #A855F7;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 18px 0 8px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
+
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media(max-width:520px){ .checklist { grid-template-columns: 1fr; } }
+  .checklist-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checklist-item .box {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .callout {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .callout.blue { background: var(--accent2); }
+  .callout.green { background: var(--green); }
+  .callout.red { background: var(--red); color: #fff; }
+  .callout.purple { background: var(--purple); color: #fff; }
+  .callout.yellow { background: var(--yellow); }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media(max-width:520px){ .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+  }
+  .compare-card h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .compare-card.analog h4 { color: var(--accent); }
+  .compare-card.digital h4 { color: var(--accent2); }
+  .compare-card ul { list-style: none; }
+  .compare-card ul li {
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-card ul li:last-child { border-bottom: none; }
+
+  /* ── M2: embedded lab ── */
+  .lab-launch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding: 16px 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--yellow);
+    border-radius: 0 5px 5px 0;
+  }
+  .lab-launch[hidden] { display: none; }
+  .lab-launch-title { font-weight: 700; color: var(--head); }
+  .lab-launch-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text); margin-top: 2px; }
+  .lab-btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--yellow);
+    background: #16120A;
+    color: var(--yellow);
+  }
+  .lab-btn:hover { background: #221A0A; }
+  .lab-btn:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+  .lab-frame {
+    display: block;
+    box-sizing: content-box;
+    width: 100%;
+    height: 640px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+  }
+</style>
+</head>
+
+<body>
+
+<div class="module-header">
+  <div class="badge">// Main Module M2 · I&C Series</div>
+  <h1>Control Valves &amp; <span>Final Control Elements</span></h1>
+</div>
+
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    The transmitter measures. The PLC decides. But <strong>the valve is the only part of the loop that actually touches the process</strong>. When a loop won't settle, a sticky stem, a worn trim, or a positioner out of calibration is one of the first things to rule out — and <em>no amount of tuning fixes a valve that doesn't move when it's told to</em>. And when instrument air fails, <strong>the valve's fail position is the last safety action the loop has left.</strong>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>A control valve is a door with a door-closer.</h2>
+  <p style="font-size:14px;margin-bottom:14px;">Someone holds the door partly open against a spring-loaded closer. How far it's open depends on how hard they push. The moment they let go, the closer wins — every time, in the same direction. That's a spring-and-diaphragm valve: air pushes, the spring pushes back, and when the air goes away the spring decides where the valve ends up.</p>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🚪</div>
+      <div class="analogy-label">The Door</div>
+      <div class="analogy-term">Plug and seat</div>
+      <div class="analogy-desc">How far it's open sets how much flow gets through.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">✋</div>
+      <div class="analogy-label">The Push</div>
+      <div class="analogy-term">Actuator air</div>
+      <div class="analogy-desc">More pressure on the diaphragm, more stem travel against the spring.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">🔁</div>
+      <div class="analogy-label">The Closer</div>
+      <div class="analogy-term">Return spring</div>
+      <div class="analogy-desc">Always pushing back. Lose the air and it wins — that's the fail position.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 3: CORE CONCEPTS ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concepts
+  </div>
+
+  <h3>1. Anatomy of a Control Valve</h3>
+  <p style="font-size:14px;margin-bottom:10px;">A control valve assembly is two machines bolted together: a <strong>body</strong> that restricts flow, and an <strong>actuator</strong> that moves it. The <strong>positioner</strong> is the brain on the side that makes the actuator go where the controller asked.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="anatTitle anatDesc">
+      <title id="anatTitle">Control valve anatomy</title>
+      <desc id="anatDesc">Spring-and-diaphragm actuator on a globe valve body, with a positioner receiving 4-20 mA and sending air to the actuator below the diaphragm (air-to-open). The stem runs through the bonnet packing to the plug, which seats against the seat ring in the body.</desc>
+
+      <!-- Positioner -->
+      <rect x="40" y="80" width="130" height="66" fill="#0C1420" stroke="#3B9EFF" stroke-width="2" rx="4"/>
+      <text x="105" y="106" fill="#3B9EFF" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">POSITIONER</text>
+      <text x="105" y="122" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">I/P + position</text>
+      <text x="105" y="135" fill="#D4D6DC" font-family="monospace" font-size="9" text-anchor="middle">control</text>
+      <!-- 4-20 mA in -->
+      <line x1="105" y1="40" x2="105" y2="80" stroke="#3B9EFF" stroke-width="2"/>
+      <text x="113" y="54" fill="#3B9EFF" font-family="monospace" font-size="9">4–20 mA from AO</text>
+      <!-- supply air in -->
+      <line x1="105" y1="146" x2="105" y2="190" stroke="#E67E22" stroke-width="2"/>
+      <text x="113" y="184" fill="#E67E22" font-family="monospace" font-size="9">supply air</text>
+      <!-- air signal to actuator (below diaphragm = ATO) -->
+      <polyline points="170,113 200,113 200,104 232,104" fill="none" stroke="#E67E22" stroke-width="2"/>
+      <text x="176" y="96" fill="#E67E22" font-family="monospace" font-size="9">air</text>
+
+      <!-- Actuator housing -->
+      <rect x="232" y="24" width="196" height="96" fill="#1A1108" stroke="#E67E22" stroke-width="2" rx="8"/>
+      <!-- diaphragm -->
+      <line x1="236" y1="84" x2="424" y2="84" stroke="#F0F1F3" stroke-width="4"/>
+      <!-- spring above diaphragm -->
+      <polyline points="330,30 316,36 344,42 316,48 344,54 316,60 344,66 316,72 330,78" fill="none" stroke="#6B7180" stroke-width="2.5" stroke-linejoin="round"/>
+      <text x="438" y="46" fill="#E67E22" font-family="monospace" font-size="11" font-weight="bold">ACTUATOR</text>
+      <text x="438" y="61" fill="#D4D6DC" font-family="monospace" font-size="9">spring above diaphragm,</text>
+      <text x="438" y="73" fill="#D4D6DC" font-family="monospace" font-size="9">air below → air-to-open</text>
+
+      <!-- Yoke -->
+      <line x1="282" y1="120" x2="282" y2="212" stroke="#6B7180" stroke-width="3"/>
+      <line x1="378" y1="120" x2="378" y2="212" stroke="#6B7180" stroke-width="3"/>
+      <line x1="276" y1="212" x2="384" y2="212" stroke="#6B7180" stroke-width="3"/>
+      <text x="438" y="160" fill="#D4D6DC" font-family="monospace" font-size="9">YOKE</text>
+      <line x1="434" y1="157" x2="384" y2="157" stroke="#1E2028" stroke-width="1"/>
+
+      <!-- Stem -->
+      <line x1="330" y1="84" x2="330" y2="296" stroke="#D4D6DC" stroke-width="4"/>
+      <text x="342" y="146" fill="#D4D6DC" font-family="monospace" font-size="9">STEM</text>
+      <!-- travel indicator -->
+      <line x1="318" y1="168" x2="342" y2="168" stroke="#F1C40F" stroke-width="2"/>
+      <text x="438" y="180" fill="#F1C40F" font-family="monospace" font-size="9">TRAVEL INDICATOR</text>
+      <line x1="434" y1="177" x2="344" y2="169" stroke="#1E2028" stroke-width="1"/>
+
+      <!-- position feedback linkage -->
+      <line x1="318" y1="168" x2="170" y2="138" stroke="#3B9EFF" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="186" y="170" fill="#3B9EFF" font-family="monospace" font-size="9">position feedback</text>
+
+      <!-- Bonnet / packing -->
+      <rect x="310" y="212" width="40" height="34" fill="#16120A" stroke="#F1C40F" stroke-width="2" rx="3"/>
+      <text x="438" y="232" fill="#F1C40F" font-family="monospace" font-size="11" font-weight="bold">BONNET + PACKING</text>
+      <line x1="434" y1="229" x2="352" y2="229" stroke="#1E2028" stroke-width="1"/>
+
+      <!-- Pipe stubs -->
+      <rect x="120" y="282" width="92" height="44" fill="#0B1A12" stroke="#2ECC71" stroke-width="2"/>
+      <rect x="448" y="282" width="92" height="44" fill="#0B1A12" stroke="#2ECC71" stroke-width="2"/>
+      <!-- Body -->
+      <rect x="212" y="246" width="236" height="112" fill="#0B1A12" stroke="#2ECC71" stroke-width="2" rx="22"/>
+      <text x="330" y="348" fill="#2ECC71" font-family="monospace" font-size="11" text-anchor="middle" font-weight="bold">BODY (globe)</text>
+      <!-- seat ring -->
+      <rect x="282" y="310" width="30" height="10" fill="#6B7180"/>
+      <rect x="348" y="310" width="30" height="10" fill="#6B7180"/>
+      <!-- plug -->
+      <path d="M308,284 L352,284 L344,308 L316,308 Z" fill="#D4D6DC" stroke="#F0F1F3" stroke-width="1"/>
+      <text x="560" y="292" fill="#D4D6DC" font-family="monospace" font-size="9">PLUG (moves)</text>
+      <line x1="556" y1="289" x2="354" y2="294" stroke="#1E2028" stroke-width="1"/>
+      <text x="560" y="318" fill="#D4D6DC" font-family="monospace" font-size="9">SEAT RING (fixed)</text>
+      <line x1="556" y1="315" x2="380" y2="315" stroke="#1E2028" stroke-width="1"/>
+      <!-- flow -->
+      <text x="128" y="276" fill="#2ECC71" font-family="monospace" font-size="9">FLOW →</text>
+      <path d="M170,304 L150,296 L150,312 Z" fill="#2ECC71"/>
+      <path d="M512,304 L492,296 L492,312 Z" fill="#2ECC71"/>
+    </svg>
+    <div class="diagram-caption">Spring-and-diaphragm globe valve, air-to-open. The positioner compares the 4–20 mA command to the stem position it feels through the feedback linkage, and adjusts actuator air until they match.</div>
+  </div>
+
+  <ul class="core-bullets">
+    <li><strong>Body</strong> — the pressure-containing part in the pipe. Its <strong>trim</strong> (plug, seat ring, stem) is what actually restricts flow, and what wears.</li>
+    <li><strong>Bonnet and packing</strong> — where the stem leaves the body. Packing seals the process in; too tight and it adds friction that makes the stem stick.</li>
+    <li><strong>Actuator</strong> — converts air pressure into stem force. In a spring-and-diaphragm actuator, air pushes one way and the spring always pushes back.</li>
+    <li><strong>Positioner</strong> — a small controller of its own. It reads the stem position and adds or bleeds actuator air until the position matches the command.</li>
+    <li><strong>Travel indicator</strong> — the pointer and scale on the yoke. It is the only thing that tells you where the valve <em>actually</em> is.</li>
+  </ul>
+
+  <h3>2. The Signal Path Into the Valve</h3>
+  <p style="font-size:14px;margin-bottom:10px;">This is the output half of the F5 loop, zoomed in. The signal changes form three times before anything moves.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Stage</th><th>Signal Form</th><th>What You'd Measure</th></tr></thead>
+    <tbody>
+      <tr><td>PLC PID output</td><td>0–100 % command</td><td>PLC software — the output value</td></tr>
+      <tr><td>AO card</td><td>4–20 mA (4 mA = 0 %, 20 mA = 100 %)</td><td>Multimeter in series with the output loop</td></tr>
+      <tr><td>I/P or positioner output</td><td>Air pressure to the actuator</td><td>Gauge on the positioner output port</td></tr>
+      <tr><td>Actuator</td><td>Force on the stem</td><td>—</td></tr>
+      <tr><td>Stem / trim</td><td>Physical travel (% open)</td><td>Travel indicator on the yoke</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Key Insight</span>
+    A plain I/P converter maps 4–20 mA to a fixed air range — commonly 3–15 psi. A <strong>positioner</strong> does not: it sends whatever pressure it takes to reach the commanded position. So <strong>air pressure is not position</strong>. The command, the air, and the stem are three different numbers — check all three.
+  </div>
+
+  <h3>3. Body Types — Linear vs Rotary</h3>
+  <table class="info-table">
+    <thead><tr><th>Body</th><th>Motion</th><th>Typical Use</th></tr></thead>
+    <tbody>
+      <tr><td>Globe</td><td>Linear (stem slides)</td><td>The classic throttling control valve. Good control across its range.</td></tr>
+      <tr><td>Ball / V-port ball</td><td>Rotary (¼ turn)</td><td>High capacity. V-port and segmented balls are used for throttling; full-port balls mostly for on/off.</td></tr>
+      <tr><td>Butterfly</td><td>Rotary (¼ turn)</td><td>Large lines, low pressure drop, lower cost. Throttles best in the middle of its travel.</td></tr>
+      <tr><td>Gate</td><td>Linear</td><td>Isolation (fully open or fully closed). <strong>Not</strong> a control valve.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4. Fail-Safe Action — ATO vs ATC</h3>
+  <p style="font-size:14px;margin-bottom:10px;">The fail position is chosen by asking one question: <strong>if the air goes away, what is the safe state for this process?</strong> Fuel to a burner should stop. Cooling water to a reactor should keep flowing.</p>
+
+  <div class="compare-grid">
+    <div class="compare-card analog">
+      <h4>Air-to-Open · Fail-Closed (FC)</h4>
+      <ul>
+        <li>Air needed to <strong>open</strong></li>
+        <li>Air port below the diaphragm; spring above</li>
+        <li>Rising signal → valve opens</li>
+        <li>Air lost → spring drives it <strong>shut</strong></li>
+        <li><strong>Typical:</strong> steam, fuel gas, hazardous or pressurized fluids</li>
+      </ul>
+    </div>
+    <div class="compare-card digital">
+      <h4>Air-to-Close · Fail-Open (FO)</h4>
+      <ul>
+        <li>Air needed to <strong>close</strong></li>
+        <li>Air port above the diaphragm; spring below</li>
+        <li>Rising signal → valve closes</li>
+        <li>Air lost → spring drives it <strong>open</strong></li>
+        <li><strong>Typical:</strong> cooling water, safety vents, pressure relief</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Action alone isn't enough</span>
+    ATO/ATC describes the actuator's spring-and-diaphragm geometry. An installed valve's action also depends on positioner configuration, bench range, and plug orientation. <strong>Never infer fail position from the tag name alone — verify at the stem.</strong>
+  </div>
+
+  <ul class="core-bullets" style="margin-top:14px;">
+    <li><strong>Loss of air ≠ loss of signal.</strong> Air failure is decided by the spring. Signal failure (the 4–20 mA drops out) is decided by how the positioner is configured. Know both for every valve you touch.</li>
+    <li><strong>No spring, no automatic fail position.</strong> Double-acting piston actuators have no return spring. On air loss they may stay where they are ("fail in place") or drift, unless the design adds lock-up valves or a volume tank.</li>
+  </ul>
+
+  <h3>5. Flow Characteristics — How Flow Follows Travel</h3>
+  <p style="font-size:14px;margin-bottom:10px;">The trim shape decides how much flow you get at each % of travel, measured at a constant pressure drop. This is the <strong>inherent</strong> characteristic.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="charTitle charDesc">
+      <title id="charTitle">Inherent flow characteristics</title>
+      <desc id="charDesc">Percent flow versus percent travel. Quick opening rises steeply at low travel, linear is a straight diagonal, equal percentage starts flat and rises steeply near full travel.</desc>
+      <line x1="60.0" y1="250.0" x2="60.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><line x1="60.0" y1="250.0" x2="460.0" y2="250.0" stroke="#1E2028" stroke-width="1"/><text x="60.0" y="266" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">0</text><text x="52" y="253.0" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="end">0</text><line x1="160.0" y1="250.0" x2="160.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><line x1="60.0" y1="195.0" x2="460.0" y2="195.0" stroke="#1E2028" stroke-width="1"/><text x="160.0" y="266" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">25</text><text x="52" y="198.0" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="end">25</text><line x1="260.0" y1="250.0" x2="260.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><line x1="60.0" y1="140.0" x2="460.0" y2="140.0" stroke="#1E2028" stroke-width="1"/><text x="260.0" y="266" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">50</text><text x="52" y="143.0" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="end">50</text><line x1="360.0" y1="250.0" x2="360.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><line x1="60.0" y1="85.0" x2="460.0" y2="85.0" stroke="#1E2028" stroke-width="1"/><text x="360.0" y="266" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">75</text><text x="52" y="88.0" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="end">75</text><line x1="460.0" y1="250.0" x2="460.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><line x1="60.0" y1="30.0" x2="460.0" y2="30.0" stroke="#1E2028" stroke-width="1"/><text x="460.0" y="266" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="middle">100</text><text x="52" y="33.0" fill="#6B7180" font-family="monospace" font-size="9" text-anchor="end">100</text><line x1="60.0" y1="250.0" x2="460.0" y2="250.0" stroke="#6B7180" stroke-width="1.5"/><line x1="60.0" y1="250.0" x2="60.0" y2="30.0" stroke="#6B7180" stroke-width="1.5"/>
+      <path d="M60.0,250.0 L68.0,237.1 L76.0,224.6 L84.0,212.7 L92.0,201.3 L100.0,190.4 L108.0,179.9 L116.0,169.9 L124.0,160.4 L132.0,151.3 L140.0,142.6 L148.0,134.4 L156.0,126.6 L164.0,119.1 L172.0,112.1 L180.0,105.5 L188.0,99.2 L196.0,93.2 L204.0,87.7 L212.0,82.4 L220.0,77.5 L228.0,72.9 L236.0,68.6 L244.0,64.6 L252.0,60.9 L260.0,57.5 L268.0,54.3 L276.0,51.4 L284.0,48.7 L292.0,46.3 L300.0,44.1 L308.0,42.1 L316.0,40.3 L324.0,38.6 L332.0,37.2 L340.0,35.9 L348.0,34.8 L356.0,33.9 L364.0,33.0 L372.0,32.3 L380.0,31.8 L388.0,31.3 L396.0,30.9 L404.0,30.6 L412.0,30.4 L420.0,30.2 L428.0,30.1 L436.0,30.0 L444.0,30.0 L452.0,30.0 L460.0,30.0" fill="none" stroke="#E67E22" stroke-width="2.5"/>
+      <path d="M60.0,250.0 L68.0,245.6 L76.0,241.2 L84.0,236.8 L92.0,232.4 L100.0,228.0 L108.0,223.6 L116.0,219.2 L124.0,214.8 L132.0,210.4 L140.0,206.0 L148.0,201.6 L156.0,197.2 L164.0,192.8 L172.0,188.4 L180.0,184.0 L188.0,179.6 L196.0,175.2 L204.0,170.8 L212.0,166.4 L220.0,162.0 L228.0,157.6 L236.0,153.2 L244.0,148.8 L252.0,144.4 L260.0,140.0 L268.0,135.6 L276.0,131.2 L284.0,126.8 L292.0,122.4 L300.0,118.0 L308.0,113.6 L316.0,109.2 L324.0,104.8 L332.0,100.4 L340.0,96.0 L348.0,91.6 L356.0,87.2 L364.0,82.8 L372.0,78.4 L380.0,74.0 L388.0,69.6 L396.0,65.2 L404.0,60.8 L412.0,56.4 L420.0,52.0 L428.0,47.6 L436.0,43.2 L444.0,38.8 L452.0,34.4 L460.0,30.0" fill="none" stroke="#3B9EFF" stroke-width="2.5"/>
+      <path d="M60.0,245.6 L68.0,245.2 L76.0,244.9 L84.0,244.4 L92.0,244.0 L100.0,243.5 L108.0,243.0 L116.0,242.4 L124.0,241.8 L132.0,241.1 L140.0,240.4 L148.0,239.6 L156.0,238.7 L164.0,237.8 L172.0,236.8 L180.0,235.8 L188.0,234.6 L196.0,233.4 L204.0,232.0 L212.0,230.5 L220.0,229.0 L228.0,227.2 L236.0,225.4 L244.0,223.4 L252.0,221.2 L260.0,218.9 L268.0,216.4 L276.0,213.6 L284.0,210.7 L292.0,207.5 L300.0,204.0 L308.0,200.2 L316.0,196.2 L324.0,191.8 L332.0,187.1 L340.0,182.0 L348.0,176.4 L356.0,170.4 L364.0,164.0 L372.0,157.0 L380.0,149.4 L388.0,141.2 L396.0,132.4 L404.0,122.8 L412.0,112.4 L420.0,101.2 L428.0,89.1 L436.0,76.0 L444.0,61.9 L452.0,46.6 L460.0,30.0" fill="none" stroke="#2ECC71" stroke-width="2.5"/>
+      <text x="118" y="70" fill="#E67E22" font-family="monospace" font-size="10" font-weight="bold">QUICK OPENING</text>
+      <text x="300" y="158" fill="#3B9EFF" font-family="monospace" font-size="10" font-weight="bold">LINEAR</text>
+      <text x="300" y="214" fill="#2ECC71" font-family="monospace" font-size="10" font-weight="bold">EQUAL %</text>
+      <text x="260" y="290" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">% TRAVEL →</text>
+      <text x="18" y="140" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle" transform="rotate(-90 18 140)">% FLOW →</text>
+    </svg>
+    <div class="diagram-caption">Inherent characteristics at constant ΔP (illustrative curves; equal % drawn with rangeability 50). Installed behaviour differs because ΔP across the valve changes with flow.</div>
+  </div>
+
+  <table class="info-table">
+    <thead><tr><th>Characteristic</th><th>Behaviour</th><th>Where You'll See It</th></tr></thead>
+    <tbody>
+      <tr><td>Linear</td><td>Flow proportional to travel</td><td>Liquid level; systems where most of the pressure drop is across the valve</td></tr>
+      <tr><td>Equal percentage</td><td>Each equal step of travel changes the <em>existing</em> flow by an equal percentage</td><td>The most common choice for general throttling service</td></tr>
+      <tr><td>Quick opening</td><td>Most of the flow in the first part of travel</td><td>On/off and relief-type service</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6. Sizing Basics — Cv</h3>
+  <p style="font-size:14px;margin-bottom:10px;"><strong>Cv</strong> is the valve's flow capacity: the US gallons per minute of 60 °F water that pass through it with a 1 psi pressure drop. For liquids:</p>
+  <div class="formula-box">Q (gpm) = Cv · √( ΔP (psi) / SG )</div>
+  <p style="font-size:14px;margin-top:12px;"><strong>Example:</strong> a valve with Cv 10, passing water (SG 1.0) at a 16 psi drop: Q = 10 · √16 = <strong>40 gpm</strong>.</p>
+
+  <ul class="core-bullets" style="margin-top:12px;">
+    <li><strong>Oversized</strong> — the valve does all its work in the first few % of travel. Tiny stem movements make big flow changes and the loop is hard to control, especially near closed.</li>
+    <li><strong>Undersized</strong> — the valve runs wide open and still can't pass the flow the process needs. The controller output saturates at 100 %.</li>
+  </ul>
+
+  <h3>7. Valve Problems That Look Like Tuning Problems</h3>
+  <table class="info-table">
+    <thead><tr><th>Symptom</th><th>Likely Valve Cause</th><th>First Check</th></tr></thead>
+    <tbody>
+      <tr><td>PV sawtooth; output ramps then the PV jumps — a slow cycle that retuning won't kill</td><td><strong>Stiction</strong> (static friction): the stem sticks, pressure builds, then it slips</td><td>Compare output vs travel in manual with small steps</td></tr>
+      <tr><td>Valve won't move at all</td><td>No air, failed I/P or positioner, seized stem</td><td>Supply air and positioner output gauges; signal at the positioner</td></tr>
+      <tr><td>Travel doesn't match command</td><td>Positioner out of calibration, loose feedback linkage</td><td>Stroke check at 0/25/50/75/100 %</td></tr>
+      <tr><td>Loop hunts only at low opening</td><td>Oversized valve</td><td>Where does the valve sit in normal operation?</td></tr>
+      <tr><td>Flow when "closed"</td><td>Seat leakage — worn trim</td><td>Compare to the valve's leakage class (ANSI/FCI 70-2)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════ SECTION 4: HANDS-ON ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Part A — Valve Fail-Action Lab</h2>
+  <p style="font-size:14px;margin-bottom:10px;">Predict first, then test. The lab won't let you cut the air until you've committed to an answer <em>and</em> a reason.</p>
+
+  <ul class="step-list">
+    <li>Open the lab and <strong>run the guided example</strong>. Watch an ATO valve track its command up to 60 %.</li>
+    <li><strong>Predict</strong> where the ATO valve goes when air is lost, and which force puts it there. Then cut the air and watch the plug move.</li>
+    <li>Repeat for the <strong>ATC</strong> valve — this time without having watched it move first. A wrong answer sends you back for another try at a new operating point.</li>
+    <li>In free exploration, <strong>cut the air and sweep the command</strong>. Watch the command and loop current keep changing while the valve position doesn't move. Command is not position.</li>
+  </ul>
+
+  <div class="lab-launch" id="labLaunch">
+    <div>
+      <div class="lab-launch-title">Valve Fail-Action Lab</div>
+      <div class="lab-launch-sub">ATO/ATC simulator · runs offline · about 5 minutes</div>
+    </div>
+    <button type="button" class="lab-btn" id="labOpen">▶ Open the lab</button>
+  </div>
+  <div id="labHost"></div>
+
+  <h2 style="margin-top:26px;">Part B — As-Found Stroke Check (Bench or Field)</h2>
+  <p style="font-size:14px;margin-bottom:10px;">The first thing a tech does on a suspect valve: record how it's <em>actually</em> behaving before changing anything.</p>
+
+  <div class="warning-box" style="margin-bottom:12px;">
+    <span class="w-label">⚠ Before You Stroke Anything</span>
+    Stroking a valve changes the process. Only do this with <strong>operations' permission</strong>, the loop in <strong>manual</strong>, and the valve isolated or bypassed as your site's procedure requires. Keep hands clear of the yoke and stem.
+  </div>
+
+  <ul class="step-list">
+    <li>Confirm the valve's tag, action (ATO/ATC) and fail position from the datasheet — then <strong>verify at the stem</strong>, not from the tag.</li>
+    <li>Put the loop in manual. Connect a meter in series with the output loop <span class="tool-tag">mA METER</span></li>
+    <li>Set the output to each point in the table below. Let the stem settle, then read the <strong>travel indicator</strong>.</li>
+    <li>Record the as-found travel <em>before</em> adjusting anything. Also note any point where the stem hesitated or jumped.</li>
+    <li>Compare the error at each point to your site's tolerance. Out of tolerance → the positioner needs calibration (M3), or the valve needs mechanical work.</li>
+  </ul>
+
+  <table class="info-table">
+    <thead><tr><th>Command</th><th>Expected Signal</th><th>Expected Travel (ATO)</th><th>As-Found Travel</th></tr></thead>
+    <tbody>
+      <tr><td>0 %</td><td>4 mA</td><td>0 % (closed)</td><td>______</td></tr>
+      <tr><td>25 %</td><td>8 mA</td><td>25 %</td><td>______</td></tr>
+      <tr><td>50 %</td><td>12 mA</td><td>50 %</td><td>______</td></tr>
+      <tr><td>75 %</td><td>16 mA</td><td>75 %</td><td>______</td></tr>
+      <tr><td>100 %</td><td>20 mA</td><td>100 % (open)</td><td>______</td></tr>
+    </tbody>
+  </table>
+  <div class="tip-box">
+    <span class="t-label">✓ Field Habit</span>
+    Stroke <strong>up</strong> through the points, then back <strong>down</strong>. If the up and down readings disagree at the same command, you've found hysteresis or friction — write it down.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: QUIZ ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>4 Questions. No partial credit.</h2>
+
+  <div class="quiz-item" id="qm2-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> Instrument air fails on an air-to-open valve feeding fuel gas to a burner. What does the valve do?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm2-1',false)">A) Holds its last position</li>
+      <li onclick="answer(this,'qm2-1',true)">B) Closes — the return spring drives it shut</li>
+      <li onclick="answer(this,'qm2-1',false)">C) Opens — pressure is released</li>
+      <li onclick="answer(this,'qm2-1',false)">D) Follows the last PLC command</li>
+    </ul>
+    <div class="quiz-feedback" id="qm2-1-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qm2-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> The controller output is 60 %. The travel indicator shows 0 % and the actuator gauge reads 0 psi. What do you check first?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm2-2',false)">A) Retune the PID — the gain is too low</li>
+      <li onclick="answer(this,'qm2-2',true)">B) Supply air, then the signal and air output at the positioner</li>
+      <li onclick="answer(this,'qm2-2',false)">C) The valve is oversized</li>
+      <li onclick="answer(this,'qm2-2',false)">D) The transmitter has failed</li>
+    </ul>
+    <div class="quiz-feedback" id="qm2-2-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qm2-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> A valve with Cv = 10 passes water (SG 1.0) with a 16 psi pressure drop. About how much flow is that?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm2-3',false)">A) 10 gpm</li>
+      <li onclick="answer(this,'qm2-3',false)">B) 16 gpm</li>
+      <li onclick="answer(this,'qm2-3',true)">C) 40 gpm</li>
+      <li onclick="answer(this,'qm2-3',false)">D) 160 gpm</li>
+    </ul>
+    <div class="quiz-feedback" id="qm2-3-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qm2-4">
+    <div class="quiz-q"><span class="qnum">Q4.</span> A flow loop cycles slowly in a sawtooth: the output ramps, then the flow jumps, over and over. Detuning slows the cycle but never stops it. Most likely cause?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm2-4',false)">A) Derivative too high</li>
+      <li onclick="answer(this,'qm2-4',false)">B) Transmitter noise</li>
+      <li onclick="answer(this,'qm2-4',false)">C) Wrong fail action</li>
+      <li onclick="answer(this,'qm2-4',true)">D) Valve stiction</li>
+    </ul>
+    <div class="quiz-feedback" id="qm2-4-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-m2">—/4</span>
+    <span class="score-label" id="msg-m2" style="color:var(--muted);font-size:12px;">Answer all 4 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: CHEAT SHEET ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">Control Valves — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Fail Action</h3>
+        <ul>
+          <li><span class="key">ATO →</span><span class="val">Fail-Closed (FC)</span></li>
+          <li><span class="key">ATC →</span><span class="val">Fail-Open (FO)</span></li>
+          <li><span class="key">Air lost →</span><span class="val">Spring decides</span></li>
+          <li><span class="key">Signal lost →</span><span class="val">Positioner config decides</span></li>
+          <li><span class="key">No spring →</span><span class="val">May fail in place</span></li>
+          <li><span class="key">Always →</span><span class="val">Verify at the stem</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Signal Path</h3>
+        <ul>
+          <li><span class="key">1.</span><span class="val">PID output 0–100 %</span></li>
+          <li><span class="key">2.</span><span class="val">AO card → 4–20 mA</span></li>
+          <li><span class="key">3.</span><span class="val">Positioner / I/P → air</span></li>
+          <li><span class="key">4.</span><span class="val">Actuator → stem force</span></li>
+          <li><span class="key">5.</span><span class="val">Trim → flow</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Body Types</h3>
+        <ul>
+          <li><span class="key">Globe</span><span class="val">Linear · throttling</span></li>
+          <li><span class="key">V-port ball</span><span class="val">Rotary · throttling</span></li>
+          <li><span class="key">Butterfly</span><span class="val">Rotary · large lines</span></li>
+          <li><span class="key">Gate</span><span class="val">Isolation only</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Characteristics</h3>
+        <ul>
+          <li><span class="key">Linear</span><span class="val">Flow ∝ travel</span></li>
+          <li><span class="key">Equal %</span><span class="val">Equal step → equal % change</span></li>
+          <li><span class="key">Quick opening</span><span class="val">Most flow early · on/off</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Symptom → First Check</h3>
+        <ul>
+          <li><span class="key">Won't move →</span><span class="val">Air, then positioner</span></li>
+          <li><span class="key">Sawtooth cycle →</span><span class="val">Stiction</span></li>
+          <li><span class="key">Travel ≠ command →</span><span class="val">Stroke check</span></li>
+          <li><span class="key">Hunts near closed →</span><span class="val">Oversized</span></li>
+          <li><span class="key">Output stuck at 100 % →</span><span class="val">Undersized</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Stroke Check Points</h3>
+        <ul>
+          <li><span class="key">0 %</span><span class="val">4 mA</span></li>
+          <li><span class="key">25 %</span><span class="val">8 mA</span></li>
+          <li><span class="key">50 %</span><span class="val">12 mA</span></li>
+          <li><span class="key">75 %</span><span class="val">16 mA</span></li>
+          <li><span class="key">100 %</span><span class="val">20 mA</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      Q = Cv · √(ΔP / SG) &nbsp;·&nbsp; mA = 4 + 16 × (% / 100)
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SERIES FOOTER ═══════════ -->
+<footer style="margin-top:28px;padding-top:14px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+  <span>AS-FOUND.ation · Main Module M2</span>
+  <a href="index.html" style="color:var(--accent);text-decoration:none;">← All modules</a>
+</footer>
+
+<!-- Valve Fail-Action Lab (Practice Tool 1.2), embedded verbatim except:
+     closing script tags are stored with a backslash before the slash, and comment
+     openers with a backslash before the "!", so this block
+     stays inert; the loader below restores both before handing it to the iframe. -->
+<script type="text/html" id="fal-src">
+<!DOCTYPE html>
+<\!--
+  Valve Fail-Action Lab — ATO/ATC Simulator (Practice Tool 1.2)
+  Single self-contained file: inline SVG, vanilla JS, no build step, offline-capable.
+
+  CASES shape (one entry per lesson case):
+    id                 string   stable case id
+    mode               'ato' | 'atc'
+    initialCommandPct  number   command on first attempt; retries re-randomise 30–90 %
+    airEvent           'loss'   the event the learner predicts
+    prompt             string   question shown on the predict panel
+    expected           { failPosition: 'open'|'closed', springDirection, pressureState }
+    distractors        { open, closed }
+                       Shape: misconception behind each wrong pick. Empty string for the
+                       correct pick. Reserved for future feedback rendering — nothing
+                       reads it yet.
+    feedback           { correct: { title, text }, wrongByChoice: { <pick>: { title, text } } }
+    sourceNote         string
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valve Fail-Action Lab — ATO/ATC Simulator</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --page:#0d1116; --panel:#151b22; --panel2:#1b232c; --line:#26313c;
+    --txt:#e6edf3; --muted:#8b98a5; --muted-2:#808e9b; --accent:#35d0ff;
+    --green:#3fb950; --amber:#d29922; --red:#f85149;
+  }
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(circle at 15% -10%, #17222d 0%, #0d1116 55%);
+    color:var(--txt);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh; padding:22px 18px 60px;
+  }
+  .app{max-width:1240px;margin:0 auto}
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+
+  /* ---------- header ---------- */
+  .crumb{
+    font-size:.68rem;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--muted-2);margin:0 0 8px;font-weight:700;
+  }
+  .topbar{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);
+       box-shadow:0 0 14px var(--accent)}
+  h1{font-size:1.24rem;margin:0;letter-spacing:.3px;font-weight:650}
+  .subtitle{margin:2px 0 0;color:var(--muted);font-size:.8rem}
+
+  /* ---------- layout ---------- */
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+
+  /* ---------- stage ---------- */
+  .stage{
+    background:linear-gradient(180deg,#141a21,#10151b);
+    border:1px solid var(--line);border-radius:18px;padding:14px;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .stage-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{
+    font-size:.72rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
+    padding:7px 13px;border-radius:999px;border:1px solid #2c4a3a;
+    background:#12251a;color:#5ee08a;transition:.25s;
+  }
+  .badge.atc{background:#2a1a12;border-color:#5a3a22;color:#ffb066}
+  .skins{display:flex;gap:6px}
+  .chip{
+    font:inherit;font-size:.72rem;letter-spacing:.4px;cursor:pointer;
+    padding:7px 12px;border-radius:999px;border:1px solid var(--line);
+    background:#121820;color:var(--muted);transition:.2s;
+  }
+  .chip:hover{color:var(--txt);border-color:#3a4a58}
+  .chip.active{background:#1d2833;color:var(--txt);border-color:#3d5468}
+  .chip.active::before{content:"● ";color:var(--accent)}
+
+  .svg-wrap{display:flex;justify-content:center;align-items:center;
+            border-radius:14px;overflow:hidden;background:#0a0e12}
+  #valve{height:min(62vh,560px);width:auto;max-width:100%;display:block}
+
+  .state-text{
+    font-size:.76rem;color:var(--muted);margin:0;line-height:1.55;
+    padding:10px 13px;border-radius:10px;background:#0e141a;border:1px solid #1c2530;
+  }
+  .state-text b{color:#c3ced8;font-weight:600}
+
+  .status-bar{
+    min-height:42px;border-radius:11px;padding:11px 14px;font-size:.8rem;
+    display:flex;align-items:center;gap:9px;line-height:1.45;
+    border:1px solid var(--line);background:#10161c;color:var(--muted);
+    transition:background .25s,border-color .25s,color .25s;
+  }
+  .status-bar.lost{background:#2a1113;border-color:#7d2429;color:#ffb3b3}
+  .status-bar.restored{background:#0f2418;border-color:#255c39;color:#8ce8ac}
+
+  /* ---------- right column ---------- */
+  .panel{display:flex;flex-direction:column;gap:14px}
+  .card{
+    background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:15px;padding:14px 15px;
+  }
+  .card h2{
+    font-size:.66rem;text-transform:uppercase;letter-spacing:1.3px;
+    color:var(--muted);margin:0 0 11px;font-weight:700;
+  }
+
+  /* ---------- lesson ---------- */
+  .lesson{
+    border:1px solid #2b3d4e;
+    background:linear-gradient(180deg,#17222c,#131a22);
+    box-shadow:inset 0 0 0 1px #ffffff08;
+  }
+  .lesson-kicker{
+    font-size:.63rem;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin:0 0 6px;
+  }
+  .lesson h3{font-size:1rem;margin:0 0 8px;line-height:1.4;font-weight:640}
+  .lesson p{font-size:.83rem;line-height:1.6;color:#c3ced8;margin:0 0 11px}
+  .lesson p:last-child{margin-bottom:0}
+  .lesson em{color:#e6edf3;font-style:normal;font-weight:600}
+
+  fieldset{border:0;padding:0;margin:0 0 13px}
+  legend{font-size:.76rem;color:#9fb0be;margin-bottom:8px;padding:0;font-weight:600}
+  .pred-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pred-btn{
+    font:inherit;font-weight:650;font-size:.9rem;cursor:pointer;
+    padding:13px 8px;border-radius:11px;border:1px solid var(--line);
+    background:#111820;color:var(--muted);transition:.18s;
+  }
+  .pred-btn:hover{border-color:#3a4a58;color:var(--txt)}
+  .pred-btn[aria-pressed="true"]{
+    background:#0f2029;border-color:#2d7d95;color:#7fe4ff;
+    box-shadow:0 0 0 1px #2d7d9555;
+  }
+  .radio{
+    display:flex;align-items:flex-start;gap:9px;
+    font-size:.81rem;color:#c3ced8;line-height:1.4;
+    padding:8px 10px;border-radius:9px;cursor:pointer;
+    border:1px solid transparent;transition:.15s;margin-bottom:4px;
+  }
+  .radio:hover{background:#ffffff08}
+  .radio input{margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}
+  .radio:has(input:checked){background:#12222c;border-color:#2d7d95;color:#e6edf3}
+  .lock-note{
+    font-size:.74rem;color:var(--muted);margin:0;padding:9px 11px;
+    border-radius:9px;background:#0e141a;border:1px dashed #26313c;line-height:1.45;
+  }
+  .lock-note.ready{color:#8ce8ac;border-color:#255c39;border-style:solid;background:#0f2418}
+
+  .choice{
+    margin:14px 0 0;padding:10px 14px;border-radius:11px;
+    background:#0e141a;border:1px solid #2a3a48;
+  }
+  .lesson .choice p{margin:0;font-size:.8rem;line-height:1.5;color:#c3ced8}
+  .lesson .choice p + p{margin-top:5px}
+  .choice b{font-weight:650}
+  .choice .right{color:#5ee08a}
+  .choice .wrong{color:#ff7b72}
+
+  .mismatch{
+    margin:14px 0 0;padding:12px 14px;border-radius:11px;
+    background:#0e141a;border:1px solid #2a3a48;
+  }
+  .mismatch p{margin:0 0 8px;font-size:.8rem;color:#e6edf3}
+  .mismatch ul{margin:0;padding-left:0;list-style:none;
+               display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .mismatch li{font-size:.76rem;color:#9fb0be;display:flex;justify-content:space-between;gap:8px}
+  .mismatch li span{color:#e6edf3;font-variant-numeric:tabular-nums;font-weight:600}
+
+  .checklist{list-style:none;padding:0;margin:0 0 12px}
+  .checklist li{
+    font-size:.82rem;color:#c3ced8;padding:7px 0 7px 26px;position:relative;line-height:1.45;
+  }
+  .checklist li::before{
+    content:"✓";position:absolute;left:0;top:7px;
+    color:var(--green);font-weight:700;
+  }
+
+  /* ---------- controls ---------- */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .seg button{
+    font:inherit;cursor:pointer;padding:11px 8px;border-radius:11px;
+    border:1px solid var(--line);background:#111820;color:var(--muted);
+    line-height:1.35;transition:.2s;text-align:center;
+  }
+  .seg button small{display:block;font-size:.64rem;opacity:.9;margin-top:3px;letter-spacing:.5px}
+  .seg button:hover:not(:disabled){border-color:#3a4a58;color:var(--txt)}
+  .seg button.active{
+    background:#10281c;border-color:#2f7d4f;color:#6ee79a;
+    box-shadow:0 0 0 1px #2f7d4f55;
+  }
+  .seg button.active.atc{background:#2a1c10;border-color:#a26a2a;color:#ffb066;
+    box-shadow:0 0 0 1px #a26a2a55}
+  .seg button:disabled{opacity:.42;cursor:not-allowed}
+
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;
+    background:linear-gradient(90deg,#2b3a48,#3d5468);outline:none;margin:6px 0 4px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--accent);cursor:pointer;border:3px solid #0d1116;
+    box-shadow:0 0 12px -2px var(--accent);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:var(--accent);
+    cursor:pointer;border:3px solid #0d1116;
+  }
+  input[type=range]:disabled{opacity:.4;cursor:not-allowed}
+  input[type=range]:disabled::-webkit-slider-thumb{cursor:not-allowed;box-shadow:none}
+
+  .slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+  .slider-row span:first-child{font-size:.78rem;color:#9fb0be}
+  .slider-row span:last-child{font-size:.86rem;font-weight:650;color:var(--accent);
+                              font-variant-numeric:tabular-nums}
+
+  /* ---------- readouts ---------- */
+  .ro-group{margin-bottom:12px}
+  .ro-group:last-child{margin-bottom:0}
+  .ro-group-head{
+    font-size:.6rem;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--muted-2);font-weight:700;margin:0 0 7px;
+    display:flex;align-items:center;gap:7px;
+  }
+  .ro-group-head::after{content:"";flex:1;height:1px;background:#1e2833}
+  .readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .ro{background:#0e141a;border:1px solid #1f2a34;border-radius:10px;padding:9px 11px}
+  .ro .k{font-size:.6rem;text-transform:uppercase;letter-spacing:.9px;color:var(--muted)}
+  .ro .v{font-size:1rem;font-weight:650;margin-top:3px;font-variant-numeric:tabular-nums}
+  .v.green{color:#5ee08a}.v.amber{color:#ffb066}.v.red{color:#ff7b72}.v.blue{color:var(--accent)}
+  .legend{margin:0 0 12px;padding:9px 11px;border-radius:10px;background:#0e141a;border:1px solid #1f2a34}
+  .legend-h{font-size:.6rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted-2);
+            font-weight:700;margin:0 0 5px}
+  .legend ul{list-style:none;padding:0;margin:0 0 9px;display:flex;flex-direction:column;gap:4px}
+  .legend ul:last-child{margin-bottom:0}
+  .legend li{font-size:.7rem;color:#9fb0be;display:flex;align-items:center;gap:7px;line-height:1.35}
+  .src-ico{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.3;
+           stroke-linecap:round;stroke-linejoin:round}
+  .legend .sw{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .legend .sw.blue{background:var(--accent)}
+  .legend .sw.amber{background:#ffb066}
+  .legend .sw.green{background:#5ee08a}
+  .legend .sw.red{background:#ff7b72}
+  .ro-note{font-size:.66rem;color:var(--muted-2);margin:7px 0 0;line-height:1.5}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font:inherit;font-weight:600;font-size:.82rem;width:100%;cursor:pointer;
+    padding:12px;border-radius:11px;border:1px solid var(--line);
+    background:#121a22;color:var(--txt);transition:.2s;
+  }
+  .btn:hover:not(:disabled){background:#1a242f;border-color:#3a4a58}
+  .btn:disabled{opacity:.42;cursor:not-allowed}
+  .btn.danger{background:#261114;border-color:#5c1f24;color:#ff9b9b}
+  .btn.danger:hover:not(:disabled){background:#331519;border-color:#8a2b31}
+  .btn.danger.armed{background:#3a151a;border-color:#c0392b;color:#fff;
+                    box-shadow:0 0 22px -6px #c0392b}
+  .btn.play{background:#0f2029;border-color:#1d4d5e;color:#7fe4ff}
+  .btn.play:hover:not(:disabled){background:#14303d}
+  .btn-row{display:grid;grid-template-columns:1fr;gap:8px}
+
+  /* ---------- comparison ---------- */
+  .compare{margin-top:28px}
+  .compare h2{font-size:.72rem;letter-spacing:1.6px;text-transform:uppercase;
+              color:var(--muted);margin:0 0 14px;font-weight:700}
+  .cards2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.cards2{grid-template-columns:1fr}}
+  .vc{
+    border-radius:16px;padding:18px;border:1px solid var(--line);
+    background:linear-gradient(180deg,#161d25,#111720);
+  }
+  .vc.ato{border-top:3px solid #3fb950}
+  .vc.atc{border-top:3px solid #e08b3f}
+  .vc h3{margin:0 0 4px;font-size:1rem}
+  .vc .tag{font-size:.68rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;
+           margin-bottom:12px;display:block}
+  .vc.ato .tag{color:#5ee08a}
+  .vc.atc .tag{color:#ffb066}
+  .vc ul{margin:0;padding-left:18px;font-size:.84rem;line-height:1.65;color:#c3ced8}
+  .vc ul li::marker{color:#4a5b6b}
+  .vc .use{
+    margin-top:13px;padding:10px 12px;border-radius:10px;font-size:.8rem;
+    background:#0e141a;border:1px solid #1f2a34;color:#9fb0be;line-height:1.55;
+  }
+  .vc .use b{color:#e6edf3}
+
+  table{width:100%;border-collapse:collapse;margin-top:18px;font-size:.83rem}
+  th,td{padding:11px 13px;text-align:left;border-bottom:1px solid #1e2833}
+  th{color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:1.1px;font-weight:700}
+  td:first-child{color:var(--muted);width:32%}
+  tr:last-child td{border-bottom:none}
+  .caution{
+    padding:10px 12px;border-radius:10px;border:1px solid #4a3a1c;border-left:3px solid var(--amber);
+    background:#1c1810;color:#e6edf3;font-size:.8rem;line-height:1.55;
+  }
+  .lesson p.caution{color:#e6edf3;font-size:.8rem;margin-top:12px}
+  .caution b{color:#ffb066}
+  .ref-caution{margin:14px 0 0}
+  .foot{margin-top:26px;font-size:.72rem;color:var(--muted-2);line-height:1.7;text-align:center}
+
+  /* ================== SVG THEMES (unchanged visual layer) ================== */
+  #valve{ --sw:2; }
+  #valve.skin-green .bg{ fill:#eef4ef; }
+  #valve.skin-black .bg{ fill:#06090b; }
+  #valve.skin-green{
+    --shell:#2f7d4f; --shell-line:#123d20; --case-fill:#2a7048; --case-inner:#e8f3ea;
+    --metal-fill:#c3ced3; --metal-line:#6d7b83; --stem-fill:#dde6ea;
+    --spring-col:#98a5ac; --diap:#2b3033; --seat-fill:#8d9aa1;
+    --air-col:#c8873c; --cav:#dff0e5; --lbl:#2b4a37; --arrow:#1f7a4a;
+  }
+  #valve.skin-black{
+    --shell:rgba(255,255,255,.03); --shell-line:#ffffff;
+    --case-fill:rgba(255,255,255,.03); --case-inner:rgba(53,208,255,.055);
+    --metal-fill:rgba(255,255,255,.05); --metal-line:#ffffff;
+    --stem-fill:rgba(255,255,255,.10); --spring-col:rgba(255,255,255,.78);
+    --diap:rgba(255,255,255,.16); --seat-fill:rgba(255,255,255,.09);
+    --air-col:#35d0ff; --cav:rgba(53,208,255,.07); --lbl:#9fd8ee; --arrow:#35d0ff;
+    --sw:1.5;
+  }
+  #valve .body{fill:var(--shell);stroke:var(--shell-line);stroke-width:var(--sw);stroke-linejoin:round}
+  #valve .case-outer{fill:var(--case-fill);stroke:var(--shell-line);stroke-width:var(--sw)}
+  #valve .case-inner{fill:var(--case-inner)}
+  #valve .cavity{fill:var(--cav)}
+  #valve .seat{fill:var(--seat-fill);stroke:var(--shell-line);stroke-width:1.2}
+  #valve .metal{fill:var(--metal-fill);stroke:var(--metal-line);stroke-width:1.5}
+  #valve .stem{fill:var(--stem-fill);stroke:var(--metal-line);stroke-width:1}
+  #valve .diaphragm{fill:var(--diap);stroke:var(--metal-line);stroke-width:1.5}
+  #valve .plate{fill:var(--metal-fill);stroke:var(--metal-line);stroke-width:1.5}
+  #valve .plug{fill:var(--metal-fill);stroke:var(--metal-line);stroke-width:1.8}
+  #valve .spring{fill:none;stroke:var(--spring-col);stroke-width:3.4;
+                 stroke-linecap:round;stroke-linejoin:round}
+  #valve.skin-black .spring{stroke-width:2.6}
+  #valve .positioner{fill:var(--metal-fill);stroke:var(--metal-line);stroke-width:1.6}
+  #valve .supply-line{fill:none;stroke:var(--air-col);stroke-width:5;stroke-linecap:round}
+  #valve .gauge-face{fill:var(--case-inner);stroke:var(--metal-line);stroke-width:1.4}
+  #valve .needle{stroke:#e5484d;stroke-width:2.4;stroke-linecap:round;
+                 transition:transform .12s linear}
+  #valve .needle-hub{fill:#e5484d}
+  #valve .vent{fill:var(--metal-line);opacity:.55}
+  #valve .air-tube{fill:none;stroke:var(--air-col);stroke-width:5;
+                   stroke-linecap:round;stroke-linejoin:round}
+  #valve .air-flow{fill:none;stroke:#ffffff;stroke-width:2;
+                   stroke-linecap:round;stroke-linejoin:round;
+                   stroke-dasharray:5 13;opacity:.85;
+                   animation:flow .9s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-36}}
+  #valve.skin-green .air-flow{stroke:#fff2dc}
+  #valve.skin-black .air-flow{stroke:#bff2ff}
+  #valve.lost .air-tube{stroke:#e5484d;opacity:.9}
+  #valve.lost .air-flow{display:none}
+  #valve .flow-arrow{fill:var(--arrow);opacity:0;transition:opacity .18s linear}
+  #valve .lbl{fill:var(--lbl);font-family:ui-sans-serif,system-ui,sans-serif;
+              font-weight:700;letter-spacing:1.4px}
+  #valve.skin-black .lbl{opacity:.75}
+
+  @media (prefers-reduced-motion: reduce){
+    #valve .air-flow{animation:none;opacity:.5}
+    #valve .needle{transition:none}
+    #valve .flow-arrow{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <p class="crumb">Instrumentation Field Manual · Practice Tool 1.2</p>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h1>Valve Fail-Action Lab</h1>
+        <p class="subtitle">ATO/ATC Simulator — predict, then test, the fail-safe position.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <\!-- ================= STAGE ================= -->
+    <section class="stage" aria-labelledby="stageHeading">
+      <h2 id="stageHeading" class="sr-only">Valve diagram and live state</h2>
+
+      <div class="stage-head">
+        <div class="badge" id="modeBadge">AIR-TO-OPEN · FAIL-CLOSED</div>
+        <div class="skins" role="group" aria-label="Diagram style">
+          <button type="button" class="chip active" data-skin="green" aria-pressed="true">Fisher Green</button>
+          <button type="button" class="chip" data-skin="black" aria-pressed="false">Cutaway</button>
+        </div>
+      </div>
+
+      <div class="svg-wrap">
+        <svg id="valve" viewBox="0 0 420 660" xmlns="http://www.w3.org/2000/svg"
+             class="skin-green" role="img" aria-labelledby="svgTitle svgDesc">
+          <title id="svgTitle">Pneumatic control valve, air-to-open configuration</title>
+          <desc id="svgDesc">Simplified cutaway of a spring-and-diaphragm control valve with an I/P positioner.</desc>
+
+          <rect class="bg" x="0" y="0" width="420" height="660" rx="18"/>
+          <path id="airTube" class="air-tube" d="M140,300 H350 V172 H302"/>
+          <path id="airFlow" class="air-flow" d="M140,300 H350 V172 H302"/>
+
+          <rect class="positioner" x="48" y="248" width="92" height="104" rx="12"/>
+          <rect class="supply-line" x="14" y="296" width="36" height="8" rx="4"/>
+          <circle class="gauge-face" cx="94" cy="286" r="19"/>
+          <line id="needle" class="needle" x1="94" y1="286" x2="94" y2="271"/>
+          <circle class="needle-hub" cx="94" cy="286" r="3.2"/>
+          <rect class="vent" x="62" y="322" width="64" height="7" rx="3.5"/>
+          <text class="lbl" x="94" y="345" text-anchor="middle" font-size="8.5">I/P POSITIONER</text>
+
+          <rect class="case-outer" x="118" y="40" width="184" height="160" rx="16"/>
+          <rect class="case-inner" x="130" y="52" width="160" height="136" rx="10"/>
+          <path id="spring" class="spring" d=""/>
+
+          <rect class="metal" x="150" y="200" width="15" height="212" rx="4"/>
+          <rect class="metal" x="255" y="200" width="15" height="212" rx="4"/>
+          <rect class="metal" x="146" y="400" width="128" height="16" rx="5"/>
+          <path class="body" d="M182,412 L238,412 L250,478 L170,478 Z"/>
+
+          <rect class="body" x="38" y="504" width="72" height="48"/>
+          <rect class="body" x="310" y="504" width="72" height="48"/>
+          <rect class="body" x="38" y="492" width="18" height="72" rx="5"/>
+          <rect class="body" x="364" y="492" width="18" height="72" rx="5"/>
+
+          <path class="body" d="M170,452 L170,480 L118,494 Q104,499 104,514
+                                 L104,574 Q104,592 122,592 L298,592
+                                 Q316,592 316,574 L316,514 Q316,499 302,494
+                                 L250,480 L250,452 Z"/>
+          <rect class="cavity" x="44" y="504" width="332" height="48"/>
+          <rect class="cavity" x="178" y="430" width="64" height="122"/>
+          <rect class="seat" x="154" y="504" width="42" height="48"/>
+          <rect class="seat" x="224" y="504" width="42" height="48"/>
+
+          <g id="flowArrows" aria-hidden="true">
+            <path class="flow-arrow" d="M62,528 L80,521 L80,535 Z"/>
+            <path class="flow-arrow" d="M358,528 L340,521 L340,535 Z"/>
+          </g>
+
+          <g id="moving">
+            <rect class="stem" x="205" y="130" width="10" height="340"/>
+            <rect class="diaphragm" x="126" y="126" width="168" height="13" rx="6.5"/>
+            <rect class="plate" x="184" y="114" width="52" height="38" rx="6"/>
+            <path class="plug" d="M182,470 L238,470 L230,506 L190,506 Z"/>
+          </g>
+
+          <text class="lbl" x="210" y="26" text-anchor="middle" font-size="10" letter-spacing="2">PNEUMATIC ACTUATOR</text>
+          <text class="lbl" x="210" y="626" text-anchor="middle" font-size="10" letter-spacing="2">VALVE BODY</text>
+        </svg>
+      </div>
+
+      <p class="state-text" id="stateText">
+        Air-to-Open valve. Command <b>0 %</b>. Actuator air <b>3.0 psi</b>. Valve <b>closed</b>.
+      </p>
+
+      <div class="status-bar" id="statusBar" role="status" aria-live="polite">
+        <span aria-hidden="true">●</span>
+        <span id="statusText">Instrument air normal — valve responding to controller output.</span>
+      </div>
+    </section>
+
+    <\!-- ================= RIGHT COLUMN ================= -->
+    <aside class="panel" aria-label="Lesson and controls">
+
+      <\!-- ---------- LESSON ---------- -->
+      <div class="card lesson" id="lessonCard">
+
+        <\!-- INTRO -->
+        <div id="panelIntro">
+          <p class="lesson-kicker">Guided example · 1 of 2</p>
+          <h3>Watch an ATO valve track its command</h3>
+          <p>An <em>Air-to-Open</em> valve opens as the PLC command rises. Air pressure is what holds it open.</p>
+          <div class="btn-row">
+            <button type="button" class="btn play" id="runExample">▶  Run the example</button>
+          </div>
+        </div>
+
+        <\!-- PREDICT -->
+        <div id="panelPredict" hidden>
+          <p class="lesson-kicker" id="predKicker">Prediction · 1 of 2</p>
+          <h3 id="predPrompt">Air is lost. Where will the spring drive this plug?</h3>
+          <p id="predContext">ATO valve — air holds it open. Command steady at 60 %.</p>
+
+          <fieldset>
+            <legend>Your prediction</legend>
+            <div class="pred-btns">
+              <button type="button" class="pred-btn" data-pred="open"   aria-pressed="false">Open</button>
+              <button type="button" class="pred-btn" data-pred="closed" aria-pressed="false">Closed</button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Dominant force once the air is gone</legend>
+            <label class="radio"><input type="radio" name="reason" value="spring"> Return spring (unopposed)</label>
+            <label class="radio"><input type="radio" name="reason" value="air"> Supply air pressure</label>
+            <label class="radio"><input type="radio" name="reason" value="plc"> The last PLC command</label>
+            <label class="radio"><input type="radio" name="reason" value="process"> Process pressure only</label>
+          </fieldset>
+
+          <p class="lock-note" id="lockNote">Select a position and a reason to unlock the air-supply test.</p>
+        </div>
+
+        <\!-- REVEAL -->
+        <div id="panelReveal" hidden>
+          <p class="lesson-kicker" id="revealKicker">Result</p>
+          <h3 id="revealHeadline"></h3>
+          <p id="revealBody"></p>
+
+          <div class="choice" id="revealChoice">
+            <p id="choicePos"></p>
+            <p id="choiceReason" hidden></p>
+          </div>
+
+          <div class="mismatch">
+            <p><b>Command ≠ position.</b> Look at the three numbers now:</p>
+            <ul>
+              <li>PLC command <span id="mmCmd">—</span></li>
+              <li>Loop current <span id="mmMa">—</span></li>
+              <li>Actuator air <span id="mmPsi">—</span></li>
+              <li>Valve position <span id="mmPos">—</span></li>
+            </ul>
+          </div>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button type="button" class="btn" id="revealNext">Continue</button>
+          </div>
+        </div>
+
+        <\!-- TRANSFER -->
+        <div id="panelTransfer" hidden>
+          <p class="lesson-kicker">Transfer · 2 of 2</p>
+          <h3>Same test, different valve</h3>
+          <p>Air restored. This valve is now <em>Air-to-Close</em> — air holds it <em>closed</em>. You have not watched this one move yet. Predict the outcome from the mechanism alone.</p>
+          <div class="btn-row">
+            <button type="button" class="btn" id="toPredict2">Continue to prediction</button>
+          </div>
+        </div>
+
+        <\!-- FREE -->
+        <div id="panelFree" hidden>
+          <p class="lesson-kicker">Free exploration</p>
+          <h3>Both actions complete</h3>
+          <ul class="checklist">
+            <li id="chkAto">ATO air loss → valve closes</li>
+            <li id="chkAtc">ATC air loss → valve opens</li>
+            <li id="chkMismatch">Command, air pressure, and position are three different numbers</li>
+          </ul>
+          <p>All controls unlocked. Switch modes, sweep the command, cut the air — watch the readouts disagree.</p>
+          <p class="caution"><b>Action alone isn’t enough.</b> ATO/ATC here describes the actuator’s spring-and-diaphragm geometry. An installed valve’s action also depends on positioner configuration, bench range, and plug orientation. Never infer fail position from the tag name alone — verify at the stem.</p>
+          <div class="btn-row" style="margin-top:12px">
+            <button type="button" class="btn" id="resetLesson">↺  Restart lesson</button>
+          </div>
+        </div>
+      </div>
+
+      <\!-- ---------- MODE ---------- -->
+      <div class="card">
+        <h2 id="modeLabel">Valve action</h2>
+        <div class="seg" id="modeSeg" role="group" aria-labelledby="modeLabel">
+          <button type="button" class="active" data-mode="ato" aria-pressed="true">
+            Air-to-Open<small>FAIL-CLOSED</small>
+          </button>
+          <button type="button" data-mode="atc" aria-pressed="false">
+            Air-to-Close<small>FAIL-OPEN</small>
+          </button>
+        </div>
+      </div>
+
+      <\!-- ---------- COMMAND ---------- -->
+      <div class="card">
+        <h2>Controller output (PLC analog)</h2>
+        <div class="slider-row">
+          <span><label for="signal">Command</label></span>
+          <span id="outPct">0 %</span>
+        </div>
+        <input type="range" id="signal" min="0" max="100" value="0" step="1"
+               aria-describedby="cmdHelp">
+        <p class="ro-note" id="cmdHelp">Simulates the 4–20 mA output from the PLC analog card.</p>
+      </div>
+
+      <\!-- ---------- READOUTS ---------- -->
+      <div class="card">
+        <h2>Live readings</h2>
+        <\!-- Two independent scales: source is an icon + label, value state is the colour. -->
+        <div class="legend" role="group" aria-label="Reading key">
+          <p class="legend-h">Source</p>
+          <ul>
+            <li><svg class="src-ico" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><rect x="1" y="3" width="5" height="6" rx="1"/><path d="M6 6h5M9 4l2 2-2 2"/></svg>Commanded — from controller</li>
+            <li><svg class="src-ico" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><circle cx="6" cy="6" r="4.5"/><path d="M6 6l2.6-2.2"/></svg>Field-side — measured at device</li>
+          </ul>
+          <p class="legend-h">Value state (colour)</p>
+          <ul>
+            <li><i class="sw blue" aria-hidden="true"></i>Blue = normal</li>
+            <li><i class="sw amber" aria-hidden="true"></i>Amber = between or near limits (valve throttling; air above 13 psi)</li>
+            <li><i class="sw green" aria-hidden="true"></i>Green = end-state (fully open or closed)</li>
+            <li><i class="sw red" aria-hidden="true"></i>Red = fault (air lost)</li>
+          </ul>
+        </div>
+
+        <div class="ro-group">
+          <p class="ro-group-head"><svg class="src-ico" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><rect x="1" y="3" width="5" height="6" rx="1"/><path d="M6 6h5M9 4l2 2-2 2"/></svg>Commanded — PLC side</p>
+          <div class="readouts">
+            <div class="ro"><div class="k">Loop current</div><div class="v blue" id="outMa">4.0 mA</div></div>
+            <div class="ro"><div class="k">Command</div><div class="v blue" id="outPct2">0 %</div></div>
+          </div>
+        </div>
+
+        <div class="ro-group">
+          <p class="ro-group-head"><svg class="src-ico" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><circle cx="6" cy="6" r="4.5"/><path d="M6 6l2.6-2.2"/></svg>Actual — field side</p>
+          <div class="readouts">
+            <div class="ro"><div class="k">Actuator air</div><div class="v" id="airPsi">3.0 psi</div></div>
+            <div class="ro"><div class="k">Valve position</div><div class="v" id="posPct">0 %</div></div>
+          </div>
+          <p class="ro-note">
+            <b>Model boundary:</b> 3–15 psi is this lab’s simplified positioner/actuator model, not a universal
+            consequence of the PLC output. Real loops vary by positioner, actuator, and bench range.
+          </p>
+        </div>
+      </div>
+
+      <\!-- ---------- AIR + SWEEP ---------- -->
+      <div class="card">
+        <h2>Instrument air supply</h2>
+        <div class="btn-row">
+          <button type="button" class="btn danger" id="airBtn" aria-describedby="airHelp">✕  Lose air supply</button>
+        </div>
+        <p class="ro-note" id="airHelp">Cutting air removes the only force holding the valve against its return spring.</p>
+      </div>
+
+      <div class="card">
+        <h2>Demonstration</h2>
+        <div class="btn-row">
+          <button type="button" class="btn play" id="playBtn">▶  Play sweep</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <\!-- ================= COMPARISON ================= -->
+  <section class="compare" aria-labelledby="refHeading">
+    <h2 id="refHeading">Field reference</h2>
+
+    <div class="cards2">
+      <div class="vc ato">
+        <h3>Air-to-Open</h3>
+        <span class="tag">ATO · Fail-Closed (FC)</span>
+        <div class="use"><b>Typical use:</b> steam, fuel gas, hazardous or pressurized fluids — anything that must be <b>shut off</b> on failure.</div>
+      </div>
+
+      <div class="vc atc">
+        <h3>Air-to-Close</h3>
+        <span class="tag">ATC · Fail-Open (FO)</span>
+        <div class="use"><b>Typical use:</b> cooling water, safety vents, pressure relief — anything that must keep <b>flowing</b> on failure.</div>
+      </div>
+    </div>
+
+    <table>
+      <caption class="sr-only">Mechanical comparison of air-to-open and air-to-close control valves</caption>
+      <thead>
+        <tr><th scope="col">Characteristic</th><th scope="col">Air-to-Open (ATO)</th><th scope="col">Air-to-Close (ATC)</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Air needed to…</th><td>Open</td><td>Close</td></tr>
+        <tr><th scope="row">Fail-safe position</th><td>Closed (FC)</td><td>Open (FO)</td></tr>
+        <tr><th scope="row">Loss of instrument air</th><td>Spring drives valve shut</td><td>Spring drives valve open</td></tr>
+        <tr><th scope="row">Actuator air port</th><td>Below diaphragm</td><td>Above diaphragm</td></tr>
+        <tr><th scope="row">Return spring sits</th><td>Above diaphragm</td><td>Below diaphragm</td></tr>
+        <tr><th scope="row">Rising signal</th><td>Valve opens</td><td>Valve closes</td></tr>
+      </tbody>
+    </table>
+    <p class="caution ref-caution"><b>Action alone isn’t enough:</b> this table describes actuator geometry; positioner configuration, bench range, and plug orientation also set installed action — verify fail position at the stem, never from the tag name.</p>
+  </section>
+
+  <p class="foot">
+    Instrumentation Field Manual · Practice Tool 1.2 — Valve Fail-Action Lab<br>
+    Actuator geometry simplified for clarity. Air-loss events are modelled, not measured.
+  </p>
+</div>
+
+<div class="sr-only" role="status" aria-live="polite" id="liveRegion"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     1. DOM
+     ============================================================ */
+  const $ = id => document.getElementById(id);
+
+  const svg      = $('valve');
+  const moving   = $('moving');
+  const spring   = $('spring');
+  const airTube  = $('airTube');
+  const airFlow  = $('airFlow');
+  const needle   = $('needle');
+  const arrows   = $('flowArrows');
+  const svgDesc  = $('svgDesc');
+  const svgTitle = $('svgTitle');
+
+  const modeBadge  = $('modeBadge');
+  const stateText  = $('stateText');
+  const statusBar  = $('statusBar');
+  const statusText = $('statusText');
+  const liveRegion = $('liveRegion');
+
+  const slider     = $('signal');
+  const airBtn     = $('airBtn');
+  const playBtn    = $('playBtn');
+
+  const outPctTop  = $('outPct');
+  const outMa      = $('outMa');
+  const outPct2    = $('outPct2');
+  const airPsiEl   = $('airPsi');
+  const posPctEl   = $('posPct');
+
+  const modeSeg    = $('modeSeg');
+
+  const panels = {
+    intro:    $('panelIntro'),
+    predict:  $('panelPredict'),
+    reveal:   $('panelReveal'),
+    transfer: $('panelTransfer'),
+    free:     $('panelFree')
+  };
+
+  const predKicker  = $('predKicker');
+  const predPrompt  = $('predPrompt');
+  const predContext = $('predContext');
+  const lockNote    = $('lockNote');
+
+  const revealKicker    = $('revealKicker');
+  const revealHeadline  = $('revealHeadline');
+  const revealBody      = $('revealBody');
+  const revealNext      = $('revealNext');
+  const mmCmd = $('mmCmd'), mmMa = $('mmMa'), mmPsi = $('mmPsi'), mmPos = $('mmPos');
+  const choicePos = $('choicePos'), choiceReason = $('choiceReason');
+
+  const chkAto = $('chkAto'), chkAtc = $('chkAtc'), chkMismatch = $('chkMismatch');
+
+  const TRAVEL = 26;   // px of plug travel in the drawing
+
+  /* ============================================================
+     2. CONTENT (kept separate from model + render)
+     ============================================================ */
+  const CASES = [
+    {
+      id: 'ato-air-loss',
+      mode: 'ato',
+      initialCommandPct: 60,
+      airEvent: 'loss',
+      prompt: 'Air is lost. Where will the spring drive this plug?',
+      expected: {
+        failPosition: 'closed',
+        springDirection: 'drives the plug onto the seat',
+        pressureState: 'air holds it open'
+      },
+      // see file header: CASES shape → distractors
+      distractors: {
+        open:   'Air is what holds an ATO valve open — and the air just left.',
+        closed: ''
+      },
+      feedback: {
+        correct: {
+          title: 'Correct — ATO fails closed.',
+          text:  'In an Air-to-Open valve, air pressure holds the plug off the seat. Remove the air and the return spring is unopposed — it drives the plug onto the seat. ATO fails CLOSED.'
+        },
+        wrongByChoice: {
+          open: {
+            title: 'Not quite — this valve fails closed.',
+            text:  'You predicted the valve would go open. But in an Air-to-Open valve, air is what holds it open — and the air just left. The only force remaining is the return spring, which pushes the plug onto the seat. ATO fails CLOSED.'
+          }
+        }
+      },
+      sourceNote: 'Spring-and-diaphragm actuator, air-to-open / fail-closed.'
+    },
+    {
+      id: 'atc-air-loss',
+      mode: 'atc',
+      initialCommandPct: 60,
+      airEvent: 'loss',
+      prompt: 'Same test, different valve. Air is lost. Where will the spring drive this plug?',
+      expected: {
+        failPosition: 'open',
+        springDirection: 'lifts the plug off the seat',
+        pressureState: 'air holds it closed'
+      },
+      distractors: {
+        open:   '',
+        closed: 'Air is what holds an ATC valve closed — and the air just left.'
+      },
+      feedback: {
+        correct: {
+          title: 'Correct — ATC fails open.',
+          text:  'In an Air-to-Close valve, air pressure holds the plug against the seat. Remove the air and the return spring is unopposed — it lifts the plug off the seat. ATC fails OPEN.'
+        },
+        wrongByChoice: {
+          closed: {
+            title: 'Not quite — this valve fails open.',
+            text:  'You predicted the valve would go closed. But in an Air-to-Close valve, air is what holds it closed — and the air just left. The only force remaining is the return spring, which lifts the plug off the seat. ATC fails OPEN.'
+          }
+        }
+      },
+      sourceNote: 'Spring-and-diaphragm actuator, air-to-close / fail-open.'
+    }
+  ];
+
+  const WRONG_REASON_TITLE = 'Right answer, wrong reason.';
+
+  const REASONS = {
+    spring:  { label: 'Return spring (unopposed)', correct: true },
+    air:     { label: 'Supply air pressure', wrong: 'You picked supply air — but the air supply is exactly what just failed. It cannot hold the valve anywhere.' },
+    plc:     { label: 'The last PLC command', wrong: 'You picked the PLC command. The PLC is still commanding — the slider has not moved — but the valve is no longer listening. Command is not position.' },
+    process: { label: 'Process pressure only', wrong: 'You picked process pressure. Process pressure pushes on the plug, but the actuator return spring is the designed fail-safe element.' }
+  };
+
+  /* ============================================================
+     3. STATE
+     ============================================================ */
+  const state = {
+    mode: 'ato',              // 'ato' | 'atc'
+    commandPct: 0,            // 0..100
+    airAvailable: true,
+    skin: 'green',
+    sweep: 'idle',            // 'idle' | 'running'
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  };
+
+  const lesson = {
+    step: 'intro',            // intro | predict | reveal | transfer | free
+    caseIndex: 0,
+    prediction: null,         // 'open' | 'closed'
+    reason: null,             // 'spring' | 'air' | 'plc' | 'process'
+    atoCorrect: false,
+    atcCorrect: false,
+    mismatchSeen: false,
+    attemptCount: 0,          // incremented on every reveal
+    retryPct: null            // set by "Try another case"; consumed by openPredictPanel
+  };
+
+  /* ============================================================
+     4. MODEL — single derived snapshot
+     ============================================================ */
+  function deriveModel(){
+    const cmd = state.commandPct;
+
+    // PLC side: what the controller is asking for. Independent of air.
+    const loopMa = 4 + 16 * (cmd / 100);
+
+    // Positioner output. Simplified 3–15 psi model, same signal for both actions.
+    const positionerPsi = state.airAvailable ? 3 + 12 * (cmd / 100) : 0;
+
+    // Field side: what the valve is actually doing.
+    let openness;   // 0 = fully closed, 1 = fully open
+    if (state.mode === 'ato'){
+      openness = state.airAvailable ? cmd / 100 : 0;
+    } else {
+      openness = state.airAvailable ? 1 - (cmd / 100) : 1;
+    }
+
+    return { cmd, loopMa, positionerPsi, openness };
+  }
+
+  /* ============================================================
+     5. SVG HELPERS
+     ============================================================ */
+  function springPath(cx, y1, y2, w, coils){
+    const h = Math.max(y2 - y1, 6);
+    const n = coils * 2;
+    let d = 'M ' + cx + ' ' + y1.toFixed(1);
+    for (let i = 1; i <= n; i++){
+      const y = y1 + (h * i) / (n + 1);
+      const x = cx + (i % 2 ? w / 2 : -w / 2);
+      d += ' L ' + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    d += ' L ' + cx + ' ' + y2.toFixed(1);
+    return d;
+  }
+
+  /* ============================================================
+     6. RENDER — attribute updates only, no SVG rebuild
+     ============================================================ */
+  function render(){
+    const m = deriveModel();
+    const o = m.openness;
+    const dy = -TRAVEL * o;
+
+    moving.setAttribute('transform', 'translate(0,' + dy.toFixed(2) + ')');
+
+    if (state.mode === 'ato'){
+      spring.setAttribute('d', springPath(210, 58, 114 + dy, 46, 6));
+    } else {
+      spring.setAttribute('d', springPath(210, 152 + dy, 182, 46, 6));
+    }
+
+    const tubeD = state.mode === 'atc'
+      ? 'M140,300 H350 V76 H302'
+      : 'M140,300 H350 V172 H302';
+    airTube.setAttribute('d', tubeD);
+    airFlow.setAttribute('d', tubeD);
+
+    const ang = -62 + (Math.min(m.positionerPsi, 15) / 15) * 124;
+    needle.setAttribute('transform', 'rotate(' + ang.toFixed(1) + ' 94 286)');
+
+    arrows.style.opacity = (o * 0.95).toFixed(2);
+
+    // ---- readouts: commanded vs actual, kept distinct ----
+    outPctTop.textContent = Math.round(m.cmd) + ' %';
+    outPct2.textContent   = Math.round(m.cmd) + ' %';
+    outMa.textContent     = m.loopMa.toFixed(1) + ' mA';
+    airPsiEl.textContent  = m.positionerPsi.toFixed(1) + ' psi';
+    posPctEl.textContent  = Math.round(o * 100) + ' %';
+
+    airPsiEl.className = 'v ' + (!state.airAvailable ? 'red'
+                       : m.positionerPsi > 13 ? 'amber' : 'blue');
+    posPctEl.className = 'v ' + (o < 0.02 ? 'green' : o > 0.98 ? 'green' : 'amber');
+
+    // ---- badge ----
+    if (state.mode === 'ato'){
+      modeBadge.textContent = 'AIR-TO-OPEN · FAIL-CLOSED';
+      modeBadge.classList.remove('atc');
+    } else {
+      modeBadge.textContent = 'AIR-TO-CLOSE · FAIL-OPEN';
+      modeBadge.classList.add('atc');
+    }
+    svg.classList.toggle('lost', !state.airAvailable);
+
+    // ---- text state description (outside the diagram) ----
+    const actionName = state.mode === 'ato' ? 'Air-to-Open' : 'Air-to-Close';
+    const posWord = o < 0.02 ? 'closed' : o > 0.98 ? 'fully open' : (Math.round(o*100) + '% open');
+    stateText.innerHTML =
+      actionName + ' valve. Command <b>' + Math.round(m.cmd) + ' %</b>. ' +
+      'Actuator air <b>' + m.positionerPsi.toFixed(1) + ' psi</b>. ' +
+      'Valve <b>' + posWord + '</b>.';
+
+    // ---- SVG desc for screen readers ----
+    svgTitle.textContent = 'Pneumatic control valve, ' +
+      (state.mode === 'ato' ? 'air-to-open' : 'air-to-close') + ' configuration';
+    svgDesc.textContent = actionName + ' valve. Command ' + Math.round(m.cmd) +
+      ' percent. Actuator air ' + m.positionerPsi.toFixed(1) + ' psi. Valve ' + posWord + '.';
+
+    // ---- status bar ----
+    if (!state.airAvailable){
+      statusBar.classList.add('lost');
+      statusBar.classList.remove('restored');
+      statusText.textContent = state.mode === 'ato'
+        ? 'Instrument air failed — the return spring has driven the valve CLOSED (fail-safe).'
+        : 'Instrument air failed — the return spring has driven the valve OPEN (fail-safe).';
+    } else {
+      statusBar.classList.remove('lost');
+      statusText.textContent = 'Instrument air normal — valve responding to controller output.';
+    }
+
+    syncControls();
+  }
+
+  /* ============================================================
+     7. CONTROL SYNC — what is unlocked, and why
+     ============================================================ */
+  function syncControls(){
+    if (animating){
+      modeSeg.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      slider.disabled = true;
+      playBtn.disabled = true;
+      airBtn.disabled = true;
+      setLessonInputsDisabled(true);
+      return;
+    }
+
+    const inPredict = lesson.step === 'predict';
+    const inReveal  = lesson.step === 'reveal';
+    const inFree    = lesson.step === 'free';
+
+    // mode buttons
+    const modeLocked = !inFree && lesson.step !== 'intro' && lesson.step !== 'transfer';
+    modeSeg.querySelectorAll('button').forEach(b => { b.disabled = modeLocked; });
+
+    // command slider
+    slider.disabled = !inFree && lesson.step !== 'intro';
+
+    // sweep
+    playBtn.disabled = !(inFree || lesson.step === 'intro' || lesson.step === 'transfer');
+
+    // air button
+    if (inFree){
+      airBtn.disabled = false;
+      airBtn.classList.remove('armed');
+      airBtn.textContent = state.airAvailable ? '✕  Lose air supply' : '↺  Restore air supply';
+    } else if (inPredict){
+      const ready = !!(lesson.prediction && lesson.reason);
+      airBtn.disabled = !ready;
+      airBtn.classList.toggle('armed', ready);
+      airBtn.textContent = ready
+        ? '✕  Lose air supply — run the test'
+        : '✕  Lose air supply (locked)';
+    } else if (inReveal){
+      airBtn.disabled = true;
+      airBtn.classList.remove('armed');
+      airBtn.textContent = 'Air lost — see result';
+    } else {
+      airBtn.disabled = true;
+      airBtn.classList.remove('armed');
+      airBtn.textContent = state.airAvailable ? '✕  Lose air supply' : '↺  Restore air supply';
+    }
+  }
+
+  /* ============================================================
+     8. LESSON PANELS
+     ============================================================ */
+  function showPanel(name){
+    Object.keys(panels).forEach(k => { panels[k].hidden = (k !== name); });
+    // move focus to the panel's first action so screen-reader users land in the new step
+    const target = panels[name].querySelector('button, input, [tabindex]');
+    if (target) target.focus({ preventScroll: true });
+  }
+
+  function setStep(step){
+    lesson.step = step;
+
+    if (step === 'intro')    { showPanel('intro');    }
+    if (step === 'transfer') { showPanel('transfer'); }
+    if (step === 'free')     { showPanel('free'); refreshChecklist(); }
+    if (step === 'predict')  { openPredictPanel();    }
+    if (step === 'reveal')   { openRevealPanel();     }
+
+    if (step === 'predict' || step === 'reveal'){
+      // panel already shown by the open* function
+    } else {
+      showPanel(step);
+    }
+    render();
+  }
+
+  function openPredictPanel(){
+    const c = CASES[lesson.caseIndex];
+    const isRetry = lesson.retryPct != null;
+    const pct = isRetry ? lesson.retryPct : c.initialCommandPct;
+    lesson.retryPct = null;
+
+    state.mode = c.mode;
+    state.commandPct = pct;
+    slider.value = pct;
+    state.airAvailable = true;
+    lesson.prediction = null;
+    lesson.reason = null;
+
+    predKicker.textContent  = 'Prediction · ' + (lesson.caseIndex + 1) + ' of ' + CASES.length +
+                              (isRetry ? ' · retry' : '');
+    predPrompt.textContent  = c.prompt;
+    predContext.textContent = c.mode.toUpperCase() + ' valve — ' + c.expected.pressureState +
+                              '. Command steady at ' + pct + ' %.';
+
+    document.querySelectorAll('.pred-btn').forEach(b => {
+      b.setAttribute('aria-pressed', 'false');
+      b.disabled = false;
+    });
+    document.querySelectorAll('input[name="reason"]').forEach(r => {
+      r.checked = false;
+      r.disabled = false;
+    });
+    lockNote.textContent = 'Select a position and a reason to unlock the air-supply test.';
+    lockNote.classList.remove('ready');
+
+    syncModeButtons();
+    showPanel('predict');
+    render();
+  }
+
+  function openRevealPanel(){
+    const c = CASES[lesson.caseIndex];
+    const positionCorrect = lesson.prediction === c.expected.failPosition;
+    const reasonCorrect   = lesson.reason === 'spring';
+
+    if (lesson.caseIndex === 0) lesson.atoCorrect = positionCorrect && reasonCorrect;
+    if (lesson.caseIndex === 1) lesson.atcCorrect = positionCorrect && reasonCorrect;
+    lesson.attemptCount++;
+
+    // One outcome drives headline, kicker, button and announcement, so
+    // "Correct" never appears alongside "Try another case".
+    const outcome = !positionCorrect ? 'wrong' : reasonCorrect ? 'correct' : 'wrongReason';
+
+    revealKicker.textContent = outcome === 'correct' ? 'Result · correct' : 'Result';
+    const fb = positionCorrect ? c.feedback.correct : c.feedback.wrongByChoice[lesson.prediction];
+    revealHeadline.textContent = outcome === 'wrongReason' ? WRONG_REASON_TITLE : fb.title;
+
+    let body = fb.text;
+    if (positionCorrect && !reasonCorrect){
+      body = 'Right position, wrong dominant force. ' + REASONS[lesson.reason].wrong +
+             ' The correct answer is the return spring, unopposed.';
+    } else if (!positionCorrect && !reasonCorrect){
+      body += ' You also named the wrong dominant force. ' + REASONS[lesson.reason].wrong;
+    }
+    revealBody.textContent = body;
+
+    // learner's pick stays visible next to the expected answer
+    choicePos.innerHTML =
+      'You predicted: <b class="' + (positionCorrect ? 'right' : 'wrong') + '">' + lesson.prediction + '</b>. ' +
+      'Expected: <b class="right">' + c.expected.failPosition + '</b>.';
+    choiceReason.hidden = reasonCorrect;
+    choiceReason.innerHTML = reasonCorrect ? '' :
+      'You reasoned: <b class="wrong">' + REASONS[lesson.reason].label + '</b>. ' +
+      'Correct: <b class="right">' + REASONS.spring.label + '</b>.';
+
+    const m = deriveModel();
+    mmCmd.textContent = Math.round(m.cmd) + ' %';
+    mmMa.textContent  = m.loopMa.toFixed(1) + ' mA';
+    mmPsi.textContent = m.positionerPsi.toFixed(1) + ' psi';
+    mmPos.textContent = Math.round(m.openness * 100) + ' % open';
+
+    lesson.mismatchSeen = true;
+
+    revealNext.textContent = outcome !== 'correct'
+      ? 'Try another case'
+      : lesson.caseIndex < CASES.length - 1
+        ? 'Next case'
+        : 'Finish lesson';
+
+    showPanel('reveal');
+    announce(
+      (outcome === 'correct' ? 'Correct. ' : outcome === 'wrongReason' ? WRONG_REASON_TITLE + ' ' : 'Incorrect. ') +
+      'Valve position is now ' + Math.round(m.openness * 100) + ' percent open, ' +
+      'while the PLC command is still ' + Math.round(m.cmd) + ' percent.'
+    );
+    render();
+  }
+
+  function syncModeButtons(){
+    modeSeg.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.mode === state.mode;
+      b.classList.toggle('active', on);
+      b.classList.toggle('atc', on && state.mode === 'atc');
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function announce(msg){
+    liveRegion.textContent = '';
+    // brief defer so repeated identical messages are re-announced
+    window.setTimeout(() => { liveRegion.textContent = msg; }, 30);
+  }
+
+  /* ============================================================
+     9. CONTROLS
+     ============================================================ */
+
+  // ---- command slider ----
+  slider.addEventListener('input', () => {
+    if (state.sweep === 'running') stopSweep();
+    state.commandPct = Number(slider.value);
+    render();
+  });
+
+  // ---- mode toggle ----
+  // Deterministic rule: switching action pauses any sweep, restores air,
+  // and resets any in-flight prediction. Position is recomputed from the
+  // current command under the new action — no stale pre-fault values.
+  modeSeg.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-mode]');
+    if (!btn || btn.disabled) return;
+
+    if (state.sweep === 'running') stopSweep();
+
+    state.mode = btn.dataset.mode;
+    state.airAvailable = true;
+
+    if (lesson.step === 'predict'){
+      lesson.prediction = null;
+      lesson.reason = null;
+      document.querySelectorAll('.pred-btn').forEach(b => b.setAttribute('aria-pressed','false'));
+      document.querySelectorAll('input[name="reason"]').forEach(r => { r.checked = false; });
+      lockNote.textContent = 'Select a position and a reason to unlock the air-supply test.';
+      lockNote.classList.remove('ready');
+    }
+
+    syncModeButtons();
+    render();
+    announce('Valve action switched to ' +
+      (state.mode === 'ato' ? 'air-to-open, fail-closed' : 'air-to-close, fail-open') +
+      '. Air restored, position recomputed from the current command.');
+  });
+
+  // ---- prediction buttons ----
+  document.querySelectorAll('.pred-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pred-btn').forEach(b =>
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+      lesson.prediction = btn.dataset.pred;
+      checkPredictReady();
+    });
+  });
+
+  // ---- reason radios ----
+  document.querySelectorAll('input[name="reason"]').forEach(r => {
+    r.addEventListener('change', () => {
+      if (r.checked) lesson.reason = r.value;
+      checkPredictReady();
+    });
+  });
+
+  function checkPredictReady(){
+    const ready = !!(lesson.prediction && lesson.reason);
+    if (ready){
+      lockNote.textContent = 'Prediction locked. The air-supply test is unlocked.';
+      lockNote.classList.add('ready');
+    } else {
+      lockNote.textContent = 'Select a position and a reason to unlock the air-supply test.';
+      lockNote.classList.remove('ready');
+    }
+    syncControls();
+  }
+
+  // ---- air supply ----
+  // The plug, spring and needle move to their new values before anything else
+  // updates. Only the lesson's predict step leads to the reveal panel.
+  airBtn.addEventListener('click', () => {
+    if (airBtn.disabled || animating) return;
+
+    const from = deriveModel();
+    state.airAvailable = !state.airAvailable;
+    const to = deriveModel();
+    const toReveal = !state.airAvailable && lesson.step === 'predict';
+
+    svg.classList.toggle('lost', !state.airAvailable);
+
+    animateAir(from, to, () => {
+      if (!state.airAvailable){
+        announce(state.mode === 'ato'
+          ? 'Air lost. Return spring drives the valve closed. ATO fails closed.'
+          : 'Air lost. Return spring drives the valve open. ATC fails open.');
+        if (toReveal) setStep('reveal');
+        else render();
+      } else {
+        announce('Air restored. Valve repositioned from the current command.');
+        render();
+      }
+    });
+  });
+
+  /* ---- air-event motion: geometry only; render() paints the final frame ---- */
+  let animating = false;
+  const AIR_ANIM_MS = 800;
+  const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;   // same curve as runExample()
+
+  function paintMechanism(o, psi){
+    const dy = -TRAVEL * o;
+    moving.setAttribute('transform', 'translate(0,' + dy.toFixed(2) + ')');
+    spring.setAttribute('d', state.mode === 'ato'
+      ? springPath(210, 58, 114 + dy, 46, 6)
+      : springPath(210, 152 + dy, 182, 46, 6));
+    const ang = -62 + (Math.min(psi, 15) / 15) * 124;
+    needle.setAttribute('transform', 'rotate(' + ang.toFixed(1) + ' 94 286)');
+    arrows.style.opacity = (o * 0.95).toFixed(2);
+  }
+
+  function animateAir(from, to, done){
+    if (state.reducedMotion){ done(); return; }
+    animating = true;
+    syncControls();
+    const start = performance.now();
+    function tick(now){
+      const t = Math.min((now - start) / AIR_ANIM_MS, 1);
+      const e = easeInOut(t);
+      paintMechanism(from.openness + (to.openness - from.openness) * e,
+                     from.positionerPsi + (to.positionerPsi - from.positionerPsi) * e);
+      if (t < 1){ requestAnimationFrame(tick); return; }
+      animating = false;
+      setLessonInputsDisabled(false);
+      done();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // controls outside syncControls' normal scope, locked only while animating
+  function setLessonInputsDisabled(off){
+    document.querySelectorAll('.pred-btn, input[name="reason"], .chip[data-skin], #lessonCard .btn')
+      .forEach(el => { el.disabled = off; });
+  }
+
+  // ---- reveal continue ----
+  // Free exploration is reached only when both cases are correct.
+  // A wrong case is retried in place at a new operating point.
+  revealNext.addEventListener('click', () => {
+    if (!caseCorrect()){
+      retryCase();
+    } else if (lesson.caseIndex === 0){
+      state.airAvailable = true;
+      lesson.caseIndex = 1;
+      setStep('transfer');
+      render();
+    } else if (lesson.atoCorrect && lesson.atcCorrect){
+      state.airAvailable = true;
+      setStep('free');
+      render();
+    }
+  });
+
+  function caseCorrect(){
+    return lesson.caseIndex === 0 ? lesson.atoCorrect : lesson.atcCorrect;
+  }
+
+  // Same mode, same caseIndex, new command between 30 and 90 %.
+  function retryCase(){
+    const prev = Math.round(state.commandPct);
+    let pct;
+    do { pct = 30 + Math.floor(Math.random() * 61); } while (pct === prev);
+    lesson.retryPct = pct;
+    state.airAvailable = true;
+    setStep('predict');
+  }
+
+  // ---- transfer continue ----
+  $('toPredict2').addEventListener('click', () => {
+    setStep('predict');
+  });
+
+  // ---- intro example ----
+  $('runExample').addEventListener('click', () => {
+    state.mode = 'ato';
+    state.airAvailable = true;
+    state.commandPct = 0;
+    slider.value = 0;
+    syncModeButtons();
+    render();
+    runExample();
+  });
+
+  function runExample(){
+    const start = performance.now();
+    const dur = state.reducedMotion ? 600 : 3400;
+    const from = 0, to = 60;
+
+    function tick(now){
+      const t = Math.min((now - start) / dur, 1);
+      const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+      state.commandPct = from + (to - from) * eased;
+      slider.value = state.commandPct;
+      render();
+      if (t < 1) requestAnimationFrame(tick);
+      else {
+        state.commandPct = to;
+        slider.value = to;
+        render();
+        lesson.caseIndex = 0;
+        setStep('predict');
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ---- free-mode reset ----
+  $('resetLesson').addEventListener('click', () => {
+    lesson.caseIndex = 0;
+    lesson.prediction = null;
+    lesson.reason = null;
+    lesson.atoCorrect = false;
+    lesson.atcCorrect = false;
+    lesson.mismatchSeen = false;
+    lesson.attemptCount = 0;
+    lesson.retryPct = null;
+    state.mode = 'ato';
+    state.airAvailable = true;
+    state.commandPct = 0;
+    slider.value = 0;
+    syncModeButtons();
+    setStep('intro');
+    render();
+  });
+
+  // ---- skins ----
+  document.querySelectorAll('.chip[data-skin]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip[data-skin]').forEach(c => {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
+      chip.classList.add('active');
+      chip.setAttribute('aria-pressed', 'true');
+      state.skin = chip.dataset.skin;
+      svg.classList.remove('skin-green', 'skin-black');
+      svg.classList.add('skin-' + state.skin);
+    });
+  });
+
+  /* ============================================================
+     10. SWEEP
+     ============================================================ */
+  let rafId = null, sweepT0 = 0;
+
+  function sweepLoop(ts){
+    if (!sweepT0) sweepT0 = ts;
+    const t = (ts - sweepT0) / 1000;
+    const period = 6;
+    const ph = (t % period) / period;
+    const v = ph < 0.5 ? ph * 2 : (1 - ph) * 2;
+    state.commandPct = Math.round(v * 100);
+    slider.value = state.commandPct;
+    if (!animating) render();
+    if (state.sweep === 'running') rafId = requestAnimationFrame(sweepLoop);
+  }
+
+  function startSweep(){
+    if (state.sweep === 'running') return;
+    state.sweep = 'running';
+    sweepT0 = 0;
+    playBtn.textContent = '❚❚  Pause sweep';
+    rafId = requestAnimationFrame(sweepLoop);
+  }
+
+  function stopSweep(){
+    if (state.sweep !== 'running') return;
+    state.sweep = 'idle';
+    cancelAnimationFrame(rafId);
+    playBtn.textContent = '▶  Play sweep';
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (state.sweep === 'running'){ stopSweep(); return; }
+    if (!state.airAvailable){
+      state.airAvailable = true;
+      render();
+    }
+    startSweep();
+  });
+
+  // stop sweep when the tab is hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && state.sweep === 'running') stopSweep();
+  });
+
+  /* ============================================================
+     11. FREE-MODE CHECKLIST
+     ============================================================ */
+  function refreshChecklist(){
+    chkAto.style.opacity       = lesson.atoCorrect ? '1' : '.45';
+    chkAtc.style.opacity       = lesson.atcCorrect ? '1' : '.45';
+    chkMismatch.style.opacity  = lesson.mismatchSeen ? '1' : '.45';
+  }
+
+  /* ============================================================
+     12. BOOT
+     ============================================================ */
+  showPanel('intro');
+  syncModeButtons();
+  syncControls();
+  render();
+  refreshChecklist();
+
+  // keep reduced-motion in sync if the user changes it
+  window.matchMedia('(prefers-reduced-motion: reduce)')
+        .addEventListener('change', e => { state.reducedMotion = e.matches; });
+
+})();
+<\/script>
+</body>
+</html>
+</script>
+
+<script>
+  // ── LAB LOADER ──
+  // In-frame adjustments: hide the lab's own header/reference/footer (section 03
+  // carries the reference table), match fonts, and report height to the parent.
+  const LAB_EMBED_HEAD = `
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  html{overflow:hidden}
+  body{background:#0B0C10;padding:0;min-height:0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif}
+  .crumb,.topbar,.compare,.foot{display:none}
+  #valve{height:auto;width:min(100%,360px)}
+  @media (min-width:700px){.layout{grid-template-columns:minmax(0,1fr) 330px}}
+</style>
+<script>
+  addEventListener('load', function(){
+    var app = document.querySelector('.app');
+    function post(){ parent.postMessage({ falHeight: Math.ceil(app.getBoundingClientRect().bottom + window.scrollY) }, '*'); }
+    new ResizeObserver(post).observe(app);
+    post();
+  });
+<\/script>
+`;
+
+  (function(){
+    const launch = document.getElementById('labLaunch');
+    const host = document.getElementById('labHost');
+    let frame = null;
+
+    document.getElementById('labOpen').addEventListener('click', () => {
+      if (frame) return;
+      const src = document.getElementById('fal-src').textContent
+        .replace(/<\\\/script>/g, '<' + '/script>')
+        .replace(/<\\!--/g, '<!--');
+      frame = document.createElement('iframe');
+      frame.className = 'lab-frame';
+      frame.title = 'Valve Fail-Action Lab — interactive ATO/ATC simulator';
+      frame.srcdoc = src.replace('</head>', LAB_EMBED_HEAD + '</head>');
+      // move keyboard focus to the lab's first control once it has loaded
+      frame.addEventListener('load', () => {
+        const first = frame.contentDocument && frame.contentDocument.getElementById('runExample');
+        if (first) first.focus(); else frame.focus();
+      });
+      host.appendChild(frame);
+      launch.hidden = true;
+    });
+
+    window.addEventListener('message', e => {
+      if (!frame || e.source !== frame.contentWindow) return;
+      if (!e.data || typeof e.data.falHeight !== 'number') return;
+      frame.style.height = e.data.falHeight + 'px';
+    });
+  })();
+</script>
+
+<script>
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qm2-1': { correct: false, answered: false },
+    'qm2-2': { correct: false, answered: false },
+    'qm2-3': { correct: false, answered: false },
+    'qm2-4': { correct: false, answered: false }
+  };
+
+  const explanations = {
+    'qm2-1': "✓ Correct. Air-to-open means air holds it open. Lose the air and the return spring is unopposed — it drives the plug onto the seat. That's why fuel gas valves are specified fail-closed.",
+    'qm2-1_wrong': "✗ In an air-to-open valve, air is the only thing holding it open. When the air goes, the spring wins and drives it closed. The PLC command no longer matters — the valve can't act on it without air.",
+    'qm2-2': "✓ Correct. 0 psi at the actuator with a 60 % command means no air is reaching the actuator. Check supply air first, then the signal arriving at the positioner and the air leaving it. Tuning can't move a valve that has no air.",
+    'qm2-2_wrong': "✗ The gauge is the clue: 0 psi means no air is reaching the actuator at all. That's a supply-air or positioner problem, not tuning, sizing, or the transmitter. Follow the signal path: supply air → positioner → actuator.",
+    'qm2-3': "✓ Correct. Q = Cv · √(ΔP / SG) = 10 · √(16 / 1.0) = 10 · 4 = 40 gpm.",
+    'qm2-3_wrong': "✗ Use Q = Cv · √(ΔP / SG). The square root is the step people skip: √16 = 4, so Q = 10 · 4 = 40 gpm.",
+    'qm2-4': "✓ Correct. A slow sawtooth that detuning only slows down is the classic stiction signature: the stem sticks while the output ramps, then slips all at once. Confirm with small output steps in manual and watch the travel indicator.",
+    'qm2-4_wrong': "✗ Tuning problems usually respond to detuning. A sawtooth that just gets slower points to the valve: the stem sticks while the output ramps, then jumps. That's stiction — a mechanical problem, fixed at the valve."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
+
+    const q = document.getElementById(qid);
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      el.classList.add('wrong');
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const keys = Object.keys(quizState);
+    const total = keys.length;
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
+
+    const display = document.getElementById('score-m2');
+    const msg = document.getElementById('msg-m2');
+
+    if (answered === total) {
+      display.textContent = correct + '/' + total;
+      if (correct === total) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You can read a valve.';
+        msg.style.color = 'var(--green)';
+      } else if (correct === total - 1) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the section you missed.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and run the lab again.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (total - answered) + ' question(s) remaining';
+    }
+  }
+</script>
+</body>
+</html>
