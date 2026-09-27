@@ -1019,7 +1019,7 @@
       </div>
       <div class="sim-slider">
         <label for="sim-kd">Kd <span class="sim-val" id="sim-kd-val">0.00</span></label>
-        <input type="range" id="sim-kd" min="0" max="2" step="0.05" value="0" oninput="simUpdate()">
+        <input type="range" id="sim-kd" min="0" max="6" step="0.05" value="0" oninput="simUpdate()">
       </div>
     </div>
 
@@ -1042,6 +1042,11 @@
     <div class="sim-caption">First-order process with dead time (FOPDT). Output shown in green. Not to scale.</div>
   </div>
 
+  <div class="tip-box" style="margin-top:14px;">
+    <span class="t-label">Note</span>
+    When Kd is greater than zero, you'll see a spike in the output at the moment the setpoint steps — this is called <strong>derivative kick</strong>. It happens because the controller form here applies D to the error, and a setpoint step produces an instantaneous change in error. Many industrial controllers avoid this by applying D to the PV only (not the error). Either configuration is common — know which one your controller uses before tuning.
+  </div>
+
   <!-- ── 07A PROCEDURAL TUNING ── -->
   <h3>07A · Tuning Session</h3>
   <ul class="step-list">
@@ -1050,7 +1055,7 @@
     <li><strong>Tune I.</strong> Start with Ki=0.01. Increase slowly until the offset is eliminated with minimal overshoot. Watch for windup at high Ki. Write down the value.</li>
     <li><strong>Tune D.</strong> Only if overshoot remains. Start with Kd=0.1. Increase carefully — watch for noise amplification. Write down the value.</li>
     <li><strong>Document.</strong> Write your final Kp/Ki/Kd. For each value, write one sentence explaining why you stopped where you did.</li>
-    <li><strong>Optional: Ziegler-Nichols.</strong> Set Ki=0, Kd=0. Increase Kp until the loop oscillates with constant amplitude. Record the Kp value at that point (<em>Ku</em>) and the oscillation period in seconds (<em>Pu</em>). For a PID, set Kp=0.6·Ku, Ti=Pu/2, Td=Pu/8. Compare the resulting response with your manual tune.</li>
+    <li><strong>Optional: Ziegler-Nichols.</strong> Set Ki=0, Kd=0. Increase Kp until the loop oscillates with constant amplitude. Record Kp at that point as <em>Ku</em>, and the period in seconds as <em>Pu</em>. For PID: <strong>Kp = 0.6·Ku</strong>, <strong>Ti = Pu/2</strong>, <strong>Td = Pu/8</strong>. Convert to the slider values with <strong>Ki = Kp/Ti</strong> and <strong>Kd = Kp·Td</strong>. Compare the resulting response with your manual tune.</li>
   </ul>
 
   <!-- ── 07B PREDICTION ── -->
@@ -1105,7 +1110,7 @@
 
   <!-- B3 -->
   <div class="quiz-item" id="B3">
-    <div class="quiz-q"><span class="qnum">B3.</span> Loop is stable: <strong>Kp=1.0, Ki=0.1, Kd=0</strong>. Overshoots ~10% after each setpoint change. Clean PV signal. You add <strong>Kd=0.3</strong>. Which PV response results?</div>
+    <div class="quiz-q"><span class="qnum">B3.</span> Loop is stable: <strong>Kp=1.5, Ki=0.1, Kd=0</strong>. Overshoots ~14% after each setpoint change. Clean PV signal. You add <strong>Kd=1.0</strong>. Which PV response results?</div>
     <div class="response-options">
       <div class="response-card" onclick="predictB(this,'B3',true)">
         <div class="response-label">Option A</div>
@@ -1151,22 +1156,22 @@
 
   <!-- B5 -->
   <div class="quiz-item" id="B5">
-    <div class="quiz-q"><span class="qnum">B5.</span> Loop is stable: <strong>Kp=1.0, Ki=0.1, Kd=0</strong>. Slight overshoot after each setpoint change. The PV signal shows visible electrical noise — small erratic fluctuations on the trend. You add <strong>Kd=1.5</strong>. Which PV response results?</div>
+    <div class="quiz-q"><span class="qnum">B5.</span> Loop is stable: <strong>Kp=1.0, Ki=0.1, Kd=0</strong>. The PV signal shows visible electrical noise — small erratic fluctuations on the trend. You add <strong>Kd=1.5</strong>. Which response results?</div>
     <div class="response-options">
       <div class="response-card" onclick="predictB(this,'B5',false)">
         <div class="response-label">Option A</div>
         <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 55 28 90 33 Q 130 36 165 35 L 185 35" stroke="#2ECC71" stroke-width="2" fill="none"/></svg>
-        <div class="response-desc">Reduced overshoot, smoother approach</div>
+        <div class="response-desc">Reduced overshoot, smoother PV trend</div>
       </div>
       <div class="response-card" onclick="predictB(this,'B5',false)">
         <div class="response-label">Option B</div>
         <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 40 15 65 40 Q 90 60 120 25 Q 150 5 185 40" stroke="#E74C3C" stroke-width="2" fill="none"/></svg>
-        <div class="response-desc">Amplified overshoot, otherwise unchanged</div>
+        <div class="response-desc">No visible change — the noise is already present</div>
       </div>
       <div class="response-card" onclick="predictB(this,'B5',true)">
         <div class="response-label">Option C</div>
         <svg viewBox="0 0 200 70"><line x1="15" y1="60" x2="190" y2="60" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="60" x2="15" y2="10" stroke="#6B7180" stroke-width="1"/><line x1="15" y1="35" x2="190" y2="35" stroke="#6B7180" stroke-width="0.5" stroke-dasharray="3,3"/><path d="M 15 55 Q 35 38 45 42 Q 55 30 70 40 Q 85 25 100 40 Q 115 30 130 42 Q 145 28 160 40 Q 175 32 185 38" stroke="#F1C40F" stroke-width="2" fill="none"/></svg>
-        <div class="response-desc">Valve jitters, PV becomes noisy, output swings rapidly</div>
+        <div class="response-desc">Valve jitters, output swings rapidly, PV trend unchanged</div>
       </div>
     </div>
     <div class="quiz-feedback" id="B5-fb"></div>
@@ -1428,7 +1433,7 @@
     </div>
 
     <div class="formula-box">
-      Output = Kp·e + Ki·∫e dt + Kd·(de/dt) &nbsp;·&nbsp; PB = 100/Kp &nbsp;·&nbsp; Ti = 1/Ki &nbsp;·&nbsp; Td = Kd/Kp
+      Output = Kp·e + Ki·∫e dt + Kd·(de/dt) &nbsp;·&nbsp; PB = 100/Kp &nbsp;·&nbsp; Ti = Kp/Ki &nbsp;·&nbsp; Td = Kd/Kp
     </div>
   </div>
 </div>
@@ -1469,8 +1474,8 @@
       wrong: "✗ 'No change' would only happen if the I term were disabled in the controller. Ki=0.1 is too small to cause instability — instability comes from 10–50× higher Ki, or windup."
     },
     B5: {
-      correct: "✓ Correct. D amplifies the rate of change. On a noisy signal, the derivative of noise is large and erratic. The controller output jumps around, driving the valve to hunt constantly. The PV develops visible noise because the output is driving the process with that noise.",
-      wrong: "✗ Reduced overshoot is what D provides on a clean signal — see B3. Amplified overshoot is what *reduced* D provides. On a noisy signal, the noise dominates the derivative calculation, and the valve jitters."
+      correct: "✓ Correct. D amplifies the rate of change. On a noisy signal, the derivative of noise is large and erratic. The output swings rapidly, driving the valve to hunt. The PV trend changes little because the process lag filters the high-frequency swings — but the valve is now being driven with that noise and will wear.",
+      wrong: "✗ D reduces overshoot on a clean signal (see B3). On a noisy signal, the noise dominates the derivative calculation. The result is output jitter and valve hunting — not a smoother trend, and not 'no change,' because the output signal is now full of rapid swings."
     },
     C1_cause: {
       correct: "✓ Correct. Fast, steady oscillation on a clean signal is proportional gain. 3-second period is consistent with a fast flow or pressure loop.",
