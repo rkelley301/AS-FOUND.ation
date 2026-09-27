@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M1 — PID Loop Control · AS-FOUND.ation</title>
+<title>M1 — PID Control (Expanded) · Industrial Instrumentation</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
 
@@ -16,6 +16,7 @@
     --green: #2ECC71;
     --red: #E74C3C;
     --yellow: #F1C40F;
+    --purple: #A855F7;
     --text: #D4D6DC;
     --muted: #6B7180;
     --head: #F0F1F3;
@@ -30,11 +31,10 @@
     font-size: 15px;
     line-height: 1.6;
     padding: 0 16px 60px;
-    max-width: 780px;
+    max-width: 820px;
     margin: 0 auto;
   }
 
-  /* ── HEADER ── */
   .module-header {
     border-bottom: 2px solid var(--accent);
     padding: 32px 0 20px;
@@ -56,7 +56,6 @@
   }
   h1 span { color: var(--accent); }
 
-  /* ── SECTION BLOCKS ── */
   .section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -101,11 +100,25 @@
     color: var(--head);
     margin-bottom: 14px;
   }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--head);
+    margin: 20px 0 10px;
+  }
+  h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 14px 0 6px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
 
   strong, b { color: var(--head); font-weight: 700; }
   em { color: var(--accent); font-style: normal; }
 
-  /* ── HOOK ── */
   .hook-block {
     border-left: 4px solid var(--accent);
     background: #16120A;
@@ -126,7 +139,6 @@
     margin-bottom: 8px;
   }
 
-  /* ── ANALOGY ── */
   .analogy-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -141,10 +153,7 @@
     padding: 14px;
     text-align: center;
   }
-  .analogy-icon {
-    font-size: 28px;
-    margin-bottom: 8px;
-  }
+  .analogy-icon { font-size: 28px; margin-bottom: 8px; }
   .analogy-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px;
@@ -164,31 +173,6 @@
     margin-top: 4px;
   }
 
-  /* ── SIGNAL CHAIN ── */
-  .signal-chain {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-  }
-  .sig-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 12px;
-    color: var(--head);
-    white-space: nowrap;
-  }
-  .sig-box.sp { border-color: var(--accent); color: var(--accent); }
-  .sig-box.pv { border-color: var(--accent2); color: var(--accent2); }
-  .sig-box.err { border-color: var(--red); color: var(--red); }
-  .sig-box.out { border-color: var(--green); color: var(--green); }
-  .sig-arrow { color: var(--muted); font-size: 16px; }
-
-  /* ── BULLETS ── */
   .core-bullets { list-style: none; padding: 0; }
   .core-bullets li {
     padding: 12px 14px;
@@ -201,53 +185,10 @@
   .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
   .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
   .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+  .core-bullets li:nth-child(4) { border-left-color: var(--purple); }
+  .core-bullets li:nth-child(5) { border-left-color: var(--yellow); }
+  .core-bullets li:nth-child(6) { border-left-color: var(--red); }
 
-  /* ── PID ROW ── */
-  .pid-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-top: 16px;
-  }
-  @media(max-width:480px){ .pid-row { grid-template-columns: 1fr; } }
-  .pid-card {
-    border-radius: 5px;
-    padding: 14px;
-    text-align: center;
-  }
-  .pid-card.p { background: #1A1108; border: 1px solid var(--accent); }
-  .pid-card.i { background: #0C1420; border: 1px solid var(--accent2); }
-  .pid-card.d { background: #0B1A12; border: 1px solid var(--green); }
-  .pid-letter {
-    font-family: 'Space Mono', monospace;
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .pid-card.p .pid-letter { color: var(--accent); }
-  .pid-card.i .pid-letter { color: var(--accent2); }
-  .pid-card.d .pid-letter { color: var(--green); }
-  .pid-name {
-    font-size: 11px;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .pid-action {
-    font-size: 13px;
-    color: var(--head);
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .pid-analogy {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  /* ── EXERCISE ── */
   .step-list { list-style: none; padding: 0; counter-reset: steps; }
   .step-list li {
     counter-increment: steps;
@@ -288,7 +229,6 @@
     vertical-align: middle;
   }
 
-  /* ── QUIZ ── */
   .quiz-item {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -334,7 +274,6 @@
   .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
   .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
 
-  /* ── CHEAT SHEET ── */
   .cheat-sheet {
     background: #0E0F14;
     border: 2px solid var(--accent);
@@ -352,10 +291,7 @@
     align-items: center;
     gap: 8px;
   }
-  .cheat-title::before {
-    content: '▣';
-    font-size: 14px;
-  }
+  .cheat-title::before { content: '▣'; font-size: 14px; }
   .cheat-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -395,7 +331,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* ── SCORE DISPLAY ── */
   .score-bar {
     margin-top: 20px;
     padding: 14px;
@@ -412,18 +347,205 @@
   }
   .score-label { color: var(--muted); }
   .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .info-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .diagram-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .warning-box {
+    background: #1A0C0C;
+    border-left: 4px solid var(--red);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .warning-box .w-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .tip-box {
+    background: #0B1A12;
+    border-left: 4px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .tip-box .t-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .pid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media(max-width:480px){ .pid-row { grid-template-columns: 1fr; } }
+  .pid-card {
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .pid-card.p { background: #1A1108; border: 1px solid var(--accent); }
+  .pid-card.i { background: #0C1420; border: 1px solid var(--accent2); }
+  .pid-card.d { background: #0B1A12; border: 1px solid var(--green); }
+  .pid-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .pid-card.p .pid-letter { color: var(--accent); }
+  .pid-card.i .pid-letter { color: var(--accent2); }
+  .pid-card.d .pid-letter { color: var(--green); }
+  .pid-name {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .pid-action {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pid-analogy {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .signal-chain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+  .sig-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: var(--head);
+    white-space: nowrap;
+  }
+  .sig-box.sp { border-color: var(--accent); color: var(--accent); }
+  .sig-box.pv { border-color: var(--accent2); color: var(--accent2); }
+  .sig-box.err { border-color: var(--red); color: var(--red); }
+  .sig-box.out { border-color: var(--green); color: var(--green); }
+  .sig-arrow { color: var(--muted); font-size: 16px; }
+
+  .callout {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .callout.blue { background: var(--accent2); }
+  .callout.green { background: var(--green); }
+  .callout.red { background: var(--red); color: #fff; }
+  .callout.purple { background: var(--purple); color: #fff; }
+  .callout.yellow { background: var(--yellow); }
+
+  .zn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media(max-width:520px){ .zn-grid { grid-template-columns: 1fr; } }
+  .zn-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+  }
+  .zn-card h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .zn-card.osc h4 { color: var(--accent); }
+  .zn-card.react h4 { color: var(--accent2); }
+  .zn-card ul { list-style: none; }
+  .zn-card ul li {
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .zn-card ul li:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
 
 <div class="module-header">
   <div class="badge">// Main Module M1 · I&C Series</div>
-  <h1>PID Loop <span>Control</span></h1>
+  <h1>PID Control <span>— Expanded</span></h1>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 1: HOOK -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 1: HOOK ═══════════ -->
 <div class="section">
   <div class="section-label">
     <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
@@ -431,13 +553,11 @@
   </div>
   <div class="hook-block">
     <span class="label-tiny">⚡ Hook</span>
-    Every process loop you touch in the field — temperature, pressure, flow, level — is probably being controlled by a PID, and <strong>if you can't read what the three terms are doing, you're flying blind when it starts hunting, oscillating, or drifting off setpoint.</strong>
+    Every process loop you touch — temperature, pressure, flow, level — is controlled by a PID. <strong>If you can't read what the three terms are doing, you're flying blind when the loop starts hunting, oscillating, or drifting off setpoint.</strong> Now that you understand DC circuits, wiring, diagrams, cabinets, and signal flow, you have the foundation to understand PID at the depth it deserves.
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 2: ANALOGY -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 2: ANALOGY ═══════════ -->
 <div class="section">
   <div class="section-label">
     <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
@@ -483,13 +603,11 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 3: CORE CONCEPT -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 3: DEEP DIVE — P, I, D ═══════════ -->
 <div class="section">
   <div class="section-label">
     <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
-    Core Concept — 3 Points Only
+    Deep Dive — The Three Terms
   </div>
 
   <div class="pid-row">
@@ -513,106 +631,415 @@
     </div>
   </div>
 
-  <ul class="core-bullets" style="margin-top:16px;">
-    <li><strong>Error (e) = SP − PV.</strong> This is what the controller is always reacting to. If error is zero, P and D output nothing — only I can still produce output.</li>
-    <li><strong>Integral windup</strong> is your #1 field problem. When output saturates (valve fully open) and error persists, I keeps accumulating. Loop goes unstable when demand drops. Look for anti-windup in your controller config.</li>
-    <li><strong>Tuning direction matters.</strong> In most DCS/PLC platforms, you tune <em>Gain (Kp)</em>, <em>Integral time (Ti)</em>, and <em>Derivative time (Td)</em> — not raw gains. Higher Ti = less integral action. Know your platform's convention before touching anything.</li>
+  <h3>Proportional Action — Deep Dive</h3>
+  <p style="font-size:14px;margin-bottom:10px;"><strong>What it does:</strong> The proportional term produces an output that is directly proportional to the current error. If error doubles, the proportional contribution doubles. If error is zero, the proportional contribution is zero.</p>
+
+  <div class="formula-box">P<sub>output</sub> = Kp × e(t)</div>
+
+  <p style="font-size:14px;margin-top:12px;margin-bottom:8px;"><strong>Where:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Kp</strong> = proportional gain. Higher gain = stronger response to a given error.</li>
+    <li><strong>e(t)</strong> = error at the current moment = SP − PV.</li>
+    <li><strong>P<sub>output</sub></strong> = the contribution of the P term to the final controller output.</li>
   </ul>
+
+  <h4>Proportional Band — The Concept You'll See in the Field</h4>
+  <p style="font-size:14px;margin-bottom:10px;">In many DCS and PLC platforms, P action is not expressed as Kp but as <strong>Proportional Band (PB)</strong> — the percentage of the measurement range that causes the output to go from 0% to 100%.</p>
+
+  <div class="formula-box">PB = 100 / Kp</div>
+
+  <table class="info-table">
+    <thead><tr><th>Kp</th><th>Proportional Band</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>0.5</td><td>200%</td><td>Very low gain — slow, sluggish response</td></tr>
+      <tr><td>1.0</td><td>100%</td><td>Moderate — full output range for full error range</td></tr>
+      <tr><td>2.0</td><td>50%</td><td>Higher gain — faster but more oscillatory</td></tr>
+      <tr><td>5.0</td><td>20%</td><td>Very high gain — likely unstable, oscillating</td></tr>
+      <tr><td>10.0</td><td>10%</td><td>Extreme — almost certainly unstable</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Critical</span>
+    <strong>A controller with P action only will always have steady-state offset.</strong> If the error goes to zero, the P output goes to zero — and the valve closes. But then error comes back because the valve is closed. The loop settles at a nonzero error where the P output exactly balances the load. This is called <em>droop</em> or <em>offset</em>, and it's why we need integral action.
+  </div>
+
+  <h3>Integral (Reset) Action — Deep Dive</h3>
+  <p style="font-size:14px;margin-bottom:10px;"><strong>What it does:</strong> The integral term produces an output that is proportional to the <em>accumulated</em> error over time. Even a small error, if it persists, will eventually drive the integral contribution higher and higher until the error is eliminated.</p>
+
+  <div class="formula-box">I<sub>output</sub> = Ki × ∫ e(t) dt</div>
+
+  <p style="font-size:14px;margin-top:12px;margin-bottom:8px;"><strong>Where:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Ki</strong> = integral gain. Higher Ki = faster integral action.</li>
+    <li><strong>∫ e(t) dt</strong> = the running sum of error over time (the area under the error curve).</li>
+    <li><strong>I<sub>output</sub></strong> = the contribution of the I term to the final output.</li>
+  </ul>
+
+  <h4>Integral Time — The Other Way You'll See It</h4>
+  <p style="font-size:14px;margin-bottom:10px;">Many platforms express integral action as <strong>Integral Time (Ti)</strong> or <strong>Reset Time</strong> — the time it takes for the integral term to produce the same output as the proportional term did for a given step error.</p>
+
+  <div class="formula-box">Ti = 1 / Ki</div>
+
+  <p style="font-size:14px;margin-top:12px;margin-bottom:8px;"><strong>The crucial inversion:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Higher Ki</strong> = more integral action = faster correction, more overshoot.</li>
+    <li><strong>Higher Ti</strong> = <em>less</em> integral action = slower correction, more stable.</li>
+    <li>If you're tuning in a platform that uses Ti, <em>increasing</em> Ti makes the loop more sluggish. This is the opposite of what most people expect.</li>
+  </ul>
+
+  <h4>Integral Windup — The #1 Field Problem</h4>
+  <p style="font-size:14px;margin-bottom:10px;">When the controller output saturates — valve fully open, motor at max speed — and the error persists, the integral term keeps accumulating. The controller "winds up" to an extreme output value. When the process finally responds and the error reverses, the integral term has to "unwind" from that extreme value. During this unwind, the controller output is stuck at saturation, and the process overshoots badly before the controller can recover.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+      <!-- Axes -->
+      <line x1="60" y1="220" x2="580" y2="220" stroke="#6B7180" stroke-width="1.5"/>
+      <line x1="60" y1="30" x2="60" y2="220" stroke="#6B7180" stroke-width="1.5"/>
+      <text x="320" y="250" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle">TIME</text>
+      <text x="30" y="125" fill="#6B7180" font-family="monospace" font-size="10" text-anchor="middle" transform="rotate(-90 30 125)">OUTPUT</text>
+
+      <!-- Saturation line -->
+      <line x1="60" y1="50" x2="580" y2="50" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="590" y="53" fill="#E74C3C" font-family="monospace" font-size="9">100% SAT</text>
+
+      <!-- Normal response -->
+      <path d="M 60 200 Q 100 200 140 80 Q 200 40 280 60 Q 340 75 400 90 Q 460 100 540 110"
+            fill="none" stroke="#2ECC71" stroke-width="2.5"/>
+      <text x="480" y="100" fill="#2ECC71" font-family="monospace" font-size="9">without windup</text>
+
+      <!-- Windup response -->
+      <path d="M 60 200 L 120 200 L 140 55 L 300 55 L 380 55 Q 420 55 440 130 Q 460 200 520 210 Q 560 210 580 200"
+            fill="none" stroke="#E74C3C" stroke-width="2.5" stroke-dasharray="5,3"/>
+      <text x="320" y="185" fill="#E74C3C" font-family="monospace" font-size="9">with windup</text>
+
+      <!-- Saturation annotation -->
+      <text x="220" y="40" fill="#E74C3C" font-family="monospace" font-size="9" text-anchor="middle">I keeps accumulating here →</text>
+
+      <!-- Overshoot annotation -->
+      <line x1="470" y1="90" x2="470" y2="140" stroke="#F1C40F" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="475" y="160" fill="#F1C40F" font-family="monospace" font-size="9">overshoot</text>
+    </svg>
+    <div class="diagram-caption">Integral windup: during saturation, the I term keeps accumulating, causing overshoot when the process finally responds.</div>
+  </div>
+
+  <p style="font-size:14px;margin-top:12px;"><strong>Anti-windup strategies:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Integral clamp:</strong> Limits the maximum value the integral term can reach. Simple and effective.</li>
+    <li><strong>Back-calculation:</strong> Feeds the saturation error back to reduce the integral term. Used by many DCS platforms.</li>
+    <li><strong>Conditional integration:</strong> Stops integrating when output is saturated. The most aggressive form.</li>
+    <li><strong>Bumpless transfer:</strong> Ensures the integral term is initialized to match the output when switching from manual to auto. Prevents sudden jumps.</li>
+  </ul>
+
+  <h3>Derivative (Rate) Action — Deep Dive</h3>
+  <p style="font-size:14px;margin-bottom:10px;"><strong>What it does:</strong> The derivative term produces an output proportional to the <em>rate of change</em> of the error. It acts as a brake — when error is decreasing rapidly, D counteracts the P output to prevent overshoot.</p>
+
+  <div class="formula-box">D<sub>output</sub> = Kd × de(t)/dt</div>
+
+  <p style="font-size:14px;margin-top:12px;margin-bottom:8px;"><strong>Where:</strong></p>
+  <ul class="core-bullets">
+    <li><strong>Kd</strong> = derivative gain. Higher Kd = stronger braking action.</li>
+    <li><strong>de(t)/dt</strong> = the rate of change of error (the slope of the error curve).</li>
+    <li><strong>D<sub>output</sub></strong> = the contribution of the D term to the final output.</li>
+  </ul>
+
+  <h4>Derivative Time (Td)</h4>
+  <p style="font-size:14px;margin-bottom:10px;">Most platforms express derivative action as <strong>Derivative Time (Td)</strong> — the time by which the D term "anticipates" the future error.</p>
+
+  <div class="formula-box">Td = Kd / Kp</div>
+
+  <h4>Why D Is Often Left at Zero</h4>
+  <ul class="core-bullets">
+    <li><strong>Noise amplification:</strong> Derivative reacts to rate of change. Noise is rapid change. So D amplifies noise like crazy — the output becomes jittery and the valve hunts constantly.</li>
+    <li><strong>Most loops don't need it:</strong> For temperature, level, and slow flow loops, P and I are enough. D adds complexity without much benefit.</li>
+    <li><strong>D is most useful on fast loops:</strong> Pressure, fast flow, and motion control benefit from D. Temperature loops — where thermal lag is huge — usually don't.</li>
+    <li><strong>Never use D on noisy signals</strong> without first filtering the PV. Even then, most technicians leave D at zero unless there's a specific reason to use it.</li>
+  </ul>
+
+  <div class="warning-box">
+    <span class="w-label">⚠ Field Rule</span>
+    <strong>If you don't know why you're adding D, don't add D.</strong> Nine times out of ten, it makes things worse. The exception is when you have a specific overshoot problem that P and I can't solve — and even then, use it sparingly.
+  </div>
+
+  <h3>The Complete PID Equation</h3>
+  <div class="formula-box" style="font-size:14px;">
+    Output(t) = Kp·e(t) + Ki·∫e(t)dt + Kd·(de/dt)
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:8px;text-align:center;">Or in the parallel form with Ti and Td:</p>
+  <div class="formula-box" style="font-size:14px;">
+    Output(t) = Kp · [ e(t) + (1/Ti)·∫e(t)dt + Td·(de/dt) ]
+  </div>
+
+  <h3>P, I, D — What Each One Actually Does to the Loop</h3>
+  <table class="info-table">
+    <thead><tr><th>Term</th><th>Responds To</th><th>Effect of Increasing</th><th>Effect of Decreasing</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P</strong></td><td>Current error size</td><td>Faster response, more oscillation, reduces offset</td><td>Slower response, more stable, increases offset</td></tr>
+      <tr><td><strong>I</strong></td><td>Accumulated error over time</td><td>Eliminates offset faster, more overshoot, can cause instability</td><td>Slower offset elimination, more stable, may never eliminate offset</td></tr>
+      <tr><td><strong>D</strong></td><td>Rate of change of error</td><td>Reduces overshoot, more noise sensitivity, can cause instability at high values</td><td>More overshoot, less noise sensitivity</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 4: EXERCISE -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 4: TUNING METHODS ═══════════ -->
 <div class="section">
   <div class="section-label">
-    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
-    Hands-On Exercise
+    <span class="section-num" style="background:#100A14;color:#A855F7;">04</span>
+    Tuning Methods
   </div>
-  <h2>Tune a Simulated Loop — Right Now</h2>
+
+  <h2>How to Actually Set the Numbers</h2>
+  <p style="font-size:14px;margin-bottom:14px;">Knowing what P, I, and D do is step one. Knowing how to set them is step two. There are several methods, ranging from mathematical to pure trial-and-error.</p>
+
+  <h3>Method 1: Ziegler-Nichols (Closed-Loop / Oscillation Method)</h3>
+  <p style="font-size:14px;margin-bottom:10px;">The most famous tuning method. It's aggressive, produces fast response, and is a great starting point — but often requires fine-tuning for real loops.</p>
 
   <ul class="step-list">
-    <li>
-      Go to <strong>pidtuner.com</strong> or search "PID simulator online." <span class="tool-tag">FREE</span><br>
-      <span style="font-size:12px;color:var(--muted);">Alternative: Google "PID loop simulator" — Incubit or similar works.</span>
-    </li>
-    <li>
-      Set <strong>Kp=1, Ki=0, Kd=0</strong>. Apply a setpoint step. Watch the process variable climb — <em>does it reach SP or stop short?</em> That gap is <strong>steady-state offset</strong> — P alone can't fix it.
-    </li>
-    <li>
-      Now add <strong>Ki=0.1</strong>. Watch offset disappear. Crank it to Ki=5 and watch it overshoot and oscillate. You just caused integral windup.
-    </li>
-    <li>
-      Reset to a stable Ki. Add <strong>Kd=0.5</strong>. The approach to setpoint should smooth out. Increase Kd until it gets twitchy — that's derivative amplifying noise.
-    </li>
-    <li>
-      <strong>Write down</strong> (on paper, not mental note) the Kp/Ki/Kd combo that gave you the fastest stable response with no overshoot. That's your baseline intuition for a first-order process.
-    </li>
+    <li><strong>Set Ki = 0 and Kd = 0.</strong> You want only proportional action.</li>
+    <li><strong>Put the loop in automatic mode</strong> with a small setpoint change.</li>
+    <li><strong>Increase Kp slowly</strong> until the loop just begins to oscillate continuously. The oscillation should be sustained — neither growing nor decaying.</li>
+    <li><strong>Record Ku</strong> — the ultimate gain. This is the Kp value that produced sustained oscillation.</li>
+    <li><strong>Record Pu</strong> — the ultimate period. This is the time (in seconds or minutes) for one complete oscillation cycle.</li>
+    <li><strong>Calculate the tuning parameters</strong> from the table below.</li>
+  </ul>
+
+  <table class="info-table">
+    <thead><tr><th>Controller Type</th><th>Kp</th><th>Ti (Integral Time)</th><th>Td (Derivative Time)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P only</strong></td><td>0.5 · Ku</td><td>—</td><td>—</td></tr>
+      <tr><td><strong>PI</strong></td><td>0.45 · Ku</td><td>Pu / 1.2</td><td>—</td></tr>
+      <tr><td><strong>PID</strong></td><td>0.6 · Ku</td><td>Pu / 2</td><td>Pu / 8</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Practical Note</span>
+    Ziegler-Nichols produces aggressive tuning — fast response but often too much overshoot for real process loops. Many technicians use it as a starting point and then <strong>reduce Kp by 20-30%</strong> and <strong>increase Ti by 20-30%</strong> for a more conservative, stable loop.
+  </div>
+
+  <h3>Method 2: Ziegler-Nichols (Open-Loop / Reaction Curve Method)</h3>
+  <p style="font-size:14px;margin-bottom:10px;">This method doesn't require the loop to oscillate. Instead, you perform a step test and measure the process reaction curve.</p>
+
+  <ul class="step-list">
+    <li>Put the controller in <strong>manual</strong>.</li>
+    <li>Step the output by a known amount (e.g., 5%).</li>
+    <li>Record the PV response over time.</li>
+    <li>Draw the steepest tangent line to the response curve.</li>
+    <li>Measure: <strong>L</strong> (dead time — delay before the PV responds) and <strong>T</strong> (time constant — time for PV to reach 63% of its final change).</li>
+    <li>Calculate the tuning parameters:</li>
+  </ul>
+
+  <table class="info-table">
+    <thead><tr><th>Controller Type</th><th>Kp</th><th>Ti</th><th>Td</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P only</strong></td><td>T / L</td><td>—</td><td>—</td></tr>
+      <tr><td><strong>PI</strong></td><td>0.9 · T / L</td><td>3.3 · L</td><td>—</td></tr>
+      <tr><td><strong>PID</strong></td><td>1.2 · T / L</td><td>2 · L</td><td>0.5 · L</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Method 3: Trial and Error (Field Method)</h3>
+  <p style="font-size:14px;margin-bottom:10px;">The method most technicians actually use. It's slower but safer — you never let the loop go unstable.</p>
+
+  <ul class="step-list">
+    <li><strong>Start with Ki = 0, Kd = 0.</strong> Tune P first.</li>
+    <li><strong>Increase Kp</strong> in small steps until the loop responds quickly but is still stable. Back off 20%.</li>
+    <li><strong>Add integral action.</strong> Start with a long Ti (slow integral) and gradually shorten it (more aggressive) until offset is eliminated without overshoot.</li>
+    <li><strong>Add derivative only if needed.</strong> If the loop still overshoots, add a small amount of D (short Td). Increase carefully, watching for noise.</li>
+    <li><strong>Test with a setpoint change.</strong> The PV should reach SP with minimal overshoot and settle quickly.</li>
+    <li><strong>Test with a load change.</strong> Introduce a disturbance (open a bypass, change feed rate) and observe recovery.</li>
+    <li><strong>Write down the final values</strong> and document the tuning.</li>
+  </ul>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Field Tuning Rules</span>
+    <strong>One change at a time.</strong> Never adjust two parameters simultaneously — you won't know which one caused the change. <strong>Make small steps.</strong> A 10-20% change in a parameter is usually enough. <strong>Document every change.</strong> Write down the before and after values, and the observed effect.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 5: TROUBLESHOOTING — OSCILLATION ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A0C0C;color:var(--red);">05</span>
+    Troubleshooting — Why Loops Oscillate
+  </div>
+
+  <h2>Multiple Reasons for Oscillation</h2>
+  <p style="font-size:14px;margin-bottom:14px;">Oscillation is the most common PID problem in the field. It has many causes, and the fix depends on which one is actually happening. Here are the most common — ordered by frequency in the field.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Cause</th><th>Signature</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Kp too high</strong></td><td>Fast oscillation, roughly sine-wave, period proportional to loop dynamics</td><td>Reduce Kp (increase PB) by 20-30%</td></tr>
+      <tr><td><strong>Ki too high (or Ti too short)</strong></td><td>Slow oscillation, larger amplitude, overshoot after disturbances</td><td>Reduce Ki (increase Ti)</td></tr>
+      <tr><td><strong>Kd too high</strong></td><td>High-frequency jitter, valve hunting constantly</td><td>Reduce or eliminate Kd; check PV filtering</td></tr>
+      <tr><td><strong>Integral windup</strong></td><td>Overshoot after long saturation, slow recovery</td><td>Enable anti-windup; check saturation limits</td></tr>
+      <tr><td><strong>Valve hysteresis / stiction</strong></td><td>Limit cycle — small sustained oscillation, valve never quite settles</td><td>Repair or replace valve; add valve positioner; reduce PB</td></tr>
+      <tr><td><strong>Process dead time too long</strong></td><td>Oscillation regardless of tuning — loop fundamentally can't be tuned tighter</td><td>Reduce dead time (move sensor, reduce pipe volume); accept slower tuning</td></tr>
+      <tr><td><strong>Two controllers fighting</strong></td><td>Cascade or interacting loops oscillate out of phase</td><td>Decouple loops; tune inner loop first; check for hidden interactions</td></tr>
+      <tr><td><strong>Noise on PV signal</strong></td><td>High-frequency jitter, especially with D action</td><td>Filter PV; shield cable; separate from power wiring; add signal isolator</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Diagnostic Trick</span>
+    <strong>Oscillation frequency tells you the cause.</strong> Fast oscillation (period of seconds) usually points to tuning (Kp too high) or noise. Slow oscillation (period of minutes) usually points to integral action or process dead time. A valve that never quite settles often points to mechanical hysteresis.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 6: TROUBLESHOOTING — FAILURE TO REACH SP ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A0C0C;color:var(--red);">06</span>
+    Troubleshooting — Why Loops Fail to Reach Setpoint
+  </div>
+
+  <h2>Multiple Reasons for Failure to Reach SP</h2>
+  <p style="font-size:14px;margin-bottom:14px;">A loop that never reaches setpoint (and isn't oscillating) has a different set of causes. The PV sits below SP (or above) and stays there.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Cause</th><th>Signature</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Integral action is off</strong></td><td>Permanent offset, loop is stable but PV is below/above SP</td><td>Turn on integral action; reduce Ti (increase Ki)</td></tr>
+      <tr><td><strong>Ki too low (Ti too long)</strong></td><td>Very slow correction toward SP, may never arrive</td><td>Increase Ki / reduce Ti</td></tr>
+      <tr><td><strong>Output saturated</strong></td><td>Valve is fully open (or fully closed) and PV is still below SP</td><td>Check valve sizing, process capacity, upstream supply; loop may be undersized</td></tr>
+      <tr><td><strong>Valve undersized</strong></td><td>Valve at 100% and PV still can't reach SP at full demand</td><td>Replace with larger valve; check Cv rating</td></tr>
+      <tr><td><strong>Valve stuck / failed</strong></td><td>Output signal changes but valve position doesn't move</td><td>Check valve actuator, air supply, positioner</td></tr>
+      <tr><td><strong>Transmitter calibration error</strong></td><td>PV reads low (or high) consistently, doesn't match a test instrument</td><td>Recalibrate transmitter</td></tr>
+      <tr><td><strong>Setpoint is unrealistic</strong></td><td>SP is beyond the process capability — physically impossible</td><td>Verify SP against process design; reset to achievable value</td></tr>
+      <tr><td><strong>Load exceeds capacity</strong></td><td>Process demand is greater than what the loop can deliver</td><td>Add capacity, reduce load, or accept lower SP</td></tr>
+      <tr><td><strong>Manual/auto mismatch</strong></td><td>Controller is in manual; output not tracking SP</td><td>Switch to auto; check tracking settings</td></tr>
+      <tr><td><strong>Cascade slave in wrong mode</strong></td><td>Inner loop not following outer loop's setpoint</td><td>Put slave in cascade mode; verify cascade initialization</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <span class="t-label">✓ Diagnostic Trick</span>
+    <strong>Check the output.</strong> If the output is at 100% (or 0%), the loop is saturated — it's not a tuning problem, it's a capacity problem. If the output is somewhere in the middle and stable, the loop is either missing integral action or has a calibration error. If the output is changing but the PV isn't, the problem is downstream — valve, actuator, or process.
+  </div>
+</div>
+
+<!-- ═══════════ SECTION 7: EXERCISE ═══════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">07</span>
+    Hands-On Exercise
+  </div>
+  <h2>Simulate, Tune, Troubleshoot</h2>
+
+  <h3>Exercise A: PID Simulator — Full Tuning Session</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Go to <strong>pidtuner.com</strong> or search "PID simulator online." Run through this complete tuning session:</p>
+
+  <ul class="step-list">
+    <li><strong>Baseline:</strong> Set Kp=1, Ki=0, Kd=0. Apply a setpoint step. Observe the steady-state offset.</li>
+    <li><strong>Tune P:</strong> Increase Kp until the loop responds quickly but doesn't oscillate. Note the value. This is your "P only" tuning.</li>
+    <li><strong>Add I:</strong> Start with a small Ki (0.01). Increase slowly until the offset is eliminated. Watch for overshoot. Find the Ki that eliminates offset with minimal overshoot.</li>
+    <li><strong>Cause windup:</strong> Set Ki=5 (way too high). Apply a large setpoint step. Watch the windup and overshoot. Reset Ki to a reasonable value.</li>
+    <li><strong>Add D:</strong> If there's still overshoot, add a small amount of Kd (0.1). Increase carefully, watching for noise. Find the Kd that smooths the approach.</li>
+    <li><strong>Test disturbance rejection:</strong> With your tuned values, introduce a load disturbance (if the simulator supports it). Watch the recovery.</li>
+    <li><strong>Document your tuning:</strong> Write down the final Kp, Ki, Kd, and describe the response.</li>
+  </ul>
+
+  <h3>Exercise B: Ziegler-Nichols Tuning</h3>
+  <p style="font-size:14px;margin-bottom:10px;">Using the same simulator, perform the Ziegler-Nichols closed-loop method:</p>
+  <ul class="step-list">
+    <li>Set Ki=0, Kd=0.</li>
+    <li>Increase Kp until the loop oscillates with constant amplitude. Record Ku and Pu.</li>
+    <li>Calculate Kp, Ti, Td from the Z-N table.</li>
+    <li>Enter those values. Observe the response. Is it faster than your manual tuning? Is it more oscillatory?</li>
+    <li>Apply the "practical correction" — reduce Kp by 25%, increase Ti by 25%. Compare again.</li>
+  </ul>
+
+  <h3>Exercise C: Troubleshooting Scenarios</h3>
+  <p style="font-size:14px;margin-bottom:10px;">For each scenario, identify the most likely cause and the fix:</p>
+  <ul class="core-bullets">
+    <li><strong>Scenario 1:</strong> A flow loop oscillates with a period of about 3 seconds. Amplitude is steady. The valve is moving constantly. The PV signal looks clean. <em>(Answer: Kp too high — reduce Kp.)</em></li>
+    <li><strong>Scenario 2:</strong> A temperature loop oscillates slowly, period about 5 minutes. Overshoots by 15°F, then undershoots by 10°F, slowly decaying. <em>(Answer: Ki too high or Ti too short — reduce integral action.)</em></li>
+    <li><strong>Scenario 3:</strong> A pressure loop sits at 2 PSI below setpoint indefinitely. No oscillation, just steady offset. Output is at 45%. <em>(Answer: Integral action off or Ki too low — enable or increase integral.)</em></li>
+    <li><strong>Scenario 4:</strong> A level loop's valve signal is at 100% but the level won't reach setpoint. The valve is fully open. <em>(Answer: Valve undersized or process demand exceeds capacity — check valve Cv and upstream supply.)</em></li>
+    <li><strong>Scenario 5:</strong> After a large setpoint change, the loop overshoots by 30% and takes a long time to recover. <em>(Answer: Integral windup — check anti-windup settings or reduce Ki.)</em></li>
+    <li><strong>Scenario 6:</strong> A flow loop oscillates with a very small amplitude at high frequency (2-3 Hz). The valve is jittering. D action is set to 0.5. <em>(Answer: Kd too high, amplifying noise — reduce Kd or filter the PV.)</em></li>
   </ul>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 5: QUIZ -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 8: QUIZ ═══════════ -->
 <div class="section">
   <div class="section-label">
-    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    <span class="section-num" style="background:#100A14;color:#A855F7;">08</span>
     Quick-Check Quiz
   </div>
-  <h2>3 Questions. No partial credit.</h2>
+  <h2>5 Questions. No partial credit.</h2>
 
-  <!-- Q1 -->
-  <div class="quiz-item" id="q1">
-    <div class="quiz-q"><span class="qnum">Q1.</span> Your flow loop is stable but the PV sits 2% below SP forever. No hunting. What's the most likely cause?</div>
+  <div class="quiz-item" id="qm1-1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> What does the Proportional term react to in a PID controller?</div>
     <ul class="quiz-options">
-      <li onclick="answer(this,'q1',false)">A) Kp is too high</li>
-      <li onclick="answer(this,'q1',true)">B) Integral action is off or Ki is too low</li>
-      <li onclick="answer(this,'q1',false)">C) Derivative is amplifying noise</li>
-      <li onclick="answer(this,'q1',false)">D) The transmitter is failed</li>
+      <li onclick="answer(this,'qm1-1',false)">A) The accumulated error over time</li>
+      <li onclick="answer(this,'qm1-1',true)">B) The size of the current error</li>
+      <li onclick="answer(this,'qm1-1',false)">C) The rate of change of error</li>
+      <li onclick="answer(this,'qm1-1',false)">D) The integral of the setpoint</li>
     </ul>
-    <div class="quiz-feedback" id="q1-fb"></div>
+    <div class="quiz-feedback" id="qm1-1-fb"></div>
   </div>
 
-  <!-- Q2 -->
-  <div class="quiz-item" id="q2">
-    <div class="quiz-q"><span class="qnum">Q2.</span> After a process upset, your temperature loop overshoots setpoint badly and keeps oscillating. Which term is most likely too aggressive?</div>
+  <div class="quiz-item" id="qm1-2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> A loop is stable but the PV sits 3% below SP indefinitely. Which term is most likely inadequate?</div>
     <ul class="quiz-options">
-      <li onclick="answer(this,'q2',false)">A) Derivative (Kd)</li>
-      <li onclick="answer(this,'q2',false)">B) Proportional (Kp) only</li>
-      <li onclick="answer(this,'q2',true)">C) Integral (Ki) — suspect windup</li>
-      <li onclick="answer(this,'q2',false)">D) The setpoint is wrong</li>
+      <li onclick="answer(this,'qm1-2',false)">A) Proportional</li>
+      <li onclick="answer(this,'qm1-2',true)">B) Integral</li>
+      <li onclick="answer(this,'qm1-2',false)">C) Derivative</li>
+      <li onclick="answer(this,'qm1-2',false)">D) None — this is normal</li>
     </ul>
-    <div class="quiz-feedback" id="q2-fb"></div>
+    <div class="quiz-feedback" id="qm1-2-fb"></div>
   </div>
 
-  <!-- Q3 -->
-  <div class="quiz-item" id="q3">
-    <div class="quiz-q"><span class="qnum">Q3.</span> In a PID loop, what does the Derivative term actually react to?</div>
+  <div class="quiz-item" id="qm1-3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> After a large setpoint change, the loop overshoots badly and takes a long time to recover. What's the most likely cause?</div>
     <ul class="quiz-options">
-      <li onclick="answer(this,'q3',false)">A) The accumulated sum of past errors</li>
-      <li onclick="answer(this,'q3',false)">B) The size of the current error</li>
-      <li onclick="answer(this,'q3',true)">C) The rate of change of error</li>
-      <li onclick="answer(this,'q3',false)">D) The gap between output and setpoint</li>
+      <li onclick="answer(this,'qm1-3',false)">A) Kp is too high</li>
+      <li onclick="answer(this,'qm1-3',true)">B) Integral windup</li>
+      <li onclick="answer(this,'qm1-3',false)">C) Kd is too high</li>
+      <li onclick="answer(this,'qm1-3',false)">D) The setpoint is wrong</li>
     </ul>
-    <div class="quiz-feedback" id="q3-fb"></div>
+    <div class="quiz-feedback" id="qm1-3-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qm1-4">
+    <div class="quiz-q"><span class="qnum">Q4.</span> In the Ziegler-Nichols closed-loop method, what do Ku and Pu represent?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm1-4',false)">A) Ki and Kd at the start of tuning</li>
+      <li onclick="answer(this,'qm1-4',true)">B) The ultimate gain (Ku) and ultimate period (Pu) at the point of sustained oscillation</li>
+      <li onclick="answer(this,'qm1-4',false)">C) The final tuning values recommended by the method</li>
+      <li onclick="answer(this,'qm1-4',false)">D) The setpoint and process variable</li>
+    </ul>
+    <div class="quiz-feedback" id="qm1-4-fb"></div>
+  </div>
+
+  <div class="quiz-item" id="qm1-5">
+    <div class="quiz-q"><span class="qnum">Q5.</span> A loop's output is at 100% and the PV still won't reach setpoint. What's the most likely cause?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'qm1-5',false)">A) Kp is too low</li>
+      <li onclick="answer(this,'qm1-5',false)">B) Integral action is off</li>
+      <li onclick="answer(this,'qm1-5',true)">C) The valve is undersized or the process demand exceeds capacity</li>
+      <li onclick="answer(this,'qm1-5',false)">D) The derivative term is too high</li>
+    </ul>
+    <div class="quiz-feedback" id="qm1-5-fb"></div>
   </div>
 
   <div class="score-bar">
     <span class="score-label">// SCORE</span>
-    <span class="score-val" id="score-display">—/3</span>
-    <span class="score-label" id="score-msg" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+    <span class="score-val" id="score-m1">—/5</span>
+    <span class="score-label" id="msg-m1" style="color:var(--muted);font-size:12px;">Answer all 5 questions</span>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 6: CHEAT SHEET -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ SECTION 9: CHEAT SHEET ═══════════ -->
 <div class="section">
   <div class="section-label">
-    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">09</span>
     Cheat Sheet Card
   </div>
   <div class="cheat-sheet">
-    <div class="cheat-title">PID Quick Reference — Pocket Card</div>
+    <div class="cheat-title">PID Control — Pocket Card</div>
 
     <div class="cheat-grid">
       <div class="cheat-block">
@@ -630,69 +1057,97 @@
       <div class="cheat-block">
         <h3>Field Symptoms → Fix</h3>
         <ul>
-          <li><span class="key">PV won't hit SP →</span><span class="val">↑ Ki</span></li>
+          <li><span class="key">PV won't hit SP →</span><span class="val">↑ Ki (↓ Ti)</span></li>
           <li><span class="key">Overshoot + oscillate →</span><span class="val">↓ Ki, check windup</span></li>
           <li><span class="key">Slow response →</span><span class="val">↑ Kp</span></li>
           <li><span class="key">Loop hunts →</span><span class="val">↓ Kp first</span></li>
           <li><span class="key">Noisy output →</span><span class="val">↓ Kd or filter PV</span></li>
-          <li><span class="key">Windup suspected →</span><span class="val">Check anti-windup setting</span></li>
+          <li><span class="key">Output at 100% →</span><span class="val">Capacity problem, not tuning</span></li>
         </ul>
       </div>
 
       <div class="cheat-block">
-        <h3>Key Terms</h3>
+        <h3>Ziegler-Nichols (Closed Loop)</h3>
         <ul>
-          <li><span class="key">SP</span><span class="val">Setpoint (target)</span></li>
-          <li><span class="key">PV</span><span class="val">Process Variable (actual)</span></li>
-          <li><span class="key">CV / Output</span><span class="val">Controller output to valve/actuator</span></li>
-          <li><span class="key">Error (e)</span><span class="val">SP − PV</span></li>
-          <li><span class="key">Windup</span><span class="val">I accumulating during saturation</span></li>
-          <li><span class="key">Offset</span><span class="val">Persistent error P can't fix</span></li>
+          <li><span class="key">Find Ku →</span><span class="val">Kp at sustained oscillation</span></li>
+          <li><span class="key">Find Pu →</span><span class="val">Period of oscillation</span></li>
+          <li><span class="key">PI →</span><span class="val">Kp=0.45Ku, Ti=Pu/1.2</span></li>
+          <li><span class="key">PID →</span><span class="val">Kp=0.6Ku, Ti=Pu/2, Td=Pu/8</span></li>
+          <li><span class="key">Practical →</span><span class="val">Reduce Kp 25%, increase Ti 25%</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Oscillation Causes</h3>
+        <ul>
+          <li><span class="key">Fast, steady →</span><span class="val">Kp too high</span></li>
+          <li><span class="key">Slow, large →</span><span class="val">Ki too high</span></li>
+          <li><span class="key">High-freq jitter →</span><span class="val">Kd too high / noise</span></li>
+          <li><span class="key">Limit cycle →</span><span class="val">Valve stiction/hysteresis</span></li>
+          <li><span class="key">Won't settle →</span><span class="val">Dead time too long</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Failure to Reach SP</h3>
+        <ul>
+          <li><span class="key">Steady offset →</span><span class="val">I off or too low</span></li>
+          <li><span class="key">Output at limit →</span><span class="val">Valve undersized / capacity</span></li>
+          <li><span class="key">Signal changes, no PV →</span><span class="val">Valve stuck or failed</span></li>
+          <li><span class="key">Consistent bias →</span><span class="val">Transmitter calibration</span></li>
+          <li><span class="key">SP unachievable →</span><span class="val">Check process design</span></li>
         </ul>
       </div>
 
       <div class="cheat-block">
         <h3>Tuning Order (Field Rule)</h3>
         <ul>
-          <li><span class="key">Step 1</span><span class="val">Tune P first. Stable?</span></li>
-          <li><span class="key">Step 2</span><span class="val">Add I until offset gone</span></li>
-          <li><span class="key">Step 3</span><span class="val">Add D only if needed</span></li>
-          <li><span class="key">Always</span><span class="val">Make one change at a time</span></li>
-          <li><span class="key">Always</span><span class="val">Document before/after values</span></li>
-          <li><span class="key">Never</span><span class="val">Tune in AUTO during upset</span></li>
+          <li><span class="key">Step 1 →</span><span class="val">Tune P first. Stable?</span></li>
+          <li><span class="key">Step 2 →</span><span class="val">Add I until offset gone</span></li>
+          <li><span class="key">Step 3 →</span><span class="val">Add D only if needed</span></li>
+          <li><span class="key">Always →</span><span class="val">One change at a time</span></li>
+          <li><span class="key">Always →</span><span class="val">Document before/after</span></li>
+          <li><span class="key">Never →</span><span class="val">Tune during an upset</span></li>
         </ul>
       </div>
     </div>
 
     <div class="formula-box">
-      Output(t) = Kp·e(t) + Ki·∫e(t)dt + Kd·(de/dt)
+      Output = Kp·e + Ki·∫e dt + Kd·(de/dt) &nbsp;·&nbsp; PB = 100/Kp &nbsp;·&nbsp; Ti = 1/Ki &nbsp;·&nbsp; Td = Kd/Kp
     </div>
   </div>
 </div>
 
-<!-- ═══════════ SERIES FOOTER ═══════════ -->
-<footer style="margin-top:28px;padding-top:14px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-  <span>AS-FOUND.ation · Main Module M1</span>
-  <a href="index.html" style="color:var(--accent);text-decoration:none;">← All modules</a>
-</footer>
-
 <script>
-  const answers = { q1: 0, q2: 0, q3: 0 };
-  const correct = { q1: false, q2: false, q3: false };
+  // ── QUIZ ENGINE ──
+  const quizState = {
+    'qm1-1': { correct: false, answered: false },
+    'qm1-2': { correct: false, answered: false },
+    'qm1-3': { correct: false, answered: false },
+    'qm1-4': { correct: false, answered: false },
+    'qm1-5': { correct: false, answered: false }
+  };
+
   const explanations = {
-    q1: "✓ Correct. P reacts to current error but can't eliminate it fully — steady-state offset is the signature of missing or inadequate integral action.",
-    q2: "✓ Correct. Post-upset oscillation with overshoot almost always points to integral windup — I kept accumulating while the valve was saturated, then dumped it all at once.",
-    q3: "✓ Correct. D = rate of change of error (de/dt). It's a brake, not a current-error or history-error term.",
-    q1_wrong: "✗ Think about what causes a permanent gap below SP. P reacts to error size — it should be pushing toward SP. What term handles accumulated error over time?",
-    q2_wrong: "✗ The clue is the post-upset timing and oscillation pattern. Think about what accumulates when the output is saturated for a long time.",
-    q3_wrong: "✗ P reacts to current error magnitude, I reacts to accumulated error history. D is about how fast error is changing — the slope, not the value."
+    'qm1-1': "✓ Correct. The P term reacts to the size of the current error: P_output = Kp × e(t). If error doubles, P output doubles. If error is zero, P output is zero.",
+    'qm1-1_wrong': "✗ P reacts to the current error magnitude. The accumulated error over time is the I term. The rate of change of error is the D term.",
+    'qm1-2': "✓ Correct. A steady-state offset that P alone can't fix is the signature of inadequate integral action. P produces output only when there's error — so it settles at a nonzero error where the P output balances the load. The I term eliminates that offset.",
+    'qm1-2_wrong': "✗ P alone always leaves offset. D doesn't affect steady-state. The term that eliminates persistent offset is integral (I).",
+    'qm1-3': "✓ Correct. Post-upset overshoot with slow recovery is the classic signature of integral windup. During saturation, I keeps accumulating, and when the process responds, the controller has to unwind from an extreme value — causing overshoot.",
+    'qm1-3_wrong': "✗ Kp too high causes continuous oscillation, not post-upset overshoot. Kd too high causes noise. The clue is the post-upset timing — think about what accumulates during saturation.",
+    'qm1-4': "✓ Correct. Ku (ultimate gain) is the Kp value that produces sustained oscillation. Pu (ultimate period) is the period of that oscillation. Both are used to calculate the tuning parameters.",
+    'qm1-4_wrong': "✗ Ku and Pu are measured experimentally, not the final answer. Ku = gain at sustained oscillation, Pu = period at sustained oscillation.",
+    'qm1-5': "✓ Correct. If the output is saturated (100%) and the PV still can't reach SP, the loop is at its maximum capability. The valve is undersized, the process demand exceeds capacity, or the setpoint is unachievable. Tuning won't fix this.",
+    'qm1-5_wrong': "✗ If the output is at 100% and PV still won't reach SP, the loop is delivering maximum effort. This is a capacity problem — valve undersized, upstream supply insufficient, or SP unachievable. Tuning can't fix a saturated loop."
   };
 
   function answer(el, qid, isCorrect) {
-    const q = document.getElementById(qid);
-    if (q.dataset.answered) return;
-    q.dataset.answered = '1';
+    const state = quizState[qid];
+    if (state.answered) return;
+    state.answered = true;
+    state.correct = isCorrect;
 
+    const q = document.getElementById(qid);
     const opts = q.querySelectorAll('.quiz-options li');
     opts.forEach(o => o.style.pointerEvents = 'none');
 
@@ -702,10 +1157,8 @@
       el.classList.add('correct');
       fb.textContent = explanations[qid];
       fb.className = 'quiz-feedback show ok';
-      correct[qid] = true;
     } else {
       el.classList.add('wrong');
-      // reveal correct
       opts.forEach(o => {
         if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
       });
@@ -713,34 +1166,35 @@
       fb.className = 'quiz-feedback show fail';
     }
 
-    answers[qid] = 1;
     updateScore();
   }
 
   function updateScore() {
-    const answered = Object.values(answers).filter(v => v === 1).length;
-    const score = Object.values(correct).filter(Boolean).length;
-    const display = document.getElementById('score-display');
-    const msg = document.getElementById('score-msg');
+    const keys = Object.keys(quizState);
+    const answered = keys.filter(k => quizState[k].answered).length;
+    const correct = keys.filter(k => quizState[k].correct).length;
 
-    if (answered === 3) {
-      display.textContent = `${score}/3`;
-      if (score === 3) {
+    const display = document.getElementById('score-m1');
+    const msg = document.getElementById('msg-m1');
+
+    if (answered === 5) {
+      display.textContent = correct + '/5';
+      if (correct === 5) {
         display.style.color = 'var(--green)';
-        msg.textContent = 'Solid. You know the loop.';
+        msg.textContent = 'Excellent. Ready for M2.';
         msg.style.color = 'var(--green)';
-      } else if (score === 2) {
+      } else if (correct >= 3) {
         display.style.color = 'var(--yellow)';
-        msg.textContent = 'Close. Re-read the weak one.';
+        msg.textContent = 'Review the questions you missed.';
         msg.style.color = 'var(--yellow)';
       } else {
         display.style.color = 'var(--red)';
-        msg.textContent = 'Go back to section 03 and 04.';
+        msg.textContent = 'Go back and re-read sections 03-06.';
         msg.style.color = 'var(--red)';
       }
     } else {
-      display.textContent = `${score}/${answered}`;
-      msg.textContent = `${3 - answered} question(s) remaining`;
+      display.textContent = correct + '/' + answered;
+      msg.textContent = (5 - answered) + ' question(s) remaining';
     }
   }
 </script>
