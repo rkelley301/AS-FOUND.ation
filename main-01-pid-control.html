@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PID Loop Control — Field Learning Module</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0B0C10;
+    --surface: #111318;
+    --border: #1E2028;
+    --accent: #E67E22;
+    --accent2: #3B9EFF;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --yellow: #F1C40F;
+    --text: #D4D6DC;
+    --muted: #6B7180;
+    --head: #F0F1F3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 16px 60px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .module-header {
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 0 20px;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--head);
+    line-height: 1.2;
+  }
+  h1 span { color: var(--accent); }
+
+  /* ── SECTION BLOCKS ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--head);
+    margin-bottom: 14px;
+  }
+
+  strong, b { color: var(--head); font-weight: 700; }
+  em { color: var(--accent); font-style: normal; }
+
+  /* ── HOOK ── */
+  .hook-block {
+    border-left: 4px solid var(--accent);
+    background: #16120A;
+    padding: 18px 20px;
+    border-radius: 0 6px 6px 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--head);
+    line-height: 1.5;
+  }
+  .hook-block .label-tiny {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ── ANALOGY ── */
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media(max-width:520px){ .analogy-grid { grid-template-columns: 1fr; } }
+  .analogy-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .analogy-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .analogy-term {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+  }
+  .analogy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── SIGNAL CHAIN ── */
+  .signal-chain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+  .sig-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: var(--head);
+    white-space: nowrap;
+  }
+  .sig-box.sp { border-color: var(--accent); color: var(--accent); }
+  .sig-box.pv { border-color: var(--accent2); color: var(--accent2); }
+  .sig-box.err { border-color: var(--red); color: var(--red); }
+  .sig-box.out { border-color: var(--green); color: var(--green); }
+  .sig-arrow { color: var(--muted); font-size: 16px; }
+
+  /* ── BULLETS ── */
+  .core-bullets { list-style: none; padding: 0; }
+  .core-bullets li {
+    padding: 12px 14px;
+    border-left: 3px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .core-bullets li:nth-child(1) { border-left-color: var(--accent); }
+  .core-bullets li:nth-child(2) { border-left-color: var(--accent2); }
+  .core-bullets li:nth-child(3) { border-left-color: var(--green); }
+
+  /* ── PID ROW ── */
+  .pid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media(max-width:480px){ .pid-row { grid-template-columns: 1fr; } }
+  .pid-card {
+    border-radius: 5px;
+    padding: 14px;
+    text-align: center;
+  }
+  .pid-card.p { background: #1A1108; border: 1px solid var(--accent); }
+  .pid-card.i { background: #0C1420; border: 1px solid var(--accent2); }
+  .pid-card.d { background: #0B1A12; border: 1px solid var(--green); }
+  .pid-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .pid-card.p .pid-letter { color: var(--accent); }
+  .pid-card.i .pid-letter { color: var(--accent2); }
+  .pid-card.d .pid-letter { color: var(--green); }
+  .pid-name {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .pid-action {
+    font-size: 13px;
+    color: var(--head);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pid-analogy {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── EXERCISE ── */
+  .step-list { list-style: none; padding: 0; counter-reset: steps; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 14px 12px 46px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-tag {
+    display: inline-block;
+    background: #1A1108;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .quiz-q {
+    font-weight: 600;
+    color: var(--head);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .quiz-q .qnum {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .quiz-options { list-style: none; }
+  .quiz-options li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-options li:hover { border-color: var(--accent); color: var(--head); }
+  .quiz-options li.correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-options li.wrong { background: #1A0C0C; border-color: var(--red); color: var(--red); }
+  .quiz-options li.reveal-correct { background: #0B1A12; border-color: var(--green); color: var(--green); }
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #0B1A12; color: var(--green); border: 1px solid var(--green); }
+  .quiz-feedback.fail { background: #1A0C0C; color: var(--red); border: 1px solid var(--red); }
+
+  /* ── CHEAT SHEET ── */
+  .cheat-sheet {
+    background: #0E0F14;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .cheat-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheat-title::before {
+    content: '▣';
+    font-size: 14px;
+  }
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:480px){ .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .cheat-block ul { list-style: none; }
+  .cheat-block ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .cheat-block ul li:last-child { border-bottom: none; }
+  .cheat-block ul li .key { color: var(--muted); }
+  .cheat-block ul li .val { color: var(--head); font-weight: 600; text-align: right; }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── SCORE DISPLAY ── */
+  .score-bar {
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-label { color: var(--muted); }
+  .score-val { color: var(--head); font-size: 20px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="module-header">
+  <div class="badge">// Field Learning Module · I&C Series</div>
+  <h1>PID Loop <span>Control</span></h1>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: HOOK -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#1A1108;color:var(--accent);">01</span>
+    Why This Matters Now
+  </div>
+  <div class="hook-block">
+    <span class="label-tiny">⚡ Hook</span>
+    Every process loop you touch in the field — temperature, pressure, flow, level — is probably being controlled by a PID, and <strong>if you can't read what the three terms are doing, you're flying blind when it starts hunting, oscillating, or drifting off setpoint.</strong>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: ANALOGY -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0C1420;color:var(--accent2);">02</span>
+    The Analogy
+  </div>
+  <h2>You're driving a car. The setpoint is 60 mph.</h2>
+
+  <div class="analogy-grid">
+    <div class="analogy-card">
+      <div class="analogy-icon">🦶</div>
+      <div class="analogy-label">Proportional</div>
+      <div class="analogy-term">How far off are you?</div>
+      <div class="analogy-desc">Press harder when you're way under 60. Ease off as you get close.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">⏱️</div>
+      <div class="analogy-label">Integral</div>
+      <div class="analogy-term">How long have you been off?</div>
+      <div class="analogy-desc">You've been stuck at 58 mph for 10 seconds — that accumulated lag gets corrected.</div>
+    </div>
+    <div class="analogy-card">
+      <div class="analogy-icon">📉</div>
+      <div class="analogy-label">Derivative</div>
+      <div class="analogy-term">How fast are you closing in?</div>
+      <div class="analogy-desc">You're approaching 60 fast — back off before you overshoot and blow past it.</div>
+    </div>
+  </div>
+
+  <div class="signal-chain">
+    <div class="sig-box sp">SP (Setpoint)</div>
+    <span class="sig-arrow">−</span>
+    <div class="sig-box pv">PV (Process Variable)</div>
+    <span class="sig-arrow">=</span>
+    <div class="sig-box err">Error (e)</div>
+    <span class="sig-arrow">→</span>
+    <div class="sig-box">PID Controller</div>
+    <span class="sig-arrow">→</span>
+    <div class="sig-box out">Output (CV)</div>
+    <span class="sig-arrow">→</span>
+    <div class="sig-box">Process</div>
+    <span class="sig-arrow">→</span>
+    <div class="sig-box pv">PV feedback</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3: CORE CONCEPT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0B1A12;color:var(--green);">03</span>
+    Core Concept — 3 Points Only
+  </div>
+
+  <div class="pid-row">
+    <div class="pid-card p">
+      <div class="pid-letter">P</div>
+      <div class="pid-name">Proportional</div>
+      <div class="pid-action">Reacts to size of error</div>
+      <div class="pid-analogy">Too low Kp = lazy. Too high = oscillation.</div>
+    </div>
+    <div class="pid-card i">
+      <div class="pid-letter">I</div>
+      <div class="pid-name">Integral</div>
+      <div class="pid-action">Kills steady-state offset</div>
+      <div class="pid-analogy">Too much Ki = windup, overshoot, instability.</div>
+    </div>
+    <div class="pid-card d">
+      <div class="pid-letter">D</div>
+      <div class="pid-name">Derivative</div>
+      <div class="pid-action">Brakes before overshoot</div>
+      <div class="pid-analogy">Too much Kd = amplifies noise. Often left at 0.</div>
+    </div>
+  </div>
+
+  <ul class="core-bullets" style="margin-top:16px;">
+    <li><strong>Error (e) = SP − PV.</strong> This is what the controller is always reacting to. If error is zero, P and D output nothing — only I can still produce output.</li>
+    <li><strong>Integral windup</strong> is your #1 field problem. When output saturates (valve fully open) and error persists, I keeps accumulating. Loop goes unstable when demand drops. Look for anti-windup in your controller config.</li>
+    <li><strong>Tuning direction matters.</strong> In most DCS/PLC platforms, you tune <em>Gain (Kp)</em>, <em>Integral time (Ti)</em>, and <em>Derivative time (Td)</em> — not raw gains. Higher Ti = less integral action. Know your platform's convention before touching anything.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4: EXERCISE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0F0F14;color:var(--yellow);">04</span>
+    Hands-On Exercise
+  </div>
+  <h2>Tune a Simulated Loop — Right Now</h2>
+
+  <ul class="step-list">
+    <li>
+      Go to <strong>pidtuner.com</strong> or search "PID simulator online." <span class="tool-tag">FREE</span><br>
+      <span style="font-size:12px;color:var(--muted);">Alternative: Google "PID loop simulator" — Incubit or similar works.</span>
+    </li>
+    <li>
+      Set <strong>Kp=1, Ki=0, Kd=0</strong>. Apply a setpoint step. Watch the process variable climb — <em>does it reach SP or stop short?</em> That gap is <strong>steady-state offset</strong> — P alone can't fix it.
+    </li>
+    <li>
+      Now add <strong>Ki=0.1</strong>. Watch offset disappear. Crank it to Ki=5 and watch it overshoot and oscillate. You just caused integral windup.
+    </li>
+    <li>
+      Reset to a stable Ki. Add <strong>Kd=0.5</strong>. The approach to setpoint should smooth out. Increase Kd until it gets twitchy — that's derivative amplifying noise.
+    </li>
+    <li>
+      <strong>Write down</strong> (on paper, not mental note) the Kp/Ki/Kd combo that gave you the fastest stable response with no overshoot. That's your baseline intuition for a first-order process.
+    </li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 5: QUIZ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#100A14;color:#A855F7;">05</span>
+    Quick-Check Quiz
+  </div>
+  <h2>3 Questions. No partial credit.</h2>
+
+  <!-- Q1 -->
+  <div class="quiz-item" id="q1">
+    <div class="quiz-q"><span class="qnum">Q1.</span> Your flow loop is stable but the PV sits 2% below SP forever. No hunting. What's the most likely cause?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'q1',false)">A) Kp is too high</li>
+      <li onclick="answer(this,'q1',true)">B) Integral action is off or Ki is too low</li>
+      <li onclick="answer(this,'q1',false)">C) Derivative is amplifying noise</li>
+      <li onclick="answer(this,'q1',false)">D) The transmitter is failed</li>
+    </ul>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-item" id="q2">
+    <div class="quiz-q"><span class="qnum">Q2.</span> After a process upset, your temperature loop overshoots setpoint badly and keeps oscillating. Which term is most likely too aggressive?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'q2',false)">A) Derivative (Kd)</li>
+      <li onclick="answer(this,'q2',false)">B) Proportional (Kp) only</li>
+      <li onclick="answer(this,'q2',true)">C) Integral (Ki) — suspect windup</li>
+      <li onclick="answer(this,'q2',false)">D) The setpoint is wrong</li>
+    </ul>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-item" id="q3">
+    <div class="quiz-q"><span class="qnum">Q3.</span> In a PID loop, what does the Derivative term actually react to?</div>
+    <ul class="quiz-options">
+      <li onclick="answer(this,'q3',false)">A) The accumulated sum of past errors</li>
+      <li onclick="answer(this,'q3',false)">B) The size of the current error</li>
+      <li onclick="answer(this,'q3',true)">C) The rate of change of error</li>
+      <li onclick="answer(this,'q3',false)">D) The gap between output and setpoint</li>
+    </ul>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+
+  <div class="score-bar">
+    <span class="score-label">// SCORE</span>
+    <span class="score-val" id="score-display">—/3</span>
+    <span class="score-label" id="score-msg" style="color:var(--muted);font-size:12px;">Answer all 3 questions</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 6: CHEAT SHEET -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">
+    <span class="section-num" style="background:#0A1018;color:var(--accent2);">06</span>
+    Cheat Sheet Card
+  </div>
+  <div class="cheat-sheet">
+    <div class="cheat-title">PID Quick Reference — Pocket Card</div>
+
+    <div class="cheat-grid">
+      <div class="cheat-block">
+        <h3>Term Behavior</h3>
+        <ul>
+          <li><span class="key">P too high →</span><span class="val">Oscillation</span></li>
+          <li><span class="key">P too low →</span><span class="val">Sluggish, won't reach SP</span></li>
+          <li><span class="key">I too high →</span><span class="val">Windup / overshoot</span></li>
+          <li><span class="key">I too low →</span><span class="val">Steady-state offset</span></li>
+          <li><span class="key">D too high →</span><span class="val">Noise amplification</span></li>
+          <li><span class="key">D = 0 →</span><span class="val">Usually fine for most loops</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Field Symptoms → Fix</h3>
+        <ul>
+          <li><span class="key">PV won't hit SP →</span><span class="val">↑ Ki</span></li>
+          <li><span class="key">Overshoot + oscillate →</span><span class="val">↓ Ki, check windup</span></li>
+          <li><span class="key">Slow response →</span><span class="val">↑ Kp</span></li>
+          <li><span class="key">Loop hunts →</span><span class="val">↓ Kp first</span></li>
+          <li><span class="key">Noisy output →</span><span class="val">↓ Kd or filter PV</span></li>
+          <li><span class="key">Windup suspected →</span><span class="val">Check anti-windup setting</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Key Terms</h3>
+        <ul>
+          <li><span class="key">SP</span><span class="val">Setpoint (target)</span></li>
+          <li><span class="key">PV</span><span class="val">Process Variable (actual)</span></li>
+          <li><span class="key">CV / Output</span><span class="val">Controller output to valve/actuator</span></li>
+          <li><span class="key">Error (e)</span><span class="val">SP − PV</span></li>
+          <li><span class="key">Windup</span><span class="val">I accumulating during saturation</span></li>
+          <li><span class="key">Offset</span><span class="val">Persistent error P can't fix</span></li>
+        </ul>
+      </div>
+
+      <div class="cheat-block">
+        <h3>Tuning Order (Field Rule)</h3>
+        <ul>
+          <li><span class="key">Step 1</span><span class="val">Tune P first. Stable?</span></li>
+          <li><span class="key">Step 2</span><span class="val">Add I until offset gone</span></li>
+          <li><span class="key">Step 3</span><span class="val">Add D only if needed</span></li>
+          <li><span class="key">Always</span><span class="val">Make one change at a time</span></li>
+          <li><span class="key">Always</span><span class="val">Document before/after values</span></li>
+          <li><span class="key">Never</span><span class="val">Tune in AUTO during upset</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      Output(t) = Kp·e(t) + Ki·∫e(t)dt + Kd·(de/dt)
+    </div>
+  </div>
+</div>
+
+<script>
+  const answers = { q1: 0, q2: 0, q3: 0 };
+  const correct = { q1: false, q2: false, q3: false };
+  const explanations = {
+    q1: "✓ Correct. P reacts to current error but can't eliminate it fully — steady-state offset is the signature of missing or inadequate integral action.",
+    q2: "✓ Correct. Post-upset oscillation with overshoot almost always points to integral windup — I kept accumulating while the valve was saturated, then dumped it all at once.",
+    q3: "✓ Correct. D = rate of change of error (de/dt). It's a brake, not a current-error or history-error term.",
+    q1_wrong: "✗ Think about what causes a permanent gap below SP. P reacts to error size — it should be pushing toward SP. What term handles accumulated error over time?",
+    q2_wrong: "✗ The clue is the post-upset timing and oscillation pattern. Think about what accumulates when the output is saturated for a long time.",
+    q3_wrong: "✗ P reacts to current error magnitude, I reacts to accumulated error history. D is about how fast error is changing — the slope, not the value."
+  };
+
+  function answer(el, qid, isCorrect) {
+    const q = document.getElementById(qid);
+    if (q.dataset.answered) return;
+    q.dataset.answered = '1';
+
+    const opts = q.querySelectorAll('.quiz-options li');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+
+    const fb = document.getElementById(qid + '-fb');
+
+    if (isCorrect) {
+      el.classList.add('correct');
+      fb.textContent = explanations[qid];
+      fb.className = 'quiz-feedback show ok';
+      correct[qid] = true;
+    } else {
+      el.classList.add('wrong');
+      // reveal correct
+      opts.forEach(o => {
+        if (o.getAttribute('onclick').includes('true')) o.classList.add('reveal-correct');
+      });
+      fb.textContent = explanations[qid + '_wrong'];
+      fb.className = 'quiz-feedback show fail';
+    }
+
+    answers[qid] = 1;
+    updateScore();
+  }
+
+  function updateScore() {
+    const answered = Object.values(answers).filter(v => v === 1).length;
+    const score = Object.values(correct).filter(Boolean).length;
+    const display = document.getElementById('score-display');
+    const msg = document.getElementById('score-msg');
+
+    if (answered === 3) {
+      display.textContent = `${score}/3`;
+      if (score === 3) {
+        display.style.color = 'var(--green)';
+        msg.textContent = 'Solid. You know the loop.';
+        msg.style.color = 'var(--green)';
+      } else if (score === 2) {
+        display.style.color = 'var(--yellow)';
+        msg.textContent = 'Close. Re-read the weak one.';
+        msg.style.color = 'var(--yellow)';
+      } else {
+        display.style.color = 'var(--red)';
+        msg.textContent = 'Go back to section 03 and 04.';
+        msg.style.color = 'var(--red)';
+      }
+    } else {
+      display.textContent = `${score}/${answered}`;
+      msg.textContent = `${3 - answered} question(s) remaining`;
+    }
+  }
+</script>
+</body>
+</html>
