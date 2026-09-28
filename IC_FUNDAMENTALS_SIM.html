@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>I&C Basics Sim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #0b0d10; color: #e8eaed; }
+  body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  input { font-family: inherit; }
+  ::selection { background: #ffc400; color: #111; }
+  @keyframes fall { from { transform: translate(-50%, 0); } to { transform: translate(-50%, 186px); } }
+  @keyframes drain { from { width: 100%; } to { width: 0%; } }
+  @keyframes pulseGlow { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+  @keyframes sirenFlash { 0%,100% { box-shadow: inset 0 0 0 3px #ff3b30, 0 0 40px rgba(255,59,48,.35); } 50% { box-shadow: inset 0 0 0 3px #ff8a80, 0 0 90px rgba(255,59,48,.7); } }
+  @keyframes sirenSpin { 0%,100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+  @keyframes shieldPop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
+  @keyframes levelUp { 0% { transform: scale(.3) rotate(-6deg); opacity: 0; } 50% { transform: scale(1.12) rotate(2deg); opacity: 1; } 70% { transform: scale(.96); } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes stripes { from { background-position: 0 0; } to { background-position: 48px 0; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes redWash { 0%,100% { background: rgba(255,59,48,.10); } 50% { background: rgba(255,59,48,.24); } }
+  @keyframes tick { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+/* =====================================================================
+   DATA — Instrumentation & Controls Fundamentals
+   ===================================================================== */
+
+const QUICK = [
+  { topic: "Ohm's Law", rule: "V = I × R (Voltage, Current, Resistance)", ref: "E&I Basics" },
+  { topic: "DC Circuits", rule: "Understand current flow, power, ground, and basic circuit behavior", ref: "E&I Basics" },
+  { topic: "Stripping wire", rule: "Safely strip insulation without nicking the conductor", ref: "E&I Basics" },
+  { topic: "Basic terminations", rule: "Crimp, secure, and inspect connections on small wires", ref: "E&I Basics" },
+  { topic: "Wiring diagrams", rule: "Follow symbols, labels, and flow from power to device", ref: "E&I Basics" },
+  { topic: "Terminal boards", rule: "Where wires land, connect, and are organized for control", ref: "E&I Basics" },
+  { topic: "Control cabinets", rule: "Clean and labeled layout of PLC, relays, power supply, and wiring ducts", ref: "E&I Basics" },
+  { topic: "Block diagrams", rule: "Sketch system flow. PLC sends/receives signals to field device", ref: "E&I Basics" },
+  { topic: "Analog Signal", rule: "4-20mA is the standard for continuous measurement", ref: "Field" },
+  { topic: "Discrete Signal", rule: "24VDC or 120VAC for simple On/Off states", ref: "Field" },
+  { topic: "First troubleshooting check", rule: "Always verify supply power first", ref: "Field" },
+];
+
+const CARDS = [
+  { id: "ohms-eq", pre: "In Ohm's Law, Voltage equals Current multiplied by", post: ".", ans: ["resistance", "r"], show: "Resistance", hint: "V = I × R", ref: "E&I Basics", topic: "Fundamentals" },
+  { id: "wire-strip", pre: "When stripping wire, safely remove insulation without", post: "the conductor.", ans: ["nicking", "cutting", "damaging", "nick"], show: "nicking", hint: "A nicked conductor creates a weak point that can break under vibration.", ref: "E&I Basics", topic: "Wiring" },
+  { id: "term-insp", pre: "For basic terminations on small wires, you must crimp, secure, and", post: "the connections.", ans: ["inspect", "check"], show: "inspect", hint: "Always verify the physical integrity of the crimp.", ref: "E&I Basics", topic: "Wiring" },
+  { id: "block-flow", pre: "A block diagram shows how the PLC sends and receives signals to the", post: "device.", ans: ["field", "field instrument", "instrument"], show: "field", hint: "PLC ↔ Field instrument.", ref: "E&I Basics", topic: "Diagrams" },
+  { id: "diagram-flow", pre: "When reading a wiring diagram, follow symbols and labels from", post: "to the device.", ans: ["power", "source"], show: "power", hint: "Start at the source and trace the flow.", ref: "E&I Basics", topic: "Diagrams" },
+  { id: "tb-func", pre: "Terminal boards are where wires land, connect, and are", post: "for control.", ans: ["organized", "arranged"], show: "organized", hint: "They keep the cabinet structured and traceable.", ref: "E&I Basics", topic: "Hardware" },
+  { id: "cab-layout", pre: "A control cabinet houses the PLC, relays, power supply, and wiring", post: ".", ans: ["ducts", "duct", "wireways"], show: "ducts", hint: "Wiring ducts keep the panel clean.", ref: "E&I Basics", topic: "Hardware" },
+  { id: "dc-power", pre: "To understand DC circuits, you must understand current flow,", post: ", and ground.", ans: ["power", "voltage"], show: "power", hint: "Current flow, power, ground, and basic circuit behavior.", ref: "E&I Basics", topic: "Fundamentals" },
+  { id: "analog-std", pre: "The industrial standard for an analog control loop is 4 to 20", post: ".", ans: ["ma", "milliamps", "milliamp"], show: "mA", hint: "4-20mA allows for live zero detection.", ref: "Field", topic: "Signals" },
+  { id: "ts-first", pre: "Before replacing a seemingly dead field instrument, always check the", post: "first.", ans: ["power", "supply", "voltage"], show: "power", hint: "Don't swap a transmitter if the breaker is tripped.", ref: "Field", topic: "Troubleshooting" },
+];
+
+const ZONES = [
+  {
+    id: "power", name: "Power Supply", color: "#3fa7ff", chips: ["24VDC", "Source"],
+    rect: [40, 470, 180, 110],
+    qs: [
+      { q: "You are tracing a dead loop. What is the very first thing you check?", o: [["Verify 24VDC at the power supply", 1], ["Replace the field transmitter", 0], ["Rewire the terminal block", 0]], why: "Always follow the evidence starting from the source. Verify supply power before assuming hardware failure.", ref: "Field" },
+      { q: "In a DC circuit, current flows from the power source and returns to...", o: [["Ground / Common", 1], ["The PLC processor", 0]], why: "DC circuits require an understanding of current flow, power, and ground.", ref: "E&I Basics" },
+    ],
+  },
+  {
+    id: "plc", name: "PLC Rack", color: "#b388ff", chips: ["I/O", "Logic"],
+    rect: [240, 300, 150, 140],
+    qs: [
+      { q: "A block diagram shows the PLC communicating with what?", o: [["Field instruments", 1], ["Only other PLCs", 0], ["The power company", 0]], why: "Block diagrams sketch system flow: PLC sends/receives signals to the field device.", ref: "E&I Basics" },
+      { q: "A discrete input card typically expects what type of signal?", o: [["On/Off (e.g., 24VDC present or absent)", 1], ["A continuous 4-20mA sweep", 0]], why: "Discrete signals are binary (On/Off states).", ref: "Field" },
+    ],
+  },
+  {
+    id: "tb", name: "Terminal Board", color: "#ffc400", chips: ["Land", "Organize"],
+    rect: [40, 300, 180, 140],
+    qs: [
+      { q: "What is the primary purpose of a terminal board?", o: [["Where wires land, connect, and are organized", 1], ["To process PLC logic", 0]], why: "Terminal boards are where wires land, connect, and are organized for control.", ref: "E&I Basics" },
+      { q: "When terminating a small wire on a block, you must crimp, secure, and...", o: [["Inspect the connection", 1], ["Tape it up", 0], ["Solder it immediately", 0]], why: "Basic terminations on small wires: Crimp, secure, inspect connections.", ref: "E&I Basics" },
+    ],
+  },
+  {
+    id: "field", name: "Field Device", color: "#26c6da", chips: ["Transmitter", "4-20mA"],
+    rect: [40, 40, 180, 230],
+    qs: [
+      { q: "A field transmitter is sending a 4-20mA signal. This is an example of an...", o: [["Analog signal", 1], ["Discrete signal", 0], ["Digital bus network", 0]], why: "4-20mA is the standard for continuous, analog measurement.", ref: "Field" },
+      { q: "You need to strip a field wire to land it. What is the critical rule?", o: [["Strip insulation without nicking the conductor", 1], ["Strip as far back as possible", 0]], why: "Safely strip insulation without nicking the conductor.", ref: "E&I Basics" },
+    ],
+  }
+];
+
+const DECO = [
+  { name: "Field Conduit", rect: [240, 40, 130, 150] },
+  { name: "Motor Starter", rect: [385, 40, 130, 150] },
+  { name: "Local HMI", rect: [530, 40, 120, 150] },
+  { name: "Wire Duct", rect: [410, 300, 240, 140] },
+];
+
+const PANIC = [
+  { t: "Pressure Transmitter output", bin: "analog", why: "Transmitters send continuous 4-20mA analog signals." },
+  { t: "Level Transmitter output", bin: "analog", why: "Continuous level is an analog signal." },
+  { t: "Control Valve position command", bin: "analog", why: "Modulating valves use 4-20mA analog signals." },
+  { t: "Limit Switch contact", bin: "discrete", why: "A limit switch is simply open or closed (discrete)." },
+  { t: "Pushbutton station (Start/Stop)", bin: "discrete", why: "Pushbuttons are binary on/off inputs." },
+  { t: "Relay coil command", bin: "discrete", why: "Energizing a standard relay is a discrete action." },
+  { t: "Motor Contactor coil", bin: "power", why: "Contactors often pull line power (120VAC) to pull in." },
+  { t: "Main Cabinet Feed", bin: "power", why: "Incoming power is usually AC line voltage." },
+  { t: "Solenoid Valve (120VAC)", bin: "power", why: "Many heavy solenoids run on 120VAC power." },
+];
+
+const BINS = [
+  { id: "discrete", label: "DISCRETE (24VDC)", color: "#3fa7ff", key: "1" },
+  { id: "analog", label: "ANALOG (4-20mA)", color: "#ffc400", key: "2" },
+  { id: "power", label: "LINE POWER (120VAC)", color: "#ff3b30", key: "3" },
+];
+
+const SCENARIOS = [
+  {
+    id: "deadloop", title: "The Dead Loop", role: "I&C Technician", tag: "Troubleshooting", color: "#ff8a3d",
+    steps: [
+      { text: "Operations reports a pressure transmitter is reading zero on the HMI. You arrive at the cabinet. What is your first move?",
+        o: [
+          { t: "Go to the field and replace the transmitter", fail: "You walked a quarter mile to swap a good transmitter because a fuse was blown in the cabinet. Follow the evidence." },
+          { t: "Verify 24VDC supply power at the terminal block", ok: 1 },
+          { t: "Force the input high in the PLC", fail: "Forcing a value masks the physical problem, it doesn't fix it." },
+        ], why: "Always verify supply power before replacing hardware. Work from the source out.", ref: "Field" },
+      { text: "You have 24VDC at the cabinet. You walk out to the field instrument. You check voltage across the terminals there and get 0V. What is the likely failure mode?",
+        o: [
+          { t: "The transmitter sensor element is shattered", fail: "A broken sensor element would likely output a fault signal (e.g., 3.6mA), but you should still have voltage at the terminals." },
+          { t: "There is an open circuit (broken wire or bad connection) between the cabinet and the field", ok: 1 },
+        ], why: "If power leaves the cabinet but doesn't reach the field, the wiring path is open.", ref: "Field" },
+      { text: "You find a junction box halfway down the line. A wire has snapped off its terminal. You look closely at the broken end.",
+        o: [
+          { t: "The copper is cleanly sheared—it was nicked during stripping", ok: 1 },
+          { t: "The wire just got tired", fail: "Wires don't get tired. Bad terminations cause mechanical failure under vibration." },
+        ], why: "Safely strip insulation without nicking the conductor. Nicks cause structural failure.", ref: "E&I Basics" },
+    ],
+  }
+];
+
+const BOSS = [
+  { q: "V = ?", a: "I × R", d: ["I / R", "P × I", "R / I"] },
+  { q: "Stripping wire rule?", a: "Don't nick the conductor", d: ["Strip 2 inches minimum", "Use a knife only", "Leave insulation in the crimp"] },
+  { q: "Basic termination rule?", a: "Crimp, secure, inspect", d: ["Twist and tape", "Solder everything", "Push in loosely"] },
+  { q: "Control flow?", a: "PLC ↔ Field Instrument", d: ["PLC ↔ HMI only", "Field ↔ Field", "Power ↔ Ground"] },
+  { q: "Analog standard?", a: "4-20mA", d: ["0-10mA", "1-5V", "120VAC"] },
+  { q: "Terminal board purpose?", a: "Land and organize", d: ["Process logic", "Convert AC to DC", "Store spare wire"] },
+  { q: "First troubleshooting step?", a: "Verify power", d: ["Replace device", "Call engineering", "Force the bit"] },
+];
+
+/* =====================================================================
+   PERSISTENCE + GAME MATH
+   ===================================================================== */
+const KEY = "eiBasicsSim.v2";
+const DAY = 86400000;
+const INTERVALS = { 1: 1, 2: 3, 3: 7 }; 
+const DEFAULT = { xp: 0, streak: 0, bestStreak: 0, answered: 0, correct: 0, vault: {}, zones: {}, scen: {}, panicBest: 0, panicBestLevel: 0, board: [], bossBest: 0, certified: false, muted: false, tab: "map" };
+
+function load() { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
+function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+
+const TITLES = ["Apprentice", "Tech I", "Tech II", "I&C Tech", "E&I Specialist", "Senior Specialist", "Controls Engineer"];
+function levelOf(xp) { let n = 1; while (xp >= 50 * n * (n + 1)) n++; return n; }
+function levelFloor(n) { return 50 * (n - 1) * n; }
+function titleOf(n) { return TITLES[Math.min(n - 1, TITLES.length - 1)]; }
+
+function shuffle(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+function norm(x) { return String(x).toLowerCase().replace(/[^a-z0-9.]/g, "").replace(/%$/, ""); }
+
+function safetyScore(s) {
+  const vaultPts = CARDS.reduce((acc, c) => acc + ((s.vault[c.id] && s.vault[c.id].lvl) || 0) / 3, 0) / CARDS.length;
+  const zonePts = ZONES.filter(z => s.zones[z.id] && s.zones[z.id].cleared).length / (ZONES.length || 1);
+  const scenPts = SCENARIOS.reduce((acc, sc) => { const r = s.scen[sc.id]; return acc + (!r ? 0 : r.perfect ? 1 : 0.6); }, 0) / (SCENARIOS.length || 1);
+  const bossPts = Math.min(1, (s.bossBest || 0) / 15);
+  return Math.round(vaultPts * 40 + zonePts * 20 + scenPts * 25 + bossPts * 15);
+}
+
+let AC = null;
+function beep(freqs, dur = 0.09, type = "square", vol = 0.05) {
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    let t = AC.currentTime;
+    freqs.forEach(f => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type; o.frequency.value = f; g.gain.value = vol;
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur);
+      t += dur * 0.9;
+    });
+  } catch (e) {}
+}
+const SFX = { good: () => beep([660, 990], 0.08, "triangle", 0.06), bad: () => beep([220, 160], 0.14, "sawtooth", 0.04), level: () => beep([523, 659, 784, 1046], 0.1, "triangle", 0.07), tick: () => beep([880], 0.03, "square", 0.02) };
+
+const C = { bg: "#0b0d10", panel: "#14181e", panel2: "#1b2129", line: "#2a323d", text: "#e8eaed", mute: "#9aa4b0", dim: "#6b7480", yellow: "#ffc400", red: "#ff3b30", green: "#2ecc71", blue: "#3fa7ff", orange: "#ff8a3d" };
+const HEAD = "'Barlow Condensed', 'Arial Narrow', Impact, sans-serif";
+const stripe = (a = C.yellow, b = "#111") => `repeating-linear-gradient(45deg, ${a} 0 12px, ${b} 12px 24px)`;
+
+function Icon({ name, size = 20, color = "currentColor", stroke = 2 }) {
+  const p = { fill: "none", stroke: color, strokeWidth: stroke, strokeLinecap: "round", strokeLinejoin: "round" };
+  const paths = { map: <g {...p}><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z" /><path d="M9 4v14M15 6v14" /></g>, bolt: <g {...p}><path d="M13 2L4 14h7l-1 8 9-12h-7z" /></g>, tree: <g {...p}><circle cx="12" cy="4" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="19" cy="19" r="2" /><path d="M12 6v5M12 11l-7 6M12 11l7 6" /></g>, vault: <g {...p}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="12" cy="12" r="4" /><path d="M12 8v1M12 15v1M8 12h1M15 12h1M3 20v1M21 20v1" /></g>, boss: <g {...p}><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z" /><path d="M5 19h14" /></g>, shield: <g {...p}><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" /><path d="M8 12l3 3 5-6" /></g>, siren: <g {...p}><path d="M6 18v-5a6 6 0 0112 0v5" /><rect x="4" y="18" width="16" height="3" rx="1" /><path d="M12 2v2M4.2 5.2l1.4 1.4M19.8 5.2l-1.4 1.4M1 12h2M21 12h2" /></g>, flame: <g {...p}><path d="M12 2c1 4 5 6 5 11a5 5 0 01-10 0c0-3 2-4 2-7 2 1 3 3 3 3s1-4 0-7z" /></g>, star: <g {...p}><path d="M12 2l3 7 7 .6-5.3 4.7L18.2 22 12 18l-6.2 4 1.5-7.7L2 9.6 9 9z" /></g>, sound: <g {...p}><path d="M4 9h4l5-4v14l-5-4H4z" /><path d="M17 8a5 5 0 010 8M19.5 5.5a9 9 0 010 13" /></g>, mute: <g {...p}><path d="M4 9h4l5-4v14l-5-4H4z" /><path d="M17 9l5 6M22 9l-5 6" /></g>, book: <g {...p}><path d="M4 4h6a3 3 0 013 3v13a2 2 0 00-2-2H4z" /><path d="M20 4h-6a3 3 0 00-3 3v13a2 2 0 012-2h7z" /></g>, check: <g {...p}><path d="M5 12l5 5 9-11" /></g>, x: <g {...p}><path d="M6 6l12 12M18 6L6 18" /></g>, clock: <g {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></g>, bulb: <g {...p}><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.6.6 1 1.5 1 2.5h6c0-1 .4-1.9 1-2.5A6 6 0 0012 3z" /></g>, reset: <g {...p}><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.4" /><path d="M3 3v4h4" /></g> };
+  return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", flexShrink: 0 }}>{paths[name]}</svg>;
+}
+
+function Btn({ children, onClick, color = C.yellow, ghost, big, disabled, style, title }) {
+  const [h, setH] = useState(false);
+  return <button title={title} disabled={disabled} onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)} style={{ cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.45 : 1, background: ghost ? (h ? "rgba(255,255,255,.06)" : "transparent") : color, color: ghost ? color : "#111", border: `2px solid ${color}`, borderRadius: 10, padding: big ? "14px 22px" : "9px 16px", fontFamily: HEAD, fontWeight: 700, letterSpacing: 1, fontSize: big ? 20 : 16, textTransform: "uppercase", transition: "transform .12s, background .15s, box-shadow .15s", transform: h && !disabled ? "translateY(-1px)" : "none", boxShadow: h && !ghost && !disabled ? `0 6px 20px ${color}55` : "none", ...style }}>{children}</button>;
+}
+function Panel({ children, style, accent }) { return <div style={{ background: C.panel, border: `1px solid ${C.line}`, borderRadius: 14, padding: 18, borderTop: accent ? `3px solid ${accent}` : undefined, animation: "fadeIn .25s ease", ...style }}>{children}</div>; }
+function H({ children, size = 28, color = C.text, style }) { return <div style={{ fontFamily: HEAD, fontWeight: 800, fontSize: size, letterSpacing: 0.5, textTransform: "uppercase", color, lineHeight: 1.05, ...style }}>{children}</div>; }
+function Chip({ children, color = C.yellow }) { return <span style={{ display: "inline-block", fontSize: 12, fontWeight: 600, padding: "3px 9px", borderRadius: 999, border: `1px solid ${color}66`, color, background: `${color}14`, marginRight: 6, marginBottom: 6 }}>{children}</span>; }
+function Ref({ r }) { return <span style={{ fontSize: 12, color: C.dim, fontWeight: 600, whiteSpace: "nowrap" }}>Ref: {r}</span>; }
+function OptionBtn({ label, idx, onClick, state, disabled }) {
+  const [h, setH] = useState(false);
+  const col = state === "right" ? C.green : state === "wrong" ? C.red : h && !disabled ? C.yellow : C.line;
+  return <button onClick={onClick} disabled={disabled} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", cursor: disabled ? "default" : "pointer", background: state === "right" ? `${C.green}1f` : state === "wrong" ? `${C.red}1f` : C.panel2, border: `2px solid ${col}`, color: C.text, borderRadius: 12, padding: "13px 14px", fontSize: 16, lineHeight: 1.35, transition: "border-color .15s, background .15s", animation: state === "wrong" ? "shake .4s" : "none" }}><span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 18, width: 28, height: 28, borderRadius: 7, display: "grid", placeItems: "center", background: state === "right" ? C.green : state === "wrong" ? C.red : "#262e38", color: state ? "#111" : C.mute, flexShrink: 0 }}>{idx + 1}</span><span style={{ flex: 1 }}>{label}</span>{state === "right" && <Icon name="check" color={C.green} />}{state === "wrong" && <Icon name="x" color={C.red} />}</button>;
+}
+function useKeys(handler, deps) { useEffect(() => { const f = e => { if (e.target && e.target.tagName === "INPUT") return; handler(e); }; window.addEventListener("keydown", f); return () => window.removeEventListener("keydown", f); }, deps); }
+function useWide() { const [w, setW] = useState(window.innerWidth); useEffect(() => { const f = () => setW(window.innerWidth); window.addEventListener("resize", f); return () => window.removeEventListener("resize", f); }, []); return w >= 900; }
+function Verdict({ ok, why, r, children }) { return <div style={{ marginTop: 14, borderRadius: 14, padding: 16, display: "flex", gap: 14, alignItems: "flex-start", background: ok ? `${C.green}14` : `${C.red}12`, border: `2px solid ${ok ? C.green : C.red}`, animation: ok ? "fadeIn .2s" : "sirenFlash .9s ease-in-out 2" }}><div style={{ animation: ok ? "shieldPop .45s ease" : "sirenSpin .35s ease-in-out 3", color: ok ? C.green : C.red }}><Icon name={ok ? "shield" : "siren"} size={44} stroke={2.2} /></div><div style={{ flex: 1 }}><H size={22} color={ok ? C.green : C.red}>{ok ? "Correct" : "Wrong call"}</H><div style={{ marginTop: 4, fontSize: 15, lineHeight: 1.45 }}>{why} {r && <Ref r={r} />}</div>{children}</div></div>; }
+function wrapLabel(name, w) { const max = Math.floor((w - 18) / 8.6); const lines = []; let cur = ""; name.split(" ").forEach(word => { if (!cur) cur = word; else if ((cur + " " + word).length <= max) cur += " " + word; else { lines.push(cur); cur = word; } }); if (cur) lines.push(cur); return lines.slice(0, 3); }
+
+/* =====================================================================
+   1) MEMORY PALACE — PLANT MAP
+   ===================================================================== */
+function PlantMap({ s, setS, award }) {
+  const [zoneId, setZoneId] = useState(null);
+  const [qi, setQi] = useState(0);
+  const [pick, setPick] = useState(null);
+  const [hits, setHits] = useState(0);
+  const [done, setDone] = useState(false);
+  const zone = ZONES.find(z => z.id === zoneId);
+  const q = zone && zone.qs[qi];
+  const opts = useMemo(() => q ? shuffle(q.o.map(([t, ok]) => ({ t, ok: !!ok }))) : [], [zoneId, qi]);
+
+  const enter = id => { setZoneId(id); setQi(0); setPick(null); setHits(0); setDone(false); };
+  const choose = i => {
+    if (pick !== null) return;
+    setPick(i);
+    const ok = opts[i].ok;
+    if (ok) setHits(h => h + 1);
+    award(ok, 10);
+  };
+  const next = () => {
+    if (qi + 1 < zone.qs.length) { setQi(qi + 1); setPick(null); return; }
+    const total = zone.qs.length, got = hits;
+    const cleared = got === total;
+    setS(p => {
+      const prev = p.zones[zone.id] || {};
+      return { ...p, zones: { ...p.zones, [zone.id]: { best: Math.max(prev.best || 0, got), cleared: prev.cleared || cleared } } };
+    });
+    if (cleared && !(s.zones[zone.id] && s.zones[zone.id].cleared)) award(true, 30);
+    setDone(true);
+  };
+  useKeys(e => {
+    if (!zone || done) return;
+    const n = parseInt(e.key, 10);
+    if (pick === null && n >= 1 && n <= opts.length) choose(n - 1);
+    else if (pick !== null && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); next(); }
+  }, [zone, done, pick, opts, qi, hits]);
+
+  const clearedCount = ZONES.filter(z => s.zones[z.id] && s.zones[z.id].cleared).length;
+
+  return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 8 }}>
+        <div>
+          <H size={34}>Control Loop Map</H>
+          <div style={{ color: C.mute, marginTop: 4 }}>Walk the loop. Each zone holds its rules. Clear a zone by going perfect.</div>
+        </div>
+        <Chip color={C.green}>{clearedCount}/{ZONES.length} zones cleared</Chip>
+      </div>
+
+      <Panel style={{ padding: 10 }}>
+        <svg viewBox="0 0 1000 610" style={{ width: "100%", display: "block", borderRadius: 10 }} role="img" aria-label="Conceptual map">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#1b222b" strokeWidth="1" /></pattern>
+          </defs>
+          <rect x="0" y="0" width="1000" height="610" fill="#0f1318" />
+          <rect x="0" y="0" width="1000" height="610" fill="url(#grid)" />
+          <rect x="18" y="18" width="964" height="580" rx="12" fill="none" stroke="#3a4450" strokeWidth="3" strokeDasharray="10 7" />
+          {DECO.map(d => (
+            <g key={d.name}>
+              <rect x={d.rect[0]} y={d.rect[1]} width={d.rect[2]} height={d.rect[3]} rx="8" fill="#161c23" stroke="#2c3540" strokeWidth="1.5" />
+              <text x={d.rect[0] + 10} y={d.rect[1] + 22} fill="#5d6772" fontSize="15" fontFamily="Barlow Condensed, sans-serif" fontWeight="700" letterSpacing="1">{d.name.toUpperCase()}</text>
+            </g>
+          ))}
+          {ZONES.map(z => {
+            const [x, y, w, h] = z.rect;
+            const cleared = s.zones[z.id] && s.zones[z.id].cleared;
+            const active = zoneId === z.id;
+            return (
+              <g key={z.id} onClick={() => enter(z.id)} style={{ cursor: "pointer" }}>
+                <rect x={x} y={y} width={w} height={h} rx="9" fill={z.color} fillOpacity={active ? 0.34 : 0.16} stroke={z.color} strokeWidth={active ? 4 : 2.5}
+                  style={{ animation: cleared || active ? "none" : "pulseGlow 2.2s ease-in-out infinite" }} />
+                {wrapLabel(z.name, w).map((ln, li) => (
+                  <text key={li} x={x + 10} y={y + 24 + li * 19} fill={z.color} fontSize="17" fontFamily="Barlow Condensed, sans-serif" fontWeight="800" letterSpacing=".5">{ln.toUpperCase()}</text>
+                ))}
+                {cleared && <g transform={`translate(${x + w - 30},${y + h - 30})`}><circle cx="12" cy="12" r="13" fill={C.green} /><path d="M6 12l4 4 8-9" stroke="#111" strokeWidth="3" fill="none" strokeLinecap="round" /></g>}
+              </g>
+            );
+          })}
+        </svg>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+          {ZONES.map(z => {
+            const cleared = s.zones[z.id] && s.zones[z.id].cleared;
+            return <button key={z.id} onClick={() => enter(z.id)} style={{ cursor: "pointer", background: zoneId === z.id ? `${z.color}33` : C.panel2, border: `1px solid ${z.color}88`, color: C.text, borderRadius: 999, padding: "6px 12px", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 9, background: cleared ? C.green : z.color }} />{z.name}
+            </button>;
+          })}
+        </div>
+      </Panel>
+
+      {!zone && <Panel accent={C.yellow}><div style={{ color: C.mute }}>Tap a glowing zone to enter it. Keys <b style={{ color: C.text }}>1–4</b> answer, <b style={{ color: C.text }}>Enter</b> moves on.</div></Panel>}
+
+      {zone && !done && (
+        <Panel accent={zone.color} key={zone.id + qi}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <H size={24} color={zone.color}>You are at: {zone.name}</H>
+            <span style={{ color: C.mute, fontWeight: 600 }}>{qi + 1} / {zone.qs.length}</span>
+          </div>
+          <div style={{ marginTop: 6 }}>{zone.chips.map(c => <Chip key={c} color={zone.color}>{c}</Chip>)}</div>
+          <div style={{ fontSize: 19, fontWeight: 600, margin: "10px 0 14px", lineHeight: 1.4 }}>{q.q}</div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {opts.map((o, i) => <OptionBtn key={i} idx={i} label={o.t} disabled={pick !== null} onClick={() => choose(i)}
+              state={pick === null ? null : o.ok ? "right" : pick === i ? "wrong" : null} />)}
+          </div>
+          {pick !== null && (
+            <Verdict ok={opts[pick].ok} why={q.why} r={q.ref}>
+              <div style={{ marginTop: 12 }}><Btn onClick={next}>{qi + 1 < zone.qs.length ? "Next concept →" : "Finish zone"}</Btn></div>
+            </Verdict>
+          )}
+        </Panel>
+      )}
+
+      {zone && done && (
+        <Panel accent={hits === zone.qs.length ? C.green : C.orange}>
+          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <div style={{ color: hits === zone.qs.length ? C.green : C.orange, animation: "shieldPop .5s" }}><Icon name={hits === zone.qs.length ? "shield" : "bulb"} size={52} /></div>
+            <div>
+              <H size={26}>{hits === zone.qs.length ? `${zone.name} cleared` : `${hits}/${zone.qs.length} — almost`}</H>
+              <div style={{ color: C.mute, marginTop: 4 }}>{hits === zone.qs.length ? "Zone locked in. +30 XP bonus on first clear." : "Run it again to lock it in. Only a perfect run clears a zone."}</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+            <Btn onClick={() => enter(zone.id)} ghost>Run again</Btn>
+            <Btn onClick={() => { const nz = ZONES.find(z => !(s.zones[z.id] && s.zones[z.id].cleared) && z.id !== zone.id); if (nz) enter(nz.id); else setZoneId(null); }}>Next zone →</Btn>
+          </div>
+        </Panel>
+      )}
+    </div>
+  );
+}
+
+/* =====================================================================
+   2) PERMIT PANIC — timed sorting
+   ===================================================================== */
+function pickPanic(level, last) {
+  const r = Math.random();
+  const bin = level < 2 ? (r < 0.6 ? "analog" : "discrete") : (r < 0.45 ? "analog" : r < 0.7 ? "discrete" : "power");
+  const pool = PANIC.filter(i => i.bin === bin && i.t !== last);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+const panicDuration = lvl => Math.max(2600, 7000 - (lvl - 1) * 650);
+
+function PermitPanic({ s, setS, award }) {
+  const [phase, setPhase] = useState("intro");
+  const [g, setG] = useState(null);
+  const [banner, setBanner] = useState(null);
+  const timer = useRef(null);
+  const [overBin, setOverBin] = useState(null);
+
+  const start = () => {
+    const item = pickPanic(1, null);
+    setG({ level: 1, score: 0, strikes: 0, inLevel: 0, item, uid: Date.now(), fb: null, missed: [], sorted: 0 });
+    setPhase("play"); setBanner(null);
+  };
+
+  const gRef = useRef(null);
+  gRef.current = g;
+
+  const answer = useCallback(choice => {
+    const prev = gRef.current;
+    if (!prev || prev.fb) return;
+    clearTimeout(timer.current);
+    const ok = choice === prev.item.bin;
+    award(ok, ok ? 4 + prev.level : 0);
+    let { level, inLevel, strikes, score, missed, sorted } = prev;
+    if (ok) { score += 10 * level; inLevel += 1; sorted += 1; }
+    else { strikes += 1; missed = [...missed, { ...prev.item, choice }]; }
+    if (inLevel >= 5) {
+      level += 1; inLevel = 0;
+      setBanner(level === 2 ? "LEVEL 2 — NEW BIN UNLOCKED: LINE POWER" : `LEVEL ${level} — SPEED UP`);
+    }
+    const nextG = { ...prev, level, inLevel, strikes, score, missed, sorted, fb: { ok, choice, timeout: choice === "__timeout" } };
+    gRef.current = nextG;
+    setG(nextG);
+  }, [award]);
+
+  useEffect(() => {
+    if (!g || !g.fb || phase !== "play") return;
+    const t = setTimeout(() => {
+      const prev = gRef.current;
+      if (prev.strikes >= 3) {
+        setPhase("over");
+        setS(p => ({ ...p, panicBest: Math.max(p.panicBest || 0, prev.score), panicBestLevel: Math.max(p.panicBestLevel || 0, prev.level) }));
+      } else {
+        setG({ ...prev, item: pickPanic(prev.level, prev.item.t), uid: Date.now(), fb: null });
+      }
+    }, g.fb.ok ? 650 : 1700);
+    return () => clearTimeout(t);
+  }, [g && g.fb, phase]);
+
+  useEffect(() => { if (!banner) return; const t = setTimeout(() => setBanner(null), 2200); return () => clearTimeout(t); }, [banner]);
+
+  useEffect(() => {
+    if (phase !== "play" || !g || g.fb) return;
+    timer.current = setTimeout(() => answer("__timeout"), panicDuration(g.level));
+    return () => clearTimeout(timer.current);
+  }, [g && g.uid, g && g.fb, phase]);
+
+  useKeys(e => {
+    if (phase !== "play" || !g || g.fb) return;
+    const b = BINS.find(b => b.key === e.key && (b.id !== "power" || g.level >= 2));
+    if (b) answer(b.id);
+  }, [phase, g, answer]);
+
+  if (phase === "intro") return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <H size={34}>Signal Panic</H>
+      <Panel accent={C.yellow}>
+        <div style={{ fontSize: 17, lineHeight: 1.5 }}>Signals drop from the top. Sort each one before it hits the floor.</div>
+        <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
+          {BINS.map(b => <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: HEAD, fontWeight: 800, background: b.color, color: "#111", borderRadius: 6, width: 26, height: 26, display: "grid", placeItems: "center" }}>{b.key}</span>
+            <span style={{ fontWeight: 700, color: b.color }}>{b.label}</span>
+            {b.id === "power" && <span style={{ color: C.mute, fontSize: 13 }}>unlocks at level 2</span>}
+          </div>)}
+        </div>
+        <div style={{ color: C.mute, marginTop: 14 }}>Click a bin, drag the card, or press 1/2/3. Every 5 correct = faster. 3 strikes and you're out.</div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 16, flexWrap: "wrap" }}>
+          <Btn big onClick={start}>Start sorting</Btn>
+          <span style={{ color: C.mute }}>Best: <b style={{ color: C.yellow }}>{s.panicBest || 0}</b>{s.panicBestLevel ? ` (level ${s.panicBestLevel})` : ""}</span>
+        </div>
+      </Panel>
+    </div>
+  );
+
+  if (phase === "over") return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <H size={34}>Faulted Out</H>
+      <Panel accent={C.red}>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <Stat label="Score" v={g.score} c={C.yellow} />
+          <Stat label="Level reached" v={g.level} c={C.blue} />
+          <Stat label="Sorted right" v={g.sorted} c={C.green} />
+          <Stat label="Best" v={Math.max(s.panicBest || 0, g.score)} c={C.orange} />
+        </div>
+        {g.missed.length > 0 && <div style={{ marginTop: 18 }}>
+          <H size={20} color={C.mute}>What got you — learn these</H>
+          <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+            {g.missed.map((m, i) => { const b = BINS.find(b => b.id === m.bin); return (
+              <div key={i} style={{ background: C.panel2, borderRadius: 10, padding: "10px 12px", borderLeft: `4px solid ${b.color}` }}>
+                <div style={{ fontWeight: 600 }}>{m.t}</div>
+                <div style={{ fontSize: 14, color: C.mute, marginTop: 2 }}>→ <b style={{ color: b.color }}>{b.label}</b>. {m.why}{m.choice === "__timeout" ? " (timed out)" : ""}</div>
+              </div>); })}
+          </div>
+        </div>}
+        <div style={{ marginTop: 16 }}><Btn big onClick={start}>Run it back</Btn></div>
+      </Panel>
+    </div>
+  );
+
+  const dur = panicDuration(g.level);
+  const bins = BINS.filter(b => b.id !== "power" || g.level >= 2);
+  const fb = g.fb;
+  const rightBin = BINS.find(b => b.id === g.item.bin);
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+        <H size={30}>Signal Panic</H>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ fontFamily: HEAD, fontSize: 22, fontWeight: 800, color: C.yellow }}>{g.score}</span>
+          <span style={{ fontFamily: HEAD, fontSize: 18, fontWeight: 700, color: C.blue }}>LVL {g.level}</span>
+          <span style={{ display: "flex", gap: 4 }}>{[0, 1, 2].map(i => <span key={i} style={{ color: i < g.strikes ? C.red : "#3a4450" }}><Icon name="siren" size={20} /></span>)}</span>
+        </div>
+      </div>
+      <div style={{ position: "relative", height: 320, borderRadius: 14, overflow: "hidden", border: `1px solid ${C.line}`,
+        background: fb && !fb.ok ? undefined : "linear-gradient(#10151b, #0c1014)", animation: fb && !fb.ok ? "redWash .5s ease-in-out 3" : "none" }}>
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 10, background: stripe(), animation: "stripes 1s linear infinite" }} />
+        <div style={{ position: "absolute", left: 0, top: 0, height: 5, background: C.yellow, animation: fb ? "none" : `drain ${dur}ms linear forwards`, width: fb ? 0 : undefined }} key={"bar" + g.uid} />
+        {banner && <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", background: C.yellow, color: "#111", fontFamily: HEAD, fontWeight: 800, padding: "6px 14px", borderRadius: 8, fontSize: 18, zIndex: 3, whiteSpace: "nowrap", animation: "levelUp .5s" }}>{banner}</div>}
+        {!fb && (
+          <div key={g.uid} draggable onDragStart={e => { e.dataTransfer.setData("text/plain", "card"); }}
+            style={{ position: "absolute", top: 18, left: "50%", width: "min(86%, 440px)", animation: `fall ${dur}ms linear forwards`,
+              background: "#f4f1e8", color: "#111", borderRadius: 12, padding: "16px 18px", boxShadow: "0 10px 30px rgba(0,0,0,.5)", cursor: "grab", borderLeft: `8px solid ${C.yellow}` }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, color: "#7a6a2a" }}>SIGNAL TRACE</div>
+            <div style={{ fontSize: 19, fontWeight: 700, marginTop: 4, lineHeight: 1.3 }}>{g.item.t}</div>
+          </div>
+        )}
+        {fb && (
+          <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", padding: 20, textAlign: "center" }}>
+            <div style={{ animation: fb.ok ? "shieldPop .35s" : "shake .45s" }}>
+              <div style={{ color: fb.ok ? C.green : C.red, display: "flex", justifyContent: "center" }}><Icon name={fb.ok ? "shield" : "siren"} size={62} /></div>
+              <H size={28} color={fb.ok ? C.green : C.red} style={{ marginTop: 6 }}>{fb.ok ? "Sorted" : fb.timeout ? "Too slow" : "Wrong bin"}</H>
+              {!fb.ok && <div style={{ marginTop: 6, fontSize: 16, maxWidth: 440 }}><b>{g.item.t}</b> → <b style={{ color: rightBin.color }}>{rightBin.label}</b><div style={{ color: C.mute, marginTop: 4 }}>{g.item.why}</div></div>}
+            </div>
+          </div>
+        )}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${bins.length}, 1fr)`, gap: 10 }}>
+        {bins.map(b => {
+          const hi = fb && b.id === g.item.bin;
+          return (
+            <button key={b.id} onClick={() => answer(b.id)}
+              onDragOver={e => { e.preventDefault(); setOverBin(b.id); }} onDragLeave={() => setOverBin(null)}
+              onDrop={e => { e.preventDefault(); setOverBin(null); answer(b.id); }}
+              style={{ cursor: "pointer", minHeight: 92, borderRadius: 14, border: `3px ${overBin === b.id ? "solid" : "dashed"} ${b.color}`,
+                background: hi ? `${b.color}40` : overBin === b.id ? `${b.color}30` : `${b.color}12`, color: b.color, fontFamily: HEAD, fontWeight: 800, fontSize: 19, letterSpacing: 0.5, padding: 8,
+                animation: b.id === "power" && banner && g.level === 2 ? "tick .5s 3" : "none" }}>
+              <div style={{ fontSize: 13, opacity: 0.8 }}>[{b.key}]</div>{b.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, v, c }) {
+  return <div><div style={{ fontFamily: HEAD, fontSize: 40, fontWeight: 800, color: c, lineHeight: 1 }}>{v}</div><div style={{ color: C.mute, fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{label}</div></div>;
+}
+
+/* =====================================================================
+   3) SCENARIO SIMULATOR
+   ===================================================================== */
+function Simulator({ s, setS, award }) {
+  const [sid, setSid] = useState(null);
+  const [step, setStep] = useState(0);
+  const [pick, setPick] = useState(null);
+  const [misses, setMisses] = useState(0);
+  const [missedHere, setMissedHere] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const sc = SCENARIOS.find(x => x.id === sid);
+  const st = sc && sc.steps[step];
+  const opts = useMemo(() => st ? shuffle(st.o) : [], [sid, step]);
+
+  const open = id => { setSid(id); setStep(0); setPick(null); setMisses(0); setMissedHere(false); setFinished(false); };
+  const choose = i => {
+    if (pick !== null) return;
+    setPick(i);
+    const ok = !!opts[i].ok;
+    award(ok, ok ? (missedHere ? 5 : 15) : 0);
+    if (!ok) { setMisses(m => m + 1); setMissedHere(true); }
+  };
+  const retry = () => setPick(null);
+  const advance = () => {
+    if (step + 1 < sc.steps.length) { setStep(step + 1); setPick(null); setMissedHere(false); return; }
+    const perfect = misses === 0;
+    const prev = s.scen[sc.id];
+    setS(p => ({ ...p, scen: { ...p.scen, [sc.id]: { done: true, perfect: (prev && prev.perfect) || perfect } } }));
+    award(true, 25 + (perfect ? 25 : 0));
+    setFinished(true);
+  };
+  useKeys(e => {
+    if (!sc || finished) return;
+    const n = parseInt(e.key, 10);
+    if (pick === null && n >= 1 && n <= opts.length) choose(n - 1);
+    else if (pick !== null && e.key === "Enter") { opts[pick].ok ? advance() : retry(); }
+  }, [sc, finished, pick, opts, step, misses, missedHere]);
+
+  if (!sc) return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <div>
+        <H size={34}>Scenario Simulator</H>
+        <div style={{ color: C.mute, marginTop: 4 }}>Follow the evidence. Wrong calls play out. Then you get the rule and a retry.</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+        {SCENARIOS.map(x => {
+          const r = s.scen[x.id];
+          return (
+            <button key={x.id} onClick={() => open(x.id)} style={{ cursor: "pointer", textAlign: "left", background: C.panel, border: `1px solid ${C.line}`, borderTop: `4px solid ${x.color}`, borderRadius: 14, padding: 16, color: C.text }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Chip color={x.color}>{x.tag}</Chip>
+                {r && <span style={{ color: r.perfect ? C.green : C.yellow, display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 700 }}><Icon name={r.perfect ? "star" : "check"} size={16} />{r.perfect ? "PERFECT" : "DONE"}</span>}
+              </div>
+              <H size={24} style={{ marginTop: 4 }}>{x.title}</H>
+              <div style={{ color: C.mute, fontSize: 14, marginTop: 4 }}>You are: {x.role} · {x.steps.length} decision{x.steps.length > 1 ? "s" : ""}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (finished) return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <Panel accent={misses === 0 ? C.green : C.yellow}>
+        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          <div style={{ color: misses === 0 ? C.green : C.yellow, animation: "shieldPop .5s" }}><Icon name={misses === 0 ? "star" : "shield"} size={54} /></div>
+          <div>
+            <H size={28}>{misses === 0 ? "Clean troubleshoot." : "Scenario survived"}</H>
+            <div style={{ color: C.mute, marginTop: 4 }}>{misses === 0 ? "Perfect — +50 XP." : `${misses} wrong call${misses > 1 ? "s" : ""} along the way. Run it again for a perfect.`}</div>
+          </div>
+        </div>
+        <div style={{ marginTop: 14, display: "grid", gap: 6 }}>
+          {sc.steps.map((x, i) => <div key={i} style={{ fontSize: 14, color: C.mute }}><b style={{ color: C.text }}>Rule {i + 1}:</b> {x.why} <Ref r={x.ref} /></div>)}
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+          <Btn ghost onClick={() => open(sc.id)}>Replay</Btn>
+          <Btn onClick={() => setSid(null)}>All scenarios</Btn>
+        </div>
+      </Panel>
+    </div>
+  );
+
+  const failed = pick !== null && !opts[pick].ok;
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <button onClick={() => setSid(null)} style={{ background: "none", border: "none", color: C.mute, cursor: "pointer", fontWeight: 600 }}>← Scenarios</button>
+        <div style={{ display: "flex", gap: 6 }}>{sc.steps.map((_, i) => <span key={i} style={{ width: 30, height: 6, borderRadius: 4, background: i < step ? C.green : i === step ? sc.color : "#2a323d" }} />)}</div>
+      </div>
+      <Panel accent={sc.color} key={sid + step} style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, color: sc.color }}>RADIO · {sc.role.toUpperCase()}</div>
+        <H size={28} style={{ marginTop: 4 }}>{sc.title}</H>
+        <div style={{ fontSize: 19, lineHeight: 1.45, margin: "12px 0 16px", fontWeight: 500 }}>{st.text}</div>
+        <div style={{ display: "grid", gap: 8 }}>
+          {opts.map((o, i) => <OptionBtn key={i} idx={i} label={o.t} disabled={pick !== null}
+            onClick={() => choose(i)} state={pick === null ? null : pick === i ? (o.ok ? "right" : "wrong") : null} />)}
+        </div>
+        {pick !== null && !failed && (
+          <Verdict ok why={st.why} r={st.ref}>
+            <div style={{ marginTop: 12 }}><Btn onClick={advance}>{step + 1 < sc.steps.length ? "Next decision →" : "Debrief"}</Btn></div>
+          </Verdict>
+        )}
+        {failed && (
+          <div style={{ marginTop: 14, borderRadius: 14, padding: 18, background: "#1a0b0b", animation: "sirenFlash .8s ease-in-out 3" }}>
+            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+              <div style={{ color: C.red, animation: "sirenSpin .3s ease-in-out 5" }}><Icon name="siren" size={48} /></div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, color: C.red }}>FAULT · SIMULATED</div>
+                <div style={{ fontSize: 17, marginTop: 4, lineHeight: 1.45 }}>{opts[pick].fail || "That call ignored the evidence."}</div>
+                <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(255,255,255,.04)", borderRadius: 10, fontSize: 15 }}>
+                  <b style={{ color: C.yellow }}>The rule:</b> {st.why} <Ref r={st.ref} />
+                </div>
+                <div style={{ marginTop: 12 }}><Btn color={C.red} onClick={retry}>Rewind — make the call again</Btn></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/* =====================================================================
+   4) SAFETY VAULT — cloze SRS (1 / 3 / 7 days)
+   ===================================================================== */
+function Vault({ s, setS, award }) {
+  const now = Date.now();
+  const due = CARDS.filter(c => { const v = s.vault[c.id]; return !v || v.due <= now; });
+  const mastered = CARDS.filter(c => s.vault[c.id] && s.vault[c.id].lvl >= 3).length;
+  const [queue, setQueue] = useState(null);
+  const [mode, setMode] = useState("due");
+  const [i, setI] = useState(0);
+  const [val, setVal] = useState("");
+  const [state, setState] = useState("ask"); 
+  const [hint, setHint] = useState(false);
+  const [missed, setMissed] = useState({});
+  const [tally, setTally] = useState({ right: 0, total: 0 });
+  const inputRef = useRef(null);
+
+  const start = m => {
+    const pool = m === "due" ? shuffle(due).slice(0, 8) : shuffle(CARDS).slice(0, 8);
+    setMode(m); setQueue(pool); setI(0); setVal(""); setState("ask"); setHint(false); setMissed({}); setTally({ right: 0, total: 0 });
+  };
+  const card = queue && queue[i];
+  useEffect(() => { if (card && inputRef.current) inputRef.current.focus(); }, [i, queue, state]);
+
+  const schedule = (id, ok) => {
+    if (mode !== "due") return;
+    setS(p => {
+      const v = p.vault[id] || { lvl: 0 };
+      const lvl = ok ? Math.min(3, v.lvl + 1) : 1;
+      return { ...p, vault: { ...p.vault, [id]: { lvl, due: Date.now() + INTERVALS[lvl] * DAY } } };
+    });
+  };
+
+  const submit = () => {
+    if (!card || !val.trim()) return;
+    const ok = card.ans.map(norm).includes(norm(val));
+    if (ok) {
+      const first = !missed[card.id];
+      setState("right");
+      award(true, first ? (mode === "due" ? 10 : 5) : 3);
+      if (first) { schedule(card.id, true); setTally(t => ({ right: t.right + 1, total: t.total + 1 })); }
+    } else {
+      setState("wrong"); setHint(true);
+      if (!missed[card.id]) {
+        setMissed(m => ({ ...m, [card.id]: true }));
+        schedule(card.id, false);
+        setTally(t => ({ ...t, total: t.total + 1 }));
+        setQueue(q => [...q, card]); 
+      }
+    }
+  };
+  const reveal = () => {
+    setState("reveal");
+    if (!missed[card.id]) {
+      setMissed(m => ({ ...m, [card.id]: true }));
+      schedule(card.id, false);
+      setTally(t => ({ ...t, total: t.total + 1 }));
+      setQueue(q => [...q, card]);
+    }
+  };
+  const next = () => { setI(i + 1); setVal(""); setState("ask"); setHint(false); };
+
+  const lvlCounts = [0, 1, 2, 3].map(l => CARDS.filter(c => ((s.vault[c.id] && s.vault[c.id].lvl) || 0) === l).length);
+  const nextDue = CARDS.map(c => s.vault[c.id]).filter(Boolean).map(v => v.due).filter(d => d > now).sort((a, b) => a - b)[0];
+
+  if (!queue || i >= queue.length) {
+    const finished = queue && i >= queue.length;
+    return (
+      <div style={{ display: "grid", gap: 16 }}>
+        <div>
+          <H size={34}>Fundamentals Vault</H>
+          <div style={{ color: C.mute, marginTop: 4 }}>Fill-in-the-blank from your reference material. Right = next review in 1 → 3 → 7 days.</div>
+        </div>
+        {finished && <Panel accent={C.green}>
+          <H size={24} color={C.green}>Vault session closed</H>
+          <div style={{ marginTop: 6, fontSize: 17 }}>{tally.right} / {tally.total} on first try{mode !== "due" ? " (practice — schedule unchanged)" : ""}.</div>
+        </Panel>}
+        <Panel accent={C.yellow}>
+          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+            <Stat label="Due now" v={due.length} c={C.yellow} />
+            <Stat label="Mastered (7-day)" v={mastered} c={C.green} />
+            <Stat label="Total cards" v={CARDS.length} c={C.blue} />
+          </div>
+          <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", marginTop: 16, background: "#222a33" }}>
+            {[["#3a4450", "New"], [C.orange, "1-day"], [C.yellow, "3-day"], [C.green, "7-day"]].map(([col], l) => lvlCounts[l] > 0 && <div key={l} style={{ width: `${lvlCounts[l] / CARDS.length * 100}%`, background: col, transition: "width .4s" }} />)}
+          </div>
+          <div style={{ display: "flex", gap: 14, marginTop: 8, fontSize: 13, color: C.mute, flexWrap: "wrap" }}>
+            {[["#3a4450", "New"], [C.orange, "1-day"], [C.yellow, "3-day"], [C.green, "7-day"]].map(([col, lab], l) => <span key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 10, height: 10, borderRadius: 3, background: col }} />{lab}: {lvlCounts[l]}</span>)}
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap", alignItems: "center" }}>
+            <Btn big disabled={!due.length} onClick={() => start("due")}>{due.length ? `Open vault (${Math.min(8, due.length)} cards)` : "Nothing due"}</Btn>
+            <Btn ghost onClick={() => start("practice")}>Practice 8 random</Btn>
+            {!due.length && nextDue && <span style={{ color: C.mute, fontSize: 14 }}>Next card due {new Date(nextDue).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>}
+          </div>
+        </Panel>
+      </div>
+    );
+  }
+
+  const correctShow = state === "right" || state === "reveal";
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <H size={30}>Fundamentals Vault</H>
+        <span style={{ color: C.mute, fontWeight: 600 }}>{i + 1} / {queue.length}{mode !== "due" ? " · practice" : ""}</span>
+      </div>
+      <div style={{ height: 6, background: "#222a33", borderRadius: 4, overflow: "hidden" }}><div style={{ width: `${i / queue.length * 100}%`, height: "100%", background: C.yellow, transition: "width .3s" }} /></div>
+      <Panel accent={state === "right" ? C.green : state === "wrong" ? C.orange : C.yellow} key={card.id + i}>
+        <Chip color={C.blue}>{card.topic}</Chip>
+        <div style={{ fontSize: 24, lineHeight: 1.6, fontWeight: 600, marginTop: 8 }}>
+          {card.pre}{" "}
+          {correctShow
+            ? <span style={{ color: state === "right" ? C.green : C.yellow, borderBottom: `3px solid ${state === "right" ? C.green : C.yellow}`, padding: "0 4px", animation: "shieldPop .35s", display: "inline-block" }}>{card.show}</span>
+            : <input ref={inputRef} value={val} onChange={e => { setVal(e.target.value); if (state === "wrong") setState("ask"); }} onKeyDown={e => { if (e.key === "Enter") submit(); }}
+                placeholder="_____" aria-label="Answer"
+                style={{ width: Math.max(110, Math.min(260, (val.length + 3) * 15)), background: "#0f1318", border: "none", borderBottom: `3px solid ${state === "wrong" ? C.orange : C.yellow}`, color: C.text, fontSize: 22, fontWeight: 700, padding: "2px 6px", outline: "none", animation: state === "wrong" ? "shake .35s" : "none" }} />}
+          {" "}{card.post}
+        </div>
+
+        {hint && !correctShow && (
+          <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 10, background: `${C.orange}14`, border: `1px solid ${C.orange}66`, display: "flex", gap: 10 }}>
+            <span style={{ color: C.orange }}><Icon name="bulb" /></span>
+            <div style={{ fontSize: 15, lineHeight: 1.45 }}>{state === "wrong" && <b style={{ color: C.orange }}>Not quite. </b>}{card.hint} <Ref r={card.ref} /></div>
+          </div>
+        )}
+        {state === "right" && <Verdict ok why={card.hint} r={card.ref} />}
+        {state === "reveal" && <div style={{ marginTop: 14, color: C.mute, fontSize: 15 }}>{card.hint} <Ref r={card.ref} /> — it'll come back at the end of this session.</div>}
+
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+          {!correctShow && <>
+            <Btn onClick={submit} disabled={!val.trim()}>Check</Btn>
+            {!hint && <Btn ghost color={C.orange} onClick={() => setHint(true)}>Hint</Btn>}
+            {(hint || state === "wrong") && <Btn ghost color={C.mute} onClick={reveal}>Show answer</Btn>}
+          </>}
+          {correctShow && <Btn onClick={next}>Next →</Btn>}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+/* =====================================================================
+   5) BOSS FIGHT — 60-second Quick Memory blitz
+   ===================================================================== */
+function Boss({ s, setS, award }) {
+  const [phase, setPhase] = useState("intro");
+  const [deck, setDeck] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [time, setTime] = useState(60);
+  const [score, setScore] = useState(0);
+  const [wrong, setWrong] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [flash, setFlash] = useState(null);
+  const [misses, setMisses] = useState([]);
+  const [result, setResult] = useState(null);
+  const [initials, setInitials] = useState("YOU");
+  const endRef = useRef(false);
+
+  const makeQ = q => ({ ...q, opts: shuffle([q.a, ...q.d.slice(0, 3)]) });
+  const start = () => {
+    setDeck(shuffle(BOSS).map(makeQ)); setIdx(0); setTime(60); setScore(0); setWrong(0); setCombo(0); setMisses([]); setFlash(null); setResult(null);
+    endRef.current = false; setPhase("play");
+  };
+
+  useEffect(() => {
+    if (phase !== "play") return;
+    const t = setInterval(() => setTime(x => x - 1), 1000);
+    return () => clearInterval(t);
+  }, [phase]);
+  useEffect(() => { if (phase === "play" && time <= 10 && time > 0) SFX.tick(); }, [time]);
+  useEffect(() => {
+    if (phase === "play" && time <= 0 && !endRef.current) {
+      endRef.current = true;
+      const acc = score + wrong ? score / (score + wrong) : 0;
+      const cert = score >= 12 && acc >= 0.85;
+      const newCert = cert && !s.certified;
+      setResult({ score, wrong, acc, cert, newCert });
+      setS(p => ({ ...p, bossBest: Math.max(p.bossBest || 0, score), certified: p.certified || cert }));
+      if (newCert) award(true, 100);
+      setPhase("over");
+    }
+  }, [time, phase]);
+
+  const q = deck[idx % Math.max(1, deck.length)];
+  const answer = opt => {
+    if (phase !== "play" || !q) return;
+    const ok = opt === q.a;
+    award(ok, ok ? 5 + Math.min(combo, 5) : 0);
+    if (ok) { setScore(x => x + 1); setCombo(c => c + 1); }
+    else { setWrong(x => x + 1); setCombo(0); setTime(t => Math.max(0, t - 3)); setMisses(m => [...m, q]); }
+    setFlash({ ok, k: Date.now() });
+    const ni = idx + 1;
+    if (ni % deck.length === 0) setDeck(shuffle(BOSS).map(makeQ));
+    setIdx(ni);
+  };
+  useKeys(e => { if (phase === "play" && q) { const n = parseInt(e.key, 10); if (n >= 1 && n <= 4) answer(q.opts[n - 1]); } }, [phase, q, idx, combo]);
+
+  const saveScore = () => {
+    setS(p => ({ ...p, board: [...(p.board || []), { n: (initials || "YOU").toUpperCase().slice(0, 3), sc: result.score, acc: Math.round(result.acc * 100), d: Date.now() }].sort((a, b) => b.sc - a.sc || b.acc - a.acc).slice(0, 5) }));
+    setResult(r => ({ ...r, saved: true }));
+  };
+
+  const Board = () => (
+    <div style={{ marginTop: 6 }}>
+      <H size={20} color={C.mute}>Local leaderboard</H>
+      {(s.board || []).length === 0 ? <div style={{ color: C.dim, marginTop: 6 }}>No runs saved yet.</div> :
+        <div style={{ display: "grid", gap: 6, marginTop: 8 }}>{s.board.map((b, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: C.panel2, borderRadius: 10, padding: "8px 12px" }}>
+            <span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 20, width: 24, color: i === 0 ? C.yellow : C.mute }}>{i + 1}</span>
+            <span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 20, letterSpacing: 2, flex: 1 }}>{b.n}</span>
+            <span style={{ color: C.mute, fontSize: 13 }}>{b.acc}% · {new Date(b.d).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+            <span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 22, color: C.yellow, width: 36, textAlign: "right" }}>{b.sc}</span>
+          </div>))}</div>}
+    </div>
+  );
+
+  const Badge = ({ big }) => (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: big ? "12px 18px" : "8px 12px", borderRadius: 12, background: stripe(C.yellow, "#1a1a1a"), animation: big ? "levelUp .7s" : "none" }}>
+      <div style={{ background: "#111", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, color: C.yellow }}>
+        <Icon name="shield" size={big ? 30 : 20} /><span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: big ? 24 : 16, letterSpacing: 2 }}>I&C BASICS CERTIFIED</span>
+      </div>
+    </div>
+  );
+
+  if (phase === "intro") return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <H size={34}>Boss Fight: Rapid Fire</H>
+      <Panel accent={C.red}>
+        <div style={{ fontSize: 17, lineHeight: 1.5 }}>60 seconds. Answer as many concepts as you can. Wrong answers cost <b style={{ color: C.red }}>3 seconds</b>. Combos add XP.</div>
+        <div style={{ color: C.mute, marginTop: 8 }}>Certification: <b style={{ color: C.text }}>12+ correct</b> at <b style={{ color: C.text }}>85%+ accuracy</b>. Keys 1–4.</div>
+        {s.certified && <div style={{ marginTop: 14 }}><Badge /></div>}
+        <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 16 }}>
+          <Btn big color={C.red} onClick={start}>Start the clock</Btn>
+          <span style={{ color: C.mute }}>Best: <b style={{ color: C.yellow }}>{s.bossBest || 0}</b></span>
+        </div>
+      </Panel>
+      <Panel><Board /></Panel>
+    </div>
+  );
+
+  if (phase === "over") return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <H size={34}>Time</H>
+      <Panel accent={result.cert ? C.green : C.orange}>
+        {result.cert && <div style={{ marginBottom: 16 }}><Badge big /></div>}
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <Stat label="Correct" v={result.score} c={C.green} />
+          <Stat label="Wrong" v={result.wrong} c={C.red} />
+          <Stat label="Accuracy" v={`${Math.round(result.acc * 100)}%`} c={C.blue} />
+        </div>
+        {!result.cert && <div style={{ marginTop: 12, color: C.mute }}>Certification needs 12+ correct at 85%+. {result.score < 12 ? `${12 - result.score} more correct.` : "Tighten accuracy."}</div>}
+        {result.newCert && <div style={{ marginTop: 10, color: C.green, fontWeight: 700 }}>Badge unlocked. +100 XP.</div>}
+        {!result.saved ? (
+          <div style={{ display: "flex", gap: 10, marginTop: 16, alignItems: "center", flexWrap: "wrap" }}>
+            <input value={initials} maxLength={3} onChange={e => setInitials(e.target.value.toUpperCase())} aria-label="Initials"
+              style={{ width: 80, background: "#0f1318", border: `2px solid ${C.line}`, borderRadius: 8, color: C.text, fontFamily: HEAD, fontSize: 22, fontWeight: 800, letterSpacing: 3, textAlign: "center", padding: 6 }} />
+            <Btn onClick={saveScore}>Save to board</Btn>
+            <Btn ghost color={C.red} onClick={start}>Rematch</Btn>
+          </div>
+        ) : <div style={{ marginTop: 16 }}><Btn color={C.red} onClick={start}>Rematch</Btn></div>}
+        {misses.length > 0 && <div style={{ marginTop: 18 }}>
+          <H size={20} color={C.mute}>Review your misses</H>
+          <div style={{ display: "grid", gap: 6, marginTop: 8 }}>{[...new Map(misses.map(m => [m.q, m])).values()].map((m, i) => (
+            <div key={i} style={{ background: C.panel2, borderRadius: 10, padding: "8px 12px", fontSize: 15 }}><b>{m.q.replace(" = ?", "").replace(" ?", "")}</b> → <span style={{ color: C.green }}>{m.a}</span></div>))}</div>
+        </div>}
+      </Panel>
+      <Panel><Board /></Panel>
+    </div>
+  );
+
+  const pct = Math.max(0, time) / 60;
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: time <= 10 ? C.red : C.yellow, animation: time <= 10 ? "tick 1s infinite" : "none" }}>
+          <Icon name="clock" size={28} /><span style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 40 }}>{Math.max(0, time)}</span>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 32, color: C.green }}>{score}</div>
+          {combo >= 3 && <div style={{ fontFamily: HEAD, fontWeight: 800, color: C.orange, animation: "tick .4s" }} key={combo}>COMBO x{combo}</div>}
+        </div>
+      </div>
+      <div style={{ height: 10, background: "#222a33", borderRadius: 6, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${pct * 100}%`, background: time <= 10 ? C.red : C.yellow, transition: "width 1s linear" }} />
+      </div>
+      <Panel accent={C.red} style={{ position: "relative", animation: flash && !flash.ok ? "shake .35s" : "none" }} key={flash ? flash.k : "p"}>
+        {flash && <div style={{ position: "absolute", top: 12, right: 14, color: flash.ok ? C.green : C.red, fontFamily: HEAD, fontWeight: 800, fontSize: 18, animation: "floatUp .8s forwards" }}>{flash.ok ? "+1" : "−3s"}</div>}
+        <H size={38} style={{ textAlign: "center", margin: "10px 0 18px", textTransform: "none" }}>{q.q}</H>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+          {q.opts.map((o, i) => <OptionBtn key={o + idx} idx={i} label={o} onClick={() => answer(o)} />)}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+/* =====================================================================
+   QUICK SHEET MODAL
+   ===================================================================== */
+function QuickSheet({ onClose }) {
+  useKeys(e => { if (e.key === "Escape") onClose(); }, [onClose]);
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "grid", placeItems: "center", padding: 16 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: C.panel, borderRadius: 16, border: `1px solid ${C.line}`, maxWidth: 720, width: "100%", maxHeight: "86vh", overflow: "auto", animation: "fadeIn .2s" }}>
+        <div style={{ height: 10, background: stripe(), borderRadius: "16px 16px 0 0" }} />
+        <div style={{ padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <H size={28}>Quick Memory Sheet</H>
+            <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: C.mute, cursor: "pointer" }}><Icon name="x" size={26} /></button>
+          </div>
+          <div style={{ display: "grid", gap: 6, marginTop: 14 }}>
+            {QUICK.map((r, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(120px, 38%) 1fr auto", gap: 10, alignItems: "baseline", background: i % 2 ? "transparent" : C.panel2, borderRadius: 8, padding: "8px 10px" }}>
+                <b style={{ fontSize: 14 }}>{r.topic}</b><span style={{ fontSize: 14, color: C.text }}>{r.rule}</span><Ref r={r.ref} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================================
+   APP SHELL
+   ===================================================================== */
+const TABS = [
+  { id: "map", label: "Control Loop Map", icon: "map" },
+  { id: "panic", label: "Signal Panic", icon: "bolt" },
+  { id: "sim", label: "Simulator", icon: "tree" },
+  { id: "vault", label: "Fundamentals Vault", icon: "vault" },
+  { id: "boss", label: "Boss Fight", icon: "boss" },
+];
+
+function ScoreRing({ v, size = 54 }) {
+  const r = size / 2 - 5, c = 2 * Math.PI * r;
+  const col = v >= 80 ? C.green : v >= 40 ? C.yellow : C.orange;
+  return (
+    <div style={{ position: "relative", width: size, height: size }} title="Knowledge Score">
+      <svg width={size} height={size}><circle cx={size / 2} cy={size / 2} r={r} stroke="#2a323d" strokeWidth="5" fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke={col} strokeWidth="5" fill="none" strokeDasharray={c} strokeDashoffset={c * (1 - v / 100)} strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset .6s" }} /></svg>
+      <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontFamily: HEAD, fontWeight: 800, fontSize: size * 0.34, color: col }}>{v}</div>
+    </div>
+  );
+}
+
+function App() {
+  const [s, setS] = useState(() => ({ ...DEFAULT, ...load() }));
+  const [tab, setTab] = useState(s.tab || "map");
+  const [lvlUp, setLvlUp] = useState(null);
+  const [pops, setPops] = useState([]);
+  const [sheet, setSheet] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const wide = useWide();
+  const mutedRef = useRef(s.muted);
+  mutedRef.current = s.muted;
+
+  useEffect(() => { save({ ...s, tab }); }, [s, tab]);
+
+  const award = useCallback((ok, xp = 0) => {
+    if (!mutedRef.current) (ok ? SFX.good : SFX.bad)();
+    setS(p => {
+      const nx = p.xp + (ok ? xp : 0);
+      const before = levelOf(p.xp), after = levelOf(nx);
+      if (after > before) setTimeout(() => { setLvlUp(after); if (!mutedRef.current) SFX.level(); }, 250);
+      const streak = ok ? p.streak + 1 : 0;
+      return { ...p, xp: nx, streak, bestStreak: Math.max(p.bestStreak, streak), answered: p.answered + 1, correct: p.correct + (ok ? 1 : 0) };
+    });
+    if (ok && xp > 0) { const k = Math.random(); setPops(ps => [...ps, { k, xp }]); setTimeout(() => setPops(ps => ps.filter(x => x.k !== k)), 900); }
+  }, []);
+
+  useEffect(() => { if (lvlUp) { const t = setTimeout(() => setLvlUp(null), 2200); return () => clearTimeout(t); } }, [lvlUp]);
+
+  const lvl = levelOf(s.xp), lo = levelFloor(lvl), hi = levelFloor(lvl + 1);
+  const score = safetyScore(s);
+  const props = { s, setS, award };
+
+  const nav = (
+    <nav style={wide
+      ? { display: "grid", gap: 6, alignContent: "start" }
+      : { position: "fixed", bottom: 0, left: 0, right: 0, display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: "#0f1318", borderTop: `1px solid ${C.line}`, zIndex: 20, paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {TABS.map(t => {
+        const on = tab === t.id;
+        return (
+          <button key={t.id} onClick={() => setTab(t.id)} style={wide
+            ? { display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, border: "none", cursor: "pointer", background: on ? `${C.yellow}1c` : "transparent", color: on ? C.yellow : C.mute, fontFamily: HEAD, fontWeight: 700, fontSize: 19, letterSpacing: 0.5, textTransform: "uppercase", borderLeft: `4px solid ${on ? C.yellow : "transparent"}`, textAlign: "left" }
+            : { display: "grid", justifyItems: "center", gap: 3, padding: "9px 2px 8px", border: "none", cursor: "pointer", background: "transparent", color: on ? C.yellow : C.mute, fontSize: 11, fontWeight: 600, borderTop: `3px solid ${on ? C.yellow : "transparent"}` }}>
+            <Icon name={t.icon} size={wide ? 22 : 22} />{t.label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+
+  const hud = (
+    <div style={{ display: "flex", alignItems: "center", gap: wide ? 18 : 10, flexWrap: "wrap" }}>
+      <div style={{ minWidth: wide ? 220 : 130, flex: wide ? "none" : 1 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: C.mute }}>
+          <span><span style={{ color: C.yellow, fontFamily: HEAD, fontSize: 16 }}>LVL {lvl}</span> · {titleOf(lvl)}</span>
+          {wide && <span>{s.xp} XP</span>}
+        </div>
+        <div style={{ height: 8, borderRadius: 5, background: "#222a33", marginTop: 5, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(s.xp - lo) / (hi - lo) * 100}%`, background: `linear-gradient(90deg, ${C.orange}, ${C.yellow})`, transition: "width .5s" }} />
+        </div>
+      </div>
+      <div title="Answer streak" style={{ display: "flex", alignItems: "center", gap: 4, color: s.streak >= 3 ? C.orange : C.mute, fontFamily: HEAD, fontWeight: 800, fontSize: 20 }}>
+        <Icon name="flame" size={20} />{s.streak}
+      </div>
+      <ScoreRing v={score} size={wide ? 54 : 42} />
+      <button onClick={() => setSheet(true)} title="Quick Memory Sheet" style={{ background: C.panel2, border: `1px solid ${C.line}`, borderRadius: 9, color: C.text, padding: 8, cursor: "pointer" }}><Icon name="book" /></button>
+      <button onClick={() => setS(p => ({ ...p, muted: !p.muted }))} title={s.muted ? "Unmute" : "Mute"} style={{ background: C.panel2, border: `1px solid ${C.line}`, borderRadius: 9, color: C.text, padding: 8, cursor: "pointer" }}><Icon name={s.muted ? "mute" : "sound"} /></button>
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg }}>
+      <div style={{ height: 8, background: stripe(), animation: "stripes 3s linear infinite" }} />
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: wide ? "14px 24px" : "10px 14px", borderBottom: `1px solid ${C.line}`, background: "#0f1318", flexWrap: "wrap", position: "sticky", top: 0, zIndex: 15 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 38, height: 38, borderRadius: 9, background: C.yellow, color: "#111", display: "grid", placeItems: "center" }}><Icon name="bolt" size={24} stroke={2.4} /></div>
+          <div>
+            <div style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 22, letterSpacing: 1, lineHeight: 1 }}>I&C FUNDAMENTALS SIM</div>
+            <div style={{ fontSize: 11, color: C.mute, fontWeight: 600, letterSpacing: 1.5 }}>E&I LEARNING ENGINE</div>
+          </div>
+        </div>
+        {hud}
+      </header>
+
+      <div style={{ display: "grid", gridTemplateColumns: wide ? "230px 1fr" : "1fr", maxWidth: 1240, margin: "0 auto" }}>
+        {wide && (
+          <aside style={{ padding: "20px 14px", borderRight: `1px solid ${C.line}`, minHeight: "calc(100vh - 80px)", display: "flex", flexDirection: "column", gap: 18 }}>
+            {nav}
+            <div style={{ background: C.panel, borderRadius: 12, padding: 14, border: `1px solid ${C.line}`, fontSize: 13, color: C.mute, display: "grid", gap: 6 }}>
+              <div style={{ fontFamily: HEAD, fontSize: 16, fontWeight: 800, color: C.text, letterSpacing: 1 }}>KNOWLEDGE SCORE {score}</div>
+              <div>Vault mastery, zones cleared, scenarios, and boss best all feed it.</div>
+              <div>Accuracy: <b style={{ color: C.text }}>{s.answered ? Math.round(s.correct / s.answered * 100) : 0}%</b> · Best streak: <b style={{ color: C.text }}>{s.bestStreak}</b></div>
+              {s.certified && <div style={{ color: C.green, fontWeight: 700 }}>Certified on Boss Fight</div>}
+            </div>
+            <div style={{ marginTop: "auto" }}>
+              {!confirmReset ? <button onClick={() => setConfirmReset(true)} style={{ background: "none", border: "none", color: C.dim, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}><Icon name="reset" size={16} />Reset progress</button>
+                : <div style={{ fontSize: 13, color: C.mute }}>Wipe all progress? <button onClick={() => { setS({ ...DEFAULT }); setConfirmReset(false); }} style={{ background: C.red, color: "#111", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontWeight: 700 }}>Yes</button> <button onClick={() => setConfirmReset(false)} style={{ background: "none", color: C.mute, border: `1px solid ${C.line}`, borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}>No</button></div>}
+            </div>
+          </aside>
+        )}
+        <main style={{ padding: wide ? "24px 28px 48px" : "16px 16px 96px", minWidth: 0 }}>
+          {tab === "map" && <PlantMap {...props} />}
+          {tab === "panic" && <PermitPanic {...props} />}
+          {tab === "sim" && <Simulator {...props} />}
+          {tab === "vault" && <Vault {...props} />}
+          {tab === "boss" && <Boss {...props} />}
+          <div style={{ marginTop: 28, fontSize: 12, color: C.dim, lineHeight: 1.5 }}>
+            Built from E&I fundamentals and troubleshooting patterns. 
+            {!wide && <> · <button onClick={() => { if (confirmReset) { setS({ ...DEFAULT }); setConfirmReset(false); } else setConfirmReset(true); }} style={{ background: "none", border: "none", color: confirmReset ? C.red : C.dim, textDecoration: "underline", cursor: "pointer", fontSize: 12, padding: 0 }}>{confirmReset ? "Tap again to wipe progress" : "Reset progress"}</button></>}
+          </div>
+        </main>
+      </div>
+      {!wide && nav}
+
+      {pops.map(p => <div key={p.k} style={{ position: "fixed", right: wide ? 60 : 20, top: wide ? 100 : 120, zIndex: 40, fontFamily: HEAD, fontWeight: 800, fontSize: 24, color: C.yellow, animation: "floatUp .9s ease-out forwards", pointerEvents: "none", textShadow: "0 2px 10px rgba(0,0,0,.6)" }}>+{p.xp} XP</div>)}
+
+      {lvlUp && (
+        <div onClick={() => setLvlUp(null)} style={{ position: "fixed", inset: 0, zIndex: 60, display: "grid", placeItems: "center", background: "rgba(0,0,0,.6)", cursor: "pointer" }}>
+          <div style={{ textAlign: "center", animation: "levelUp .7s ease" }}>
+            <div style={{ height: 14, background: stripe(), animation: "stripes .8s linear infinite", borderRadius: 4 }} />
+            <div style={{ background: "#111", padding: "22px 40px", border: `3px solid ${C.yellow}` }}>
+              <div style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 22, color: C.mute, letterSpacing: 4 }}>LEVEL UP</div>
+              <div style={{ fontFamily: HEAD, fontWeight: 800, fontSize: 84, color: C.yellow, lineHeight: 1 }}>{lvlUp}</div>
+              <div style={{ fontFamily: HEAD, fontWeight: 700, fontSize: 26, color: C.text, letterSpacing: 1 }}>{titleOf(lvlUp).toUpperCase()}</div>
+            </div>
+            <div style={{ height: 14, background: stripe(), animation: "stripes .8s linear infinite", borderRadius: 4 }} />
+          </div>
+        </div>
+      )}
+      {sheet && <QuickSheet onClose={() => setSheet(false)} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
